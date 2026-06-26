@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ecuación de la Recta · y = mx + b</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg-0:#05060f;
+  --bg-1:#0a0e27;
+  --cyan:#00f0ff;
+  --magenta:#ff2bd6;
+  --violet:#7b5cff;
+  --lime:#9dff5b;
+  --gold:#ffd24a;
+  --orange:#ff8c42;
+  --pink:#ff6eb4;
+  --txt:#dfe9ff;
+  --muted:#7a8bb5;
+  --card:rgba(15,22,55,0.55);
+  --border:rgba(0,240,255,0.25);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:'Rajdhani',sans-serif;
+  color:var(--txt);
+  background:var(--bg-0);
+  overflow-x:hidden;
+  min-height:100vh;
+}
+.bg-grid{
+  position:fixed;inset:0;z-index:-3;
+  background:
+    radial-gradient(ellipse at 15% 15%, rgba(255,43,214,0.22), transparent 50%),
+    radial-gradient(ellipse at 85% 85%, rgba(0,240,255,0.18), transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(123,92,255,0.12), transparent 60%),
+    linear-gradient(180deg,var(--bg-0),var(--bg-1));
+}
+.bg-grid::before{
+  content:"";position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(0,240,255,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,240,255,0.05) 1px, transparent 1px);
+  background-size:48px 48px;
+  mask-image:radial-gradient(ellipse at center, black 30%, transparent 80%);
+  animation:gridMove 30s linear infinite;
+}
+@keyframes gridMove{0%{background-position:0 0,0 0}100%{background-position:480px 480px,480px 480px}}
+.scanline{position:fixed;inset:0;z-index:-2;pointer-events:none;background:repeating-linear-gradient(transparent 0 3px,rgba(0,240,255,0.02) 3px 4px);mix-blend-mode:overlay}
+.particles{position:fixed;inset:0;z-index:-2;pointer-events:none}
+.particle{position:absolute;width:3px;height:3px;border-radius:50%;animation:floatUp linear infinite;opacity:0.5}
+@keyframes floatUp{0%{transform:translateY(110vh) scale(0);opacity:0}10%{opacity:.7}90%{opacity:.5}100%{transform:translateY(-10vh) scale(1.4);opacity:0}}
+
+/* HEADER */
+header{
+  padding:22px 40px 16px;display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--border);
+  background:linear-gradient(180deg,rgba(5,6,15,.7),transparent);
+  backdrop-filter:blur(8px);position:relative;z-index:5;flex-wrap:wrap;gap:12px;
+}
+.brand{display:flex;align-items:center;gap:16px}
+.logo{
+  font-family:'Orbitron',sans-serif;font-weight:900;font-size:28px;
+  background:linear-gradient(135deg,var(--cyan),var(--magenta));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  letter-spacing:4px;padding:5px 14px;border:2px solid var(--cyan);border-radius:6px;
+  box-shadow:0 0 20px rgba(0,240,255,.3),inset 0 0 20px rgba(0,240,255,.08);
+}
+.brand-text h1{font-family:'Orbitron',sans-serif;font-weight:700;font-size:16px;color:var(--txt);letter-spacing:2px}
+.brand-text p{color:var(--muted);font-size:12px;letter-spacing:1px;text-transform:uppercase}
+.hud{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.hud-chip{padding:7px 14px;border-radius:8px;background:var(--card);border:1px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:12px;display:flex;align-items:center;gap:7px;backdrop-filter:blur(10px)}
+.hud-chip .lbl{color:var(--muted);text-transform:uppercase;font-size:10px}
+.hud-chip .val{color:var(--cyan);font-weight:600}
+.hud-chip.gld .val{color:var(--gold)}
+.hud-chip.mgn .val{color:var(--magenta)}
+
+/* LAYOUT */
+main{
+  padding:24px 40px 60px;
+  display:grid;
+  grid-template-columns:350px 1fr;
+  gap:22px;
+  max-width:1400px;margin:0 auto;
+}
+@media(max-width:1000px){main{grid-template-columns:1fr}header{flex-direction:column}}
+
+.panel{
+  background:var(--card);border:1px solid var(--border);border-radius:14px;
+  padding:20px;backdrop-filter:blur(14px);
+  box-shadow:0 8px 40px rgba(0,0,0,.5),inset 0 0 30px rgba(0,240,255,.03);
+  position:relative;overflow:hidden;
+}
+.panel::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--magenta),var(--cyan),transparent);opacity:.7}
+.panel h2{font-family:'Orbitron',sans-serif;font-size:13px;letter-spacing:2px;color:var(--cyan);text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.panel h2::before{content:"";width:5px;height:12px;background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
+
+/* FORMULA BOX */
+.formula-box{
+  background:rgba(0,0,0,.4);border:1px dashed var(--border);border-radius:10px;
+  padding:16px;text-align:center;margin-bottom:16px;
+}
+.formula-main{
+  font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:700;
+  background:linear-gradient(135deg,var(--gold),var(--orange));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  letter-spacing:3px;text-shadow:none;
+  filter:drop-shadow(0 0 10px rgba(255,210,74,.4));
+}
+.formula-sub{font-size:11px;color:var(--muted);margin-top:8px;letter-spacing:.5px;line-height:1.8}
+.formula-sub b{color:var(--cyan)}
+
+/* INPUTS */
+.field{margin-bottom:12px}
+.field label{display:block;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:5px;font-weight:600}
+.field .iw{position:relative;display:flex;align-items:center}
+.field input{
+  width:100%;padding:11px 50px 11px 14px;
+  background:rgba(0,0,0,.4);border:1px solid var(--border);border-radius:8px;
+  color:var(--txt);font-family:'JetBrains Mono',monospace;font-size:16px;outline:none;transition:all .3s;
+}
+.field input:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(0,240,255,.12),0 0 18px rgba(0,240,255,.2);background:rgba(0,240,255,.04)}
+.field .unit{position:absolute;right:12px;color:var(--muted);font-size:12px;font-family:'JetBrains Mono',monospace;pointer-events:none}
+.slider-row{display:flex;align-items:center;gap:10px;margin-top:6px}
+input[type=range]{flex:1;accent-color:var(--cyan);cursor:pointer;height:4px}
+.slider-val{font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--cyan);min-width:40px;text-align:right}
+
+/* BUTTONS */
+.btn-row{display:flex;gap:10px;margin-top:16px}
+.btn{flex:1;padding:12px;border:none;border-radius:8px;cursor:pointer;font-family:'Orbitron',sans-serif;font-weight:700;letter-spacing:1.5px;font-size:12px;text-transform:uppercase;transition:all .25s}
+.btn-primary{background:linear-gradient(135deg,var(--magenta),var(--violet));color:#fff;box-shadow:0 4px 20px rgba(255,43,214,.35)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 28px rgba(255,43,214,.55)}
+.btn-ghost{background:transparent;color:var(--cyan);border:1px solid var(--cyan)}
+.btn-ghost:hover{background:rgba(0,240,255,.1);transform:translateY(-2px)}
+
+/* RESULT */
+.result-card{
+  margin-top:14px;padding:16px;border-radius:10px;
+  background:linear-gradient(135deg,rgba(255,43,214,.08),rgba(123,92,255,.08));
+  border:1px solid var(--magenta);text-align:center;
+}
+.result-card .rlbl{font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase}
+.result-eq{
+  font-family:'JetBrains Mono',monospace;font-weight:700;font-size:22px;
+  background:linear-gradient(135deg,var(--pink),var(--gold));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  margin:8px 0;letter-spacing:2px;
+}
+.result-sub{font-size:12px;color:var(--muted);line-height:1.8}
+.result-sub b{color:var(--lime)}
+
+/* CHIPS RESULTADO */
+.res-chips{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;justify-content:center}
+.rchip{padding:5px 12px;border-radius:20px;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600}
+.rchip-m{background:rgba(255,110,180,.15);color:var(--pink);border:1px solid var(--pink)}
+.rchip-b{background:rgba(255,210,74,.12);color:var(--gold);border:1px solid var(--gold)}
+
+/* CANVAS TABLERO */
+#board-wrap{position:relative}
+canvas#board{
+  display:block;width:100%;border-radius:14px;
+  border:2px solid rgba(157,255,91,.3);
+  cursor:crosshair;
+  background:#0d1a0d;
+}
+
+/* FRACCIONES CSS puras */
+.frac-wrap{display:flex;align-items:center;justify-content:center;gap:6px;padding:4px 0;font-family:'JetBrains Mono',monospace;flex-wrap:wrap}
+.frac{display:inline-flex;flex-direction:column;align-items:center}
+.fn{padding-bottom:2px;border-bottom:2.5px solid currentColor;font-size:17px;font-weight:700;line-height:1.2;min-width:18px;text-align:center}
+.fd{padding-top:2px;font-size:17px;font-weight:700;line-height:1.2;min-width:18px;text-align:center}
+.feq{font-size:19px;font-weight:700;color:#fff}
+.placeholder{color:#4b5563;font-size:12px;text-align:center;padding:8px 0}
+
+/* TABLA */
+.table-wrap{margin-top:16px;background:rgba(0,0,0,.35);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.table-header{padding:10px 14px;display:flex;justify-content:space-between;align-items:center;background:rgba(157,255,91,.04);border-bottom:1px solid var(--border)}
+.table-header h3{font-family:'Orbitron',sans-serif;font-size:12px;letter-spacing:2px;color:var(--lime)}
+.icon-btn{background:transparent;border:1px solid var(--border);color:var(--muted);padding:4px 10px;border-radius:6px;cursor:pointer;font-size:11px;transition:all .2s;font-family:'JetBrains Mono',monospace}
+.icon-btn:hover{color:var(--magenta);border-color:var(--magenta)}
+table{width:100%;border-collapse:collapse;font-family:'JetBrains Mono',monospace;font-size:12px}
+thead th{background:rgba(157,255,91,.08);color:#9dff5b;padding:9px 10px;text-align:left;font-weight:600;letter-spacing:.8px;font-size:10px;text-transform:uppercase;border-bottom:1px solid rgba(157,255,91,.2)}
+tbody td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--txt)}
+tbody tr:hover{background:rgba(157,255,91,.04)}
+tbody tr.nr{animation:rowFade .5s ease}
+@keyframes rowFade{0%{background:rgba(157,255,91,.25);opacity:0}100%{background:transparent;opacity:1}}
+.empty-td{text-align:center;color:var(--muted);padding:20px;font-style:italic}
+
+/* INSIGHTS */
+.insights{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+@media(max-width:600px){.insights{grid-template-columns:repeat(2,1fr)}}
+.insight{padding:12px;border-radius:10px;background:rgba(0,0,0,.3);border:1px solid var(--border);text-align:center}
+.insight .ilbl{font-size:9px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase}
+.insight .ival{font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:600;margin-top:3px}
+.insight:nth-child(1) .ival{color:var(--pink)}
+.insight:nth-child(2) .ival{color:var(--gold)}
+.insight:nth-child(3) .ival{color:var(--lime)}
+.insight:nth-child(4) .ival{color:var(--cyan)}
+
+/* PANEL CALCULO */
+.calc-block{background:rgba(0,0,0,.3);border:1.5px solid rgba(157,255,91,.2);border-radius:10px;padding:12px;margin-top:12px}
+.calc-title{font-size:10px;color:var(--lime);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
+
+/* TOAST */
+.toast-stack{position:fixed;bottom:20px;right:20px;z-index:50;display:flex;flex-direction:column;gap:8px}
+.toast{background:linear-gradient(135deg,rgba(15,22,55,.96),rgba(10,5,25,.96));border:1px solid var(--lime);border-left:4px solid var(--lime);padding:10px 16px;border-radius:8px;min-width:220px;backdrop-filter:blur(10px);box-shadow:0 8px 30px rgba(0,0,0,.6),0 0 18px rgba(157,255,91,.15);animation:tIn .4s ease,tOut .4s ease 3.6s forwards;display:flex;align-items:center;gap:10px}
+.toast .ic{font-size:20px}
+.toast .tt{font-family:'Orbitron',sans-serif;font-size:12px;color:var(--lime);letter-spacing:1px}
+.toast .ts{font-size:11px;color:var(--muted)}
+@keyframes tIn{from{transform:translateX(120%);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes tOut{to{transform:translateX(120%);opacity:0}}
+
+footer{text-align:center;padding:18px;color:var(--muted);font-size:11px;letter-spacing:1.5px;border-top:1px solid var(--border)}
+footer b{color:var(--lime)}
+
+/* hint box */
+.hint-box{background:rgba(157,255,91,.06);border:1px dashed rgba(157,255,91,.3);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--muted);text-align:center;margin-top:12px;line-height:1.7}
+.hint-box b{color:var(--lime)}
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="scanline"></div>
+<div class="particles" id="particles"></div>
+
+<header>
+  <div class="brand">
+    <div class="logo">MATH</div>
+    <div class="brand-text">
+      <h1>ECUACIÓN DE LA RECTA</h1>
+      <p>Forma Pendiente-Intercepto · Laboratorio Interactivo</p>
+    </div>
+  </div>
+  <div class="hud">
+    <div class="hud-chip"><span class="lbl">Puntos</span><span class="val" id="hud-pts">0</span></div>
+    <div class="hud-chip gld"><span class="lbl">Rectas</span><span class="val" id="hud-lines">0</span></div>
+    <div class="hud-chip mgn"><span class="lbl">Racha</span><span class="val" id="hud-streak">🔥 0</span></div>
+  </div>
+</header>
+
+<main>
+  <!-- IZQUIERDA -->
+  <section class="panel">
+    <h2>Panel de Control</h2>
+
+    <div class="formula-box">
+      <div class="formula-main">y = mx + b</div>
+      <div class="formula-sub">
+        <b>m</b> = pendiente (inclinación de la recta)<br>
+        <b>b</b> = intercepto en y (donde cruza el eje y)<br>
+        <b>A(x₁,y₁)</b> y <b>B(x₂,y₂)</b> = dos puntos de la recta
+      </div>
+    </div>
+
+    <!-- Coordenadas manuales -->
+    <div class="field">
+      <label>Punto A — coordenada x₁</label>
+      <div class="iw"><input type="number" id="x1" value="1" step="1"><span class="unit">x₁</span></div>
+    </div>
+    <div class="field">
+      <label>Punto A — coordenada y₁</label>
+      <div class="iw"><input type="number" id="y1" value="2" step="1"><span class="unit">y₁</span></div>
+    </div>
+    <div class="field">
+      <label>Punto B — coordenada x₂</label>
+      <div class="iw"><input type="number" id="x2" value="4" step="1"><span class="unit">x₂</span></div>
+    </div>
+    <div class="field">
+      <label>Punto B — coordenada y₂</label>
+      <div class="iw"><input type="number" id="y2" value="8" step="1"><span class="unit">y₂</span></div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" id="btn-calc">⚡ Calcular</button>
+      <button class="btn btn-ghost"   id="btn-reset">⟲ Limpiar</button>
+    </div>
+
+    <!-- RESULTADO -->
+    <div class="result-card" id="res-card">
+      <div class="rlbl">Ecuación de la recta</div>
+      <div class="result-eq" id="res-eq">y = mx + b</div>
+      <div class="res-chips">
+        <span class="rchip rchip-m" id="chip-m">m = ?</span>
+        <span class="rchip rchip-b" id="chip-b">b = ?</span>
+      </div>
+      <div class="result-sub" style="margin-top:8px" id="res-sub">Ingresa dos puntos y pulsa ⚡ Calcular</div>
+    </div>
+
+    <!-- CALCULO PASO A PASO -->
+    <div class="calc-block">
+      <div class="calc-title">📐 Cálculo paso a paso</div>
+
+      <div style="margin-bottom:10px">
+        <div style="font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">Paso 1 · Pendiente m</div>
+        <div id="step1" class="placeholder">—</div>
+      </div>
+
+      <div>
+        <div style="font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">Paso 2 · Intercepto b</div>
+        <div id="step2" class="placeholder">—</div>
+      </div>
+    </div>
+
+    <div class="hint-box">
+      <b>💡 Tip:</b> También puedes hacer clic en el tablero para colocar los puntos.<br>
+      <b>Doble clic</b> para reiniciar el tablero.
+    </div>
+  </section>
+
+  <!-- DERECHA -->
+  <section class="panel">
+    <h2>Tablero Clásico · Plano Cartesiano</h2>
+
+    <div id="board-wrap">
+      <canvas id="board" width="560" height="480"></canvas>
+    </div>
+
+    <div class="insights">
+      <div class="insight"><div class="ilbl">Pendiente m</div><div class="ival" id="ins-m">—</div></div>
+      <div class="insight"><div class="ilbl">Intercepto b</div><div class="ival" id="ins-b">—</div></div>
+      <div class="insight"><div class="ilbl">Δy / Δx</div><div class="ival" id="ins-dy">—</div></div>
+      <div class="insight"><div class="ilbl">Ángulo θ</div><div class="ival" id="ins-ang">—</div></div>
+    </div>
+
+    <div class="table-wrap">
+      <div class="table-header">
+        <h3>📒 Historial de Rectas</h3>
+        <div>
+          <button class="icon-btn" id="btn-export">⬇ CSV</button>
+          <button class="icon-btn" id="btn-purge">🗑 Vaciar</button>
+        </div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>#</th><th>A(x₁,y₁)</th><th>B(x₂,y₂)</th>
+            <th>m (fracción)</th><th>b</th><th>Ecuación</th><th>θ</th>
+          </tr>
+        </thead>
+        <tbody id="tbody">
+          <tr><td class="empty-td" colspan="7">Sin rectas aún. ¡Coloca dos puntos y calcula!</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<footer><b>MATH LAB</b> · Ecuación de la Recta y = mx + b · Aprendizaje interactivo gamificado</footer>
+<div class="toast-stack" id="tstack"></div>
+
+<script>
+/* ===== PARTÍCULAS ===== */
+(function(){
+  const c=document.getElementById('particles');
+  const colors=['var(--cyan)','var(--magenta)','var(--lime)','var(--gold)'];
+  for(let i=0;i<35;i++){
+    const p=document.createElement('div');
+    p.className='particle';
+    p.style.left=Math.random()*100+'vw';
+    p.style.animationDuration=(8+Math.random()*14)+'s';
+    p.style.animationDelay=(-Math.random()*15)+'s';
+    const col=colors[Math.floor(Math.random()*colors.length)];
+    p.style.background=col;p.style.boxShadow='0 0 8px '+col;
+    c.appendChild(p);
+  }
+})();
+
+/* ===== ESTADO ===== */
+const state={pts:[],history:[],points:0,streak:0};
+
+/* ===== CANVAS ===== */
+const cv=document.getElementById('board');
+const ctx=cv.getContext('2d');
+const W=cv.width, H=cv.height;
+const CELLS=20, STEP=W/CELLS;
+const OX=W/2, OY=H/2;
+
+function toCv(gx,gy){return{px:OX+gx*STEP,py:OY-gy*STEP};}
+function toGrid(px,py){return{gx:Math.round((px-OX)/STEP),gy:Math.round((OY-py)/STEP)};}
+
+function gcd(a,b){a=Math.abs(a);b=Math.abs(b);while(b){[a,b]=[b,a%b];}return a;}
+function fracStr(n,d){
+  if(d===0) return 'undef';
+  const g=gcd(Math.abs(n),Math.abs(d));
+  let fn=n/g, fd=d/g;
+  if(fd<0){fn=-fn;fd=-fd;}
+  return fd===1?`${fn}`:`${fn}/${fd}`;
+}
+function fracHTML(n,d,color){
+  if(d===0) return `<span style="color:#f87171;font-weight:700">indefinida</span>`;
+  const g=gcd(Math.abs(n),Math.abs(d));
+  let fn=n/g, fd=d/g;
+  if(fd<0){fn=-fn;fd=-fd;}
+  if(fd===1) return `<span style="color:${color};font-size:19px;font-weight:700;font-family:monospace">${fn}</span>`;
+  return `<span class="frac" style="color:${color}"><span class="fn">${fn}</span><span class="fd">${fd}</span></span>`;
+}
+
+/* ===== DIBUJO ===== */
+function draw(){
+  ctx.clearRect(0,0,W,H);
+
+  // Fondo tablero verde oscuro clásico
+  ctx.fillStyle='#0d1a0d';
+  ctx.fillRect(0,0,W,H);
+
+  // Cuadrícula fina (estilo encerado)
+  ctx.strokeStyle='rgba(157,255,91,0.1)';
+  ctx.lineWidth=0.7;
+  for(let i=0;i<=CELLS;i++){
+    ctx.beginPath();ctx.moveTo(i*STEP,0);ctx.lineTo(i*STEP,H);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(0,i*STEP);ctx.lineTo(W,i*STEP);ctx.stroke();
+  }
+  // Cuadrícula gruesa cada 5
+  ctx.strokeStyle='rgba(157,255,91,0.22)';
+  ctx.lineWidth=1.1;
+  for(let i=0;i<=CELLS;i+=5){
+    ctx.beginPath();ctx.moveTo(i*STEP,0);ctx.lineTo(i*STEP,H);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(0,i*STEP);ctx.lineTo(W,i*STEP);ctx.stroke();
+  }
+
+  // Eje X — amarillo cálido
+  ctx.save();
+  ctx.strokeStyle='#ffd24a'; ctx.lineWidth=2.8;
+  ctx.shadowColor='#ffd24a'; ctx.shadowBlur=7;
+  ctx.beginPath();ctx.moveTo(0,OY);ctx.lineTo(W,OY);ctx.stroke();
+  ctx.fillStyle='#ffd24a';
+  ctx.beginPath();ctx.moveTo(W-3,OY);ctx.lineTo(W-14,OY-6);ctx.lineTo(W-14,OY+6);ctx.closePath();ctx.fill();
+  ctx.restore();
+
+  // Eje Y — magenta
+  ctx.save();
+  ctx.strokeStyle='#ff2bd6'; ctx.lineWidth=2.8;
+  ctx.shadowColor='#ff2bd6'; ctx.shadowBlur=7;
+  ctx.beginPath();ctx.moveTo(OX,H);ctx.lineTo(OX,0);ctx.stroke();
+  ctx.fillStyle='#ff2bd6';
+  ctx.beginPath();ctx.moveTo(OX,3);ctx.lineTo(OX-6,14);ctx.lineTo(OX+6,14);ctx.closePath();ctx.fill();
+  ctx.restore();
+
+  // Labels ejes
+  ctx.font='bold 14px monospace';
+  ctx.fillStyle='#ffd24a'; ctx.textAlign='center'; ctx.fillText('x',W-9,OY-12);
+  ctx.fillStyle='#ff2bd6'; ctx.textAlign='left';   ctx.fillText('y',OX+9,17);
+
+  // Números
+  ctx.font='bold 10px monospace';
+  for(let g=-9;g<=9;g++){
+    if(g===0||g%2!==0) continue;
+    const{px}=toCv(g,0);
+    ctx.fillStyle='rgba(255,210,74,0.65)'; ctx.textAlign='center';
+    ctx.fillText(g,px,OY+16);
+    const{py}=toCv(0,g);
+    ctx.fillStyle='rgba(255,43,214,0.65)'; ctx.textAlign='right';
+    ctx.fillText(g,OX-7,py+4);
+  }
+  ctx.fillStyle='rgba(255,255,255,.4)'; ctx.textAlign='right';
+  ctx.fillText('0',OX-6,OY+16);
+
+  const pts=state.pts;
+
+  // Línea entre puntos
+  if(pts.length===2){
+    const A=toCv(pts[0].gx,pts[0].gy), B=toCv(pts[1].gx,pts[1].gy);
+    const dx=B.px-A.px, dy=B.py-A.py, len=Math.sqrt(dx*dx+dy*dy);
+
+    // Recta extendida — cyan neón
+    ctx.save();
+    ctx.strokeStyle='#00f0ff'; ctx.lineWidth=2.5;
+    ctx.shadowColor='#00f0ff'; ctx.shadowBlur=14;
+    if(len>0){
+      const ux=dx/len,uy=dy/len;
+      ctx.beginPath();ctx.moveTo(A.px-ux*800,A.py-uy*800);ctx.lineTo(A.px+ux*800,A.py+uy*800);ctx.stroke();
+    } else {
+      ctx.beginPath();ctx.moveTo(A.px,0);ctx.lineTo(A.px,H);ctx.stroke();
+    }
+    ctx.restore();
+
+    // Triángulo Δx/Δy
+    const dxG=pts[1].gx-pts[0].gx, dyG=pts[1].gy-pts[0].gy;
+    if(dxG!==0||dyG!==0){
+      ctx.save(); ctx.setLineDash([6,4]); ctx.lineWidth=1.8;
+      ctx.strokeStyle='#ffd24a'; ctx.shadowColor='#ffd24a'; ctx.shadowBlur=6;
+      ctx.beginPath();ctx.moveTo(A.px,A.py);ctx.lineTo(B.px,A.py);ctx.stroke();
+      ctx.strokeStyle='#9dff5b'; ctx.shadowColor='#9dff5b';
+      ctx.beginPath();ctx.moveTo(B.px,A.py);ctx.lineTo(B.px,B.py);ctx.stroke();
+      ctx.restore();
+      ctx.font='bold 12px monospace';
+      ctx.fillStyle='#ffd24a'; ctx.textAlign='center';
+      ctx.fillText('Δx='+dxG,(A.px+B.px)/2,A.py+(dyG>=0?20:-13));
+      ctx.fillStyle='#9dff5b'; ctx.textAlign=B.px>OX?'left':'right';
+      ctx.fillText('Δy='+dyG,B.px+(B.px>OX?8:-8),(A.py+B.py)/2+4);
+    }
+
+    // Punto intercepto b en eje Y
+    const dxGn=pts[1].gx-pts[0].gx;
+    if(dxGn!==0){
+      const m=(pts[1].gy-pts[0].gy)/dxGn;
+      const b=pts[0].gy - m*pts[0].gx;
+      if(Math.abs(b)<=10){
+        const bp=toCv(0,b);
+        ctx.save();
+        ctx.beginPath();ctx.arc(bp.px,bp.py,7,0,Math.PI*2);
+        ctx.fillStyle='#ffd24a'; ctx.shadowColor='#ffd24a'; ctx.shadowBlur=12; ctx.fill();
+        ctx.strokeStyle='#fff'; ctx.lineWidth=1.5; ctx.stroke();
+        ctx.restore();
+        ctx.font='bold 10px monospace'; ctx.fillStyle='#ffd24a';
+        ctx.textAlign='left'; ctx.fillText(`b=${b%1===0?b:b.toFixed(2)}`,bp.px+10,bp.py-5);
+      }
+    }
+  }
+
+  // Puntos A y B
+  const colP=['#ff6eb4','#9dff5b'], glw=['#ff6eb4','#9dff5b'], lbl=['A','B'];
+  pts.forEach((p,i)=>{
+    const{px,py}=toCv(p.gx,p.gy);
+    ctx.save();
+    ctx.shadowColor=glw[i]; ctx.shadowBlur=18;
+    ctx.beginPath();ctx.arc(px,py,11,0,Math.PI*2);
+    ctx.fillStyle=colP[i]; ctx.fill();
+    ctx.restore();
+    ctx.beginPath();ctx.arc(px,py,11,0,Math.PI*2);
+    ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.stroke();
+    ctx.fillStyle='#0d1a0d'; ctx.font='bold 11px sans-serif'; ctx.textAlign='center';
+    ctx.fillText(lbl[i],px,py+4);
+    // coordenada
+    ctx.save();
+    ctx.font='bold 11px monospace'; ctx.fillStyle=colP[i];
+    ctx.shadowColor=glw[i]; ctx.shadowBlur=6;
+    ctx.textAlign=px<W-90?'left':'right';
+    ctx.fillText(`(${p.gx}, ${p.gy})`,px<W-90?px+16:px-16,py-15);
+    ctx.restore();
+  });
+}
+
+/* ===== TOAST ===== */
+function toast(title,sub,ic='⚡'){
+  const s=document.getElementById('tstack');
+  const t=document.createElement('div');
+  t.className='toast';
+  t.innerHTML=`<div class="ic">${ic}</div><div><div class="tt">${title}</div><div class="ts">${sub}</div></div>`;
+  s.appendChild(t);
+  setTimeout(()=>t.remove(),4200);
+}
+
+/* ===== CALCULAR ===== */
+function calc(){
+  const x1=parseFloat(document.getElementById('x1').value);
+  const y1=parseFloat(document.getElementById('y1').value);
+  const x2=parseFloat(document.getElementById('x2').value);
+  const y2=parseFloat(document.getElementById('y2').value);
+
+  if([x1,y1,x2,y2].some(isNaN)){toast('Dato inválido','Ingresa valores numéricos','⚠️');return;}
+  if(x1===x2&&y1===y2){toast('Puntos iguales','Los dos puntos deben ser distintos','⚠️');return;}
+
+  // Colocar puntos en el tablero
+  state.pts=[{gx:Math.round(x1),gy:Math.round(y1)},{gx:Math.round(x2),gy:Math.round(y2)}];
+  draw();
+  compute(x1,y1,x2,y2);
+}
+
+function compute(x1,y1,x2,y2){
+  const dx=x2-x1, dy=y2-y1;
+
+  // PENDIENTE
+  let mNum=dy, mDen=dx;
+  let mVal, mStr, mFracH;
+  if(dx===0){
+    mVal=Infinity; mStr='undef'; mFracH='<span style="color:#f87171;font-weight:700">indefinida (∞)</span>';
+  } else {
+    mVal=dy/dx;
+    const g=gcd(Math.abs(mNum),Math.abs(mDen));
+    let fn=mNum/g, fd=mDen/g;
+    if(fd<0){fn=-fn;fd=-fd;}
+    mStr=fd===1?`${fn}`:`${fn}/${fd}`;
+    mFracH=fracHTML(mNum,mDen,'#ff6eb4');
+  }
+
+  // INTERCEPTO b = y1 - m*x1
+  let bVal, bStr;
+  if(dx===0){bVal=null;bStr='—';}
+  else{bVal=y1-mVal*x1; bStr=Number.isInteger(bVal)?`${bVal}`:`${bVal.toFixed(3)}`;}
+
+  // ECUACIÓN
+  let eq;
+  if(dx===0){eq=`x = ${x1}`;}
+  else{
+    const mPart=mStr==='1'?'':mStr==='-1'?'-':`${mStr}`;
+    const bPart=bVal===0?'':(bVal>0?` + ${bStr}`:` - ${Math.abs(bVal%1===0?bVal:parseFloat(bVal.toFixed(3)))}`)
+    eq=`y = ${mPart}x${bPart}`;
+  }
+
+  // ÁNGULO
+  const ang=dx===0?90:Math.abs(Math.atan(mVal)*180/Math.PI);
+
+  // DOM resultado
+  document.getElementById('res-eq').textContent=eq;
+  document.getElementById('chip-m').textContent=`m = ${mStr}`;
+  document.getElementById('chip-b').textContent=dx===0?'b = ∞':`b = ${bStr}`;
+  document.getElementById('res-sub').innerHTML=
+    dx===0
+    ?'Recta <b>vertical</b> — pendiente indefinida'
+    :`Pendiente <b>${mStr}</b> · Intercepto y: <b>${bStr}</b>`;
+
+  // PASO 1 — fracción pendiente
+  const s1=document.getElementById('step1');
+  s1.innerHTML=`<div class="frac-wrap">
+    <span style="color:#9dff5b;font-size:16px;font-weight:700;font-family:monospace">m =</span>
+    ${fracHTML(dy,dx,'#9dff5b')}
+    <span class="feq">=</span>
+    ${fracHTML(dy,dx,'#9dff5b')}
+    <span style="color:#9dff5b;font-size:14px;font-family:monospace">= ${mStr}</span>
+  </div>
+  <div style="font-size:11px;color:var(--muted);margin-top:4px;text-align:center">
+    m = (y₂−y₁)/(x₂−x₁) = (${y2}−${y1})/(${x2}−${x1}) = ${dy}/${dx}
+  </div>`;
+
+  // PASO 2 — intercepto b
+  const s2=document.getElementById('step2');
+  if(dx===0){
+    s2.innerHTML=`<span style="color:#f87171;font-size:13px">Recta vertical: no existe intercepto b</span>`;
+  } else {
+    s2.innerHTML=`<div style="font-family:monospace;font-size:13px;color:#ffd24a;text-align:center;line-height:1.9">
+      b = y₁ − m·x₁<br>
+      b = ${y1} − (${mStr})·${x1}<br>
+      <b style="font-size:16px;color:#ffd24a">b = ${bStr}</b>
+    </div>`;
+  }
+
+  // INSIGHTS
+  document.getElementById('ins-m').textContent=mStr;
+  document.getElementById('ins-b').textContent=dx===0?'∞':bStr;
+  document.getElementById('ins-dy').textContent=`${dy}/${dx}`;
+  document.getElementById('ins-ang').textContent=ang.toFixed(1)+'°';
+
+  // HISTORIAL
+  state.history.push({x1,y1,x2,y2,mStr,bStr:dx===0?'∞':bStr,eq,ang:ang.toFixed(1)});
+  state.points+=15; state.streak++;
+  document.getElementById('hud-pts').textContent=state.points;
+  document.getElementById('hud-lines').textContent=state.history.length;
+  document.getElementById('hud-streak').textContent='🔥 '+state.streak;
+  renderTable();
+  toast('Recta calculada ✔',eq,'📐');
+}
+
+function renderTable(){
+  const tb=document.getElementById('tbody');
+  if(state.history.length===0){
+    tb.innerHTML='<tr><td class="empty-td" colspan="7">Sin rectas aún. ¡Coloca dos puntos y calcula!</td></tr>';
+    return;
+  }
+  tb.innerHTML=state.history.map((h,i)=>`
+    <tr class="${i===state.history.length-1?'nr':''}">
+      <td style="color:var(--muted)">${i+1}</td>
+      <td style="color:#ff6eb4">(${h.x1},${h.y1})</td>
+      <td style="color:#9dff5b">(${h.x2},${h.y2})</td>
+      <td style="color:var(--cyan);font-weight:600">${h.mStr}</td>
+      <td style="color:var(--gold)">${h.bStr}</td>
+      <td style="color:#fff;font-weight:600">${h.eq}</td>
+      <td style="color:var(--magenta)">${h.ang}°</td>
+    </tr>`).reverse().join('');
+}
+
+/* ===== EVENTOS CANVAS ===== */
+let dragging=null;
+function getR(){return cv.getBoundingClientRect();}
+function cxy(e){const r=getR();const sx=W/r.width,sy=H/r.height;return{cx:(e.clientX-r.left)*sx,cy:(e.clientY-r.top)*sy};}
+function nearPt(cx,cy){for(let i=0;i<state.pts.length;i++){const c=toCv(state.pts[i].gx,state.pts[i].gy);if(Math.hypot(cx-c.px,cy-c.py)<22)return i;}return -1;}
+
+cv.addEventListener('mousedown',e=>{
+  const{cx,cy}=cxy(e);const n=nearPt(cx,cy);
+  if(n>=0){dragging=n;return;}
+  if(state.pts.length<2){
+    const g=toGrid(cx,cy);state.pts.push(g);
+    const ids=['x1','y1','x2','y2'];
+    const i=state.pts.length-1;
+    document.getElementById(ids[i*2]).value=g.gx;
+    document.getElementById(ids[i*2+1]).value=g.gy;
+    draw();
+    if(state.pts.length===2) computeFromPts();
+  }
+});
+cv.addEventListener('mousemove',e=>{
+  if(dragging===null)return;
+  const{cx,cy}=cxy(e);const g=toGrid(cx,cy);
+  state.pts[dragging]=g;
+  const ids=['x1','y1','x2','y2'];
+  document.getElementById(ids[dragging*2]).value=g.gx;
+  document.getElementById(ids[dragging*2+1]).value=g.gy;
+  draw();
+  if(state.pts.length===2) computeFromPts();
+});
+cv.addEventListener('mouseup',()=>{dragging=null;});
+cv.addEventListener('mouseleave',()=>{dragging=null;});
+cv.addEventListener('dblclick',()=>{state.pts=[];draw();resetPanel();});
+
+cv.addEventListener('touchstart',e=>{e.preventDefault();const t=e.touches[0];const r=getR();const sx=W/r.width,sy=H/r.height;const cx=(t.clientX-r.left)*sx,cy=(t.clientY-r.top)*sy;const n=nearPt(cx,cy);if(n>=0){dragging=n;return;}if(state.pts.length<2){const g=toGrid(cx,cy);state.pts.push(g);const ids=['x1','y1','x2','y2'];const i=state.pts.length-1;document.getElementById(ids[i*2]).value=g.gx;document.getElementById(ids[i*2+1]).value=g.gy;draw();if(state.pts.length===2)computeFromPts();}},{passive:false});
+cv.addEventListener('touchmove',e=>{e.preventDefault();if(dragging===null)return;const t=e.touches[0];const r=getR();const sx=W/r.width,sy=H/r.height;const g=toGrid((t.clientX-r.left)*sx,(t.clientY-r.top)*sy);state.pts[dragging]=g;const ids=['x1','y1','x2','y2'];document.getElementById(ids[dragging*2]).value=g.gx;document.getElementById(ids[dragging*2+1]).value=g.gy;draw();if(state.pts.length===2)computeFromPts();},{passive:false});
+cv.addEventListener('touchend',()=>{dragging=null;});
+
+function computeFromPts(){
+  const A=state.pts[0],B=state.pts[1];
+  compute(A.gx,A.gy,B.gx,B.gy);
+  // no agregar al historial en drag, solo en calc
+  state.history.pop(); // remueve el agregado por compute
+  document.getElementById('hud-lines').textContent=state.history.length;
+}
+
+function resetPanel(){
+  document.getElementById('res-eq').textContent='y = mx + b';
+  document.getElementById('chip-m').textContent='m = ?';
+  document.getElementById('chip-b').textContent='b = ?';
+  document.getElementById('res-sub').textContent='Ingresa dos puntos y pulsa ⚡ Calcular';
+  document.getElementById('step1').innerHTML='<span class="placeholder">—</span>';
+  document.getElementById('step2').innerHTML='<span class="placeholder">—</span>';
+  ['ins-m','ins-b','ins-dy','ins-ang'].forEach(id=>document.getElementById(id).textContent='—');
+}
+
+/* ===== BOTONES ===== */
+document.getElementById('btn-calc').addEventListener('click',calc);
+document.getElementById('btn-reset').addEventListener('click',()=>{
+  state.pts=[];draw();resetPanel();state.streak=0;
+  document.getElementById('hud-streak').textContent='🔥 0';
+  ['x1','y1','x2','y2'].forEach((id,i)=>document.getElementById(id).value=[1,2,4,8][i]);
+  toast('Tablero limpio','Listo para una nueva recta','⟲');
+});
+document.getElementById('btn-purge').addEventListener('click',()=>{
+  state.history=[];renderTable();toast('Historial vaciado','','🗑');
+});
+document.getElementById('btn-export').addEventListener('click',()=>{
+  if(!state.history.length){toast('Sin datos','Calcula al menos una recta','ℹ️');return;}
+  let csv='#,x1,y1,x2,y2,m,b,Ecuacion,Angulo\n';
+  state.history.forEach((h,i)=>{
+    csv+=`${i+1},${h.x1},${h.y1},${h.x2},${h.y2},${h.mStr},${h.bStr},"${h.eq}",${h.ang}°\n`;
+  });
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download='rectas.csv';a.click();
+  toast('CSV exportado','Archivo descargado','⬇️');
+});
+
+draw();
+// Demo inicial
+setTimeout(()=>{calc();},500);
+</script>
+</body>
+</html>
