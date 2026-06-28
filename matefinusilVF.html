@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>USIL · Matemática Financiera · Interés Compuesto</title>
+
+<!-- KaTeX -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+        onload="renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<!-- Google Fonts futuristas -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg-0:#05060f;
+    --bg-1:#0a0e27;
+    --cyan:#00f0ff;
+    --magenta:#ff2bd6;
+    --violet:#7b5cff;
+    --lime:#9dff5b;
+    --gold:#ffd24a;
+    --txt:#dfe9ff;
+    --muted:#7a8bb5;
+    --card:rgba(15,22,55,0.55);
+    --border:rgba(0,240,255,0.25);
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:'Rajdhani',sans-serif;
+    color:var(--txt);
+    background:var(--bg-0);
+    overflow-x:hidden;
+    position:relative;
+    min-height:100vh;
+  }
+
+  /* ===== FONDO FUTURISTA ===== */
+  .bg-grid{
+    position:fixed;inset:0;z-index:-3;
+    background:
+      radial-gradient(ellipse at 20% 10%, rgba(123,92,255,0.25), transparent 50%),
+      radial-gradient(ellipse at 80% 90%, rgba(0,240,255,0.18), transparent 50%),
+      radial-gradient(ellipse at 50% 50%, rgba(255,43,214,0.10), transparent 60%),
+      linear-gradient(180deg, var(--bg-0), var(--bg-1));
+  }
+  .bg-grid::before{
+    content:"";position:absolute;inset:0;
+    background-image:
+      linear-gradient(rgba(0,240,255,0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,240,255,0.06) 1px, transparent 1px);
+    background-size:48px 48px;
+    mask-image:radial-gradient(ellipse at center, black 30%, transparent 80%);
+    animation:gridMove 30s linear infinite;
+  }
+  @keyframes gridMove{
+    0%{background-position:0 0,0 0}
+    100%{background-position:480px 480px,480px 480px}
+  }
+  .scanline{
+    position:fixed;inset:0;z-index:-2;pointer-events:none;
+    background:repeating-linear-gradient(transparent 0 3px, rgba(0,240,255,0.025) 3px 4px);
+    mix-blend-mode:overlay;
+  }
+  .particles{position:fixed;inset:0;z-index:-2;pointer-events:none}
+  .particle{
+    position:absolute;width:3px;height:3px;border-radius:50%;
+    background:var(--cyan);box-shadow:0 0 8px var(--cyan);
+    animation:floatUp linear infinite;opacity:0.5;
+  }
+  @keyframes floatUp{
+    0%{transform:translateY(110vh) scale(0);opacity:0}
+    10%{opacity:0.7}
+    90%{opacity:0.5}
+    100%{transform:translateY(-10vh) scale(1.4);opacity:0}
+  }
+
+  /* ===== HEADER ===== */
+  header{
+    padding:28px 40px 18px;
+    display:flex;align-items:center;justify-content:space-between;
+    border-bottom:1px solid var(--border);
+    background:linear-gradient(180deg, rgba(5,6,15,0.7), transparent);
+    backdrop-filter:blur(8px);
+    position:relative;z-index:5;
+  }
+  .brand{display:flex;align-items:center;gap:18px}
+  .logo-usil{
+    font-family:'Orbitron',sans-serif;font-weight:900;font-size:34px;
+    background:linear-gradient(135deg,var(--cyan),var(--magenta));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    letter-spacing:4px;
+    text-shadow:0 0 30px rgba(0,240,255,0.5);
+    padding:6px 18px;border:2px solid var(--cyan);
+    border-radius:6px;
+    box-shadow:0 0 20px rgba(0,240,255,0.3), inset 0 0 20px rgba(0,240,255,0.1);
+  }
+  .brand-text h1{
+    font-family:'Orbitron',sans-serif;font-weight:700;font-size:20px;
+    color:var(--txt);letter-spacing:2px;
+  }
+  .brand-text p{
+    color:var(--muted);font-size:14px;letter-spacing:1px;text-transform:uppercase;
+  }
+  .hud{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+  .hud-chip{
+    padding:8px 16px;border-radius:8px;
+    background:var(--card);border:1px solid var(--border);
+    font-family:'JetBrains Mono',monospace;font-size:13px;
+    display:flex;align-items:center;gap:8px;
+    backdrop-filter:blur(10px);
+  }
+  .hud-chip .lbl{color:var(--muted);text-transform:uppercase;font-size:11px}
+  .hud-chip .val{color:var(--cyan);font-weight:600}
+  .hud-chip.level .val{color:var(--gold)}
+  .hud-chip.streak .val{color:var(--magenta)}
+  .bar-xp{
+    width:160px;height:6px;background:rgba(255,255,255,0.08);
+    border-radius:3px;overflow:hidden;
+  }
+  .bar-xp > span{
+    display:block;height:100%;width:0%;
+    background:linear-gradient(90deg,var(--cyan),var(--magenta));
+    box-shadow:0 0 10px var(--cyan);
+    transition:width 0.6s ease;
+  }
+
+  /* ===== LAYOUT ===== */
+  main{
+    padding:30px 40px 60px;
+    display:grid;
+    grid-template-columns: 380px 1fr;
+    gap:24px;
+    max-width:1600px;margin:0 auto;
+  }
+  @media (max-width: 1100px){
+    main{grid-template-columns:1fr}
+    header{flex-direction:column;gap:16px}
+  }
+
+  .panel{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:22px;
+    backdrop-filter:blur(14px);
+    box-shadow:0 8px 40px rgba(0,0,0,0.5), inset 0 0 30px rgba(0,240,255,0.04);
+    position:relative;
+    overflow:hidden;
+  }
+  .panel::before{
+    content:"";position:absolute;top:0;left:0;right:0;height:2px;
+    background:linear-gradient(90deg,transparent,var(--cyan),var(--magenta),transparent);
+    opacity:0.7;
+  }
+  .panel h2{
+    font-family:'Orbitron',sans-serif;font-size:15px;letter-spacing:2px;
+    color:var(--cyan);text-transform:uppercase;margin-bottom:16px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .panel h2::before{
+    content:"";width:6px;height:14px;background:var(--cyan);
+    box-shadow:0 0 10px var(--cyan);
+  }
+
+  /* ===== FÓRMULA ===== */
+  .formula-box{
+    background:rgba(0,0,0,0.35);
+    border:1px dashed var(--border);
+    border-radius:10px;
+    padding:18px;
+    text-align:center;
+    margin-bottom:18px;
+    font-size:18px;
+  }
+  .formula-box .katex{color:var(--txt)}
+  .legend{
+    font-size:12px;color:var(--muted);
+    line-height:1.7;letter-spacing:0.5px;
+  }
+  .legend b{color:var(--cyan)}
+
+  /* ===== INPUTS ===== */
+  .field{margin-bottom:14px}
+  .field label{
+    display:block;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;
+    color:var(--muted);margin-bottom:6px;font-weight:600;
+  }
+  .field .input-wrap{
+    position:relative;display:flex;align-items:center;
+  }
+  .field input{
+    width:100%;padding:12px 14px;
+    background:rgba(0,0,0,0.4);
+    border:1px solid var(--border);
+    border-radius:8px;
+    color:var(--txt);
+    font-family:'JetBrains Mono',monospace;font-size:16px;
+    outline:none;transition:all 0.3s;
+  }
+  .field input:focus{
+    border-color:var(--cyan);
+    box-shadow:0 0 0 3px rgba(0,240,255,0.15), 0 0 18px rgba(0,240,255,0.25);
+    background:rgba(0,240,255,0.05);
+  }
+  .field .unit{
+    position:absolute;right:12px;color:var(--muted);
+    font-size:13px;font-family:'JetBrains Mono',monospace;
+    pointer-events:none;
+  }
+  .preset-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+  .preset{
+    font-size:11px;padding:4px 9px;border-radius:5px;
+    background:rgba(123,92,255,0.15);border:1px solid rgba(123,92,255,0.4);
+    color:#c8baff;cursor:pointer;transition:all 0.2s;
+    font-family:'JetBrains Mono',monospace;
+  }
+  .preset:hover{background:rgba(123,92,255,0.3);transform:translateY(-1px)}
+
+  /* ===== BOTONES ===== */
+  .btn-row{display:flex;gap:10px;margin-top:18px}
+  .btn{
+    flex:1;padding:13px;border:none;border-radius:8px;cursor:pointer;
+    font-family:'Orbitron',sans-serif;font-weight:700;letter-spacing:1.5px;
+    font-size:13px;text-transform:uppercase;transition:all 0.25s;
+    position:relative;overflow:hidden;
+  }
+  .btn-primary{
+    background:linear-gradient(135deg,var(--cyan),var(--violet));
+    color:#02040d;
+    box-shadow:0 4px 20px rgba(0,240,255,0.4);
+  }
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 28px rgba(0,240,255,0.6)}
+  .btn-ghost{
+    background:transparent;color:var(--magenta);
+    border:1px solid var(--magenta);
+  }
+  .btn-ghost:hover{background:rgba(255,43,214,0.12);transform:translateY(-2px)}
+
+  /* ===== RESULTADO DESTACADO ===== */
+  .result-card{
+    margin-top:18px;padding:18px;border-radius:10px;
+    background:linear-gradient(135deg, rgba(0,240,255,0.08), rgba(255,43,214,0.08));
+    border:1px solid var(--cyan);
+    text-align:center;
+  }
+  .result-card .label{font-size:11px;letter-spacing:2px;color:var(--muted);text-transform:uppercase}
+  .result-card .amount{
+    font-family:'Orbitron',sans-serif;font-weight:900;font-size:32px;
+    background:linear-gradient(135deg,var(--cyan),var(--lime));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    margin:6px 0;text-shadow:0 0 25px rgba(0,240,255,0.4);
+  }
+  .result-card .sub{font-size:13px;color:var(--muted)}
+  .result-card .sub b{color:var(--gold)}
+
+  /* ===== GRÁFICA ===== */
+  .chart-wrap{
+    position:relative;height:340px;
+    background:rgba(0,0,0,0.3);border-radius:10px;padding:12px;
+    border:1px solid rgba(0,240,255,0.15);
+  }
+
+  /* ===== TABLA ===== */
+  .table-wrap{
+    margin-top:18px;
+    background:rgba(0,0,0,0.35);
+    border:1px solid var(--border);
+    border-radius:10px;
+    overflow:hidden;
+  }
+  .table-header{
+    padding:12px 16px;display:flex;justify-content:space-between;align-items:center;
+    background:rgba(0,240,255,0.05);border-bottom:1px solid var(--border);
+  }
+  .table-header h3{
+    font-family:'Orbitron',sans-serif;font-size:13px;letter-spacing:2px;color:var(--cyan);
+  }
+  .table-actions{display:flex;gap:8px}
+  .icon-btn{
+    background:transparent;border:1px solid var(--border);color:var(--muted);
+    padding:5px 10px;border-radius:6px;cursor:pointer;font-size:12px;
+    transition:all 0.2s;font-family:'JetBrains Mono',monospace;
+  }
+  .icon-btn:hover{color:var(--magenta);border-color:var(--magenta)}
+
+  table{width:100%;border-collapse:collapse;font-family:'JetBrains Mono',monospace;font-size:13px}
+  thead th{
+    background:rgba(123,92,255,0.12);
+    color:#c8baff;padding:10px 12px;text-align:left;
+    font-weight:600;letter-spacing:1px;font-size:11px;text-transform:uppercase;
+    border-bottom:1px solid rgba(123,92,255,0.3);
+    position:sticky;top:0;
+  }
+  tbody td{
+    padding:9px 12px;border-bottom:1px solid rgba(255,255,255,0.04);
+    color:var(--txt);
+  }
+  tbody tr:hover{background:rgba(0,240,255,0.05)}
+  tbody tr.new-row{animation:rowFade 0.6s ease}
+  @keyframes rowFade{
+    0%{background:rgba(0,240,255,0.3);transform:translateX(-10px);opacity:0}
+    100%{background:transparent;transform:translateX(0);opacity:1}
+  }
+  .scroll-tbody{
+    max-height:260px;overflow-y:auto;
+    scrollbar-width:thin;scrollbar-color:var(--cyan) transparent;
+  }
+  .scroll-tbody::-webkit-scrollbar{width:6px}
+  .scroll-tbody::-webkit-scrollbar-thumb{background:var(--cyan);border-radius:3px}
+  .empty-row td{text-align:center;color:var(--muted);padding:24px;font-style:italic}
+  .badge-tier{
+    display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;
+    font-weight:700;letter-spacing:1px;
+  }
+  .tier-bronze{background:rgba(205,127,50,0.2);color:#e8a87c;border:1px solid #cd7f32}
+  .tier-silver{background:rgba(192,192,192,0.15);color:#e0e0e0;border:1px solid #c0c0c0}
+  .tier-gold{background:rgba(255,210,74,0.15);color:var(--gold);border:1px solid var(--gold)}
+  .tier-platinum{background:rgba(0,240,255,0.15);color:var(--cyan);border:1px solid var(--cyan)}
+  .tier-diamond{background:rgba(255,43,214,0.15);color:var(--magenta);border:1px solid var(--magenta)}
+
+  /* ===== LOGROS / TOAST ===== */
+  .toast-stack{
+    position:fixed;bottom:24px;right:24px;z-index:50;
+    display:flex;flex-direction:column;gap:10px;
+  }
+  .toast{
+    background:linear-gradient(135deg,rgba(15,22,55,0.95),rgba(30,15,60,0.95));
+    border:1px solid var(--cyan);border-left:4px solid var(--cyan);
+    padding:12px 18px;border-radius:8px;min-width:240px;
+    backdrop-filter:blur(10px);
+    box-shadow:0 8px 30px rgba(0,0,0,0.6), 0 0 20px rgba(0,240,255,0.2);
+    animation:toastIn 0.4s ease, toastOut 0.4s ease 3.6s forwards;
+    display:flex;align-items:center;gap:12px;
+  }
+  .toast .ic{font-size:24px}
+  .toast .tt{font-family:'Orbitron',sans-serif;font-size:13px;color:var(--cyan);letter-spacing:1px}
+  .toast .ts{font-size:12px;color:var(--muted)}
+  @keyframes toastIn{from{transform:translateX(120%);opacity:0}to{transform:translateX(0);opacity:1}}
+  @keyframes toastOut{to{transform:translateX(120%);opacity:0}}
+
+  /* ===== INSIGHTS ===== */
+  .insights{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:18px;
+  }
+  @media (max-width:700px){.insights{grid-template-columns:repeat(2,1fr)}}
+  .insight{
+    padding:14px;border-radius:10px;
+    background:rgba(0,0,0,0.3);border:1px solid var(--border);
+    text-align:center;
+  }
+  .insight .lbl{font-size:10px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase}
+  .insight .val{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:600;margin-top:4px}
+  .insight:nth-child(1) .val{color:var(--cyan)}
+  .insight:nth-child(2) .val{color:var(--magenta)}
+  .insight:nth-child(3) .val{color:var(--lime)}
+  .insight:nth-child(4) .val{color:var(--gold)}
+
+  /* Footer */
+  footer{
+    text-align:center;padding:20px;color:var(--muted);font-size:12px;
+    letter-spacing:1.5px;border-top:1px solid var(--border);
+  }
+  footer b{color:var(--cyan)}
+</style>
+</head>
+<body>
+
+<div class="bg-grid"></div>
+<div class="scanline"></div>
+<div class="particles" id="particles"></div>
+
+<!-- HEADER -->
+<header>
+  <div class="brand">
+    <div class="logo-usil">USIL</div>
+    <div class="brand-text">
+      <h1>MATEMÁTICA FINANCIERA</h1>
+      <p>Laboratorio de Interés Compuesto · Edición Holográfica</p>
+    </div>
+  </div>
+  <div class="hud">
+    <div class="hud-chip">
+      <span class="lbl">Puntos</span>
+      <span class="val" id="hud-points">0</span>
+    </div>
+    <div class="hud-chip level">
+      <span class="lbl">Nivel</span>
+      <span class="val" id="hud-level">1</span>
+      <div class="bar-xp"><span id="hud-xp"></span></div>
+    </div>
+    <div class="hud-chip streak">
+      <span class="lbl">Racha</span>
+      <span class="val" id="hud-streak">🔥 0</span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- ===== COLUMNA IZQUIERDA: CONTROL ===== -->
+  <section class="panel" id="control-panel">
+    <h2>Núcleo de Simulación</h2>
+
+    <div class="formula-box">
+      $$ M \;=\; C\left(1 + \frac{r}{k}\right)^{k \cdot t} $$       <div class="legend" style="margin-top:10px">
+        <b>M</b> = Monto final · <b>C</b> = Capital inicial<br>
+        <b>r</b> = Tasa nominal anual · <b>t</b> = Tiempo (años)<br>
+        <b>k</b> = Capitalizaciones por año
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Capital Inicial (C)</label>
+      <div class="input-wrap">
+        <input type="number" id="inp-C" value="1000" min="1" step="any">
+        <span class="unit">S/</span>
+      </div>
+      <div class="preset-row">
+        <span class="preset" data-c="500">500</span>
+        <span class="preset" data-c="1000">1K</span>
+        <span class="preset" data-c="10000">10K</span>
+        <span class="preset" data-c="50000">50K</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Tasa de Interés Nominal Anual (r)</label>
+      <div class="input-wrap">
+        <input type="number" id="inp-r" value="8" min="0" max="100" step="0.1">
+        <span class="unit">% anual</span>
+      </div>
+      <div class="preset-row">
+        <span class="preset" data-r="3">3%</span>
+        <span class="preset" data-r="5">5%</span>
+        <span class="preset" data-r="8">8%</span>
+        <span class="preset" data-r="12">12%</span>
+        <span class="preset" data-r="18">18%</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Capitalizaciones por año (k)</label>
+      <div class="input-wrap">
+        <input type="number" id="inp-k" value="12" min="1" step="1">
+        <span class="unit">veces/año</span>
+      </div>
+      <div class="preset-row">
+        <span class="preset" data-k="1">Anual</span>
+        <span class="preset" data-k="2">Semestral</span>
+        <span class="preset" data-k="4">Trimestral</span>
+        <span class="preset" data-k="12">Mensual</span>
+        <span class="preset" data-k="365">Diario</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Tiempo (t)</label>
+      <div class="input-wrap">
+        <input type="number" id="inp-t" value="10" min="1" max="100" step="1">
+        <span class="unit">años</span>
+      </div>
+      <div class="preset-row">
+        <span class="preset" data-t="5">5</span>
+        <span class="preset" data-t="10">10</span>
+        <span class="preset" data-t="20">20</span>
+        <span class="preset" data-t="30">30</span>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" id="btn-simulate">⚡ Simular</button>
+      <button class="btn btn-ghost" id="btn-clear">⟲ Limpiar</button>
+    </div>
+
+    <div class="result-card" id="result-card">
+      <div class="label">Monto Final Proyectado</div>
+      <div class="amount" id="res-amount">S/ 0.00</div>
+      <div class="sub">Interés generado: <b id="res-interest">S/ 0.00</b></div>
+      <div class="sub">Crecimiento: <b id="res-growth">0%</b></div>
+    </div>
+  </section>
+
+  <!-- ===== COLUMNA DERECHA: GRÁFICA + TABLA ===== -->
+  <section class="panel">
+    <h2>Visualización del Monto M(t)</h2>
+    <div class="chart-wrap">
+      <canvas id="chart"></canvas>
+    </div>
+
+    <div class="insights">
+      <div class="insight">
+        <div class="lbl">M(0) Capital</div>
+        <div class="val" id="ins-m0">—</div>
+      </div>
+      <div class="insight">
+        <div class="lbl">M(t) Final</div>
+        <div class="val" id="ins-mt">—</div>
+      </div>
+      <div class="insight">
+        <div class="lbl">Δ Interés</div>
+        <div class="val" id="ins-delta">—</div>
+      </div>
+      <div class="insight">
+        <div class="lbl">Tasa Efectiva</div>
+        <div class="val" id="ins-eff">—</div>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <div class="table-header">
+        <h3>📒 Registro de Simulaciones</h3>
+        <div class="table-actions">
+          <button class="icon-btn" id="btn-export">⬇ Exportar CSV</button>
+          <button class="icon-btn" id="btn-purge">🗑 Vaciar</button>
+        </div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>C</th>
+            <th>r</th>
+            <th>k</th>
+            <th>t</th>
+            <th>M(t)</th>
+            <th>Interés</th>
+            <th>Crecim.</th>
+            <th>Tier</th>
+          </tr>
+        </thead>
+        <tbody class="scroll-tbody" id="tbody">
+          <tr class="empty-row"><td colspan="9">Aún no hay simulaciones. Pulsa ⚡ Simular para empezar.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <b>USIL</b> · Curso de Matemática Financiera · Modelo: Interés Compuesto ·
+  Aprendizaje basado en simulación gamificada
+</footer>
+
+<div class="toast-stack" id="toast-stack"></div>
+
+<script>
+/* =========================================================
+   1) PARTÍCULAS DE FONDO
+========================================================= */
+(function makeParticles(){
+  const c = document.getElementById('particles');
+  for(let i=0;i<40;i++){
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = Math.random()*100 + 'vw';
+    p.style.animationDuration = (8 + Math.random()*14) + 's';
+    p.style.animationDelay = (-Math.random()*15) + 's';
+    p.style.background = Math.random()>0.5 ? 'var(--cyan)' : 'var(--magenta)';
+    p.style.boxShadow = `0 0 8px ${p.style.background}`;
+    c.appendChild(p);
+  }
+})();
+
+/* =========================================================
+   2) ESTADO GAMIFICADO
+========================================================= */
+const state = {
+  points: 0,
+  level: 1,
+  streak: 0,
+  simulations: [],   // {id,C,r,k,t,M,interest,growth}
+  achievements: new Set(),
+};
+const ACHIEVEMENTS = [
+  {id:'first',  name:'Primer Paso',          desc:'Realizaste tu primera simulación',  ic:'🚀'},
+  {id:'x10',    name:'Inversión Decenal',    desc:'Simulaste 10 años o más',           ic:'⏳'},
+  {id:'x2',     name:'Duplicador',           desc:'Lograste duplicar el capital',      ic:'✨'},
+  {id:'x5',     name:'Quíntuple',            desc:'Multiplicaste x5 tu capital',       ic:'💎'},
+  {id:'hi30',   name:'Tasa Alta',            desc:'Probaste una tasa ≥ 30%',           ic:'🔥'},
+  {id:'pro',    name:'Analista',             desc:'Realizaste 10 simulaciones',        ic:'📊'},
+  {id:'mega',   name:'Megacapital',          desc:'Simulaste más de S/ 100,000',       ic:'🏛️'},
+  {id:'freq',   name:'Alta Frecuencia',      desc:'Probaste k ≥ 12 (mensual o más)',   ic:'📅'}
+];
+
+function levelFromPoints(p){
+  return 1 + Math.floor(Math.sqrt(p/50));
+}
+function xpInLevel(p){
+  const lvl = levelFromPoints(p);
+  const base = (lvl-1)*(lvl-1)*50;
+  const next = lvl*lvl*50;
+  return {cur:p-base, need:next-base, lvl};
+}
+function addPoints(n){
+  state.points += n;
+  const xp = xpInLevel(state.points);
+  document.getElementById('hud-points').textContent = state.points;
+  document.getElementById('hud-level').textContent = xp.lvl;
+  document.getElementById('hud-xp').style.width = (xp.cur/xp.need*100) + '%';
+}
+function bumpStreak(){
+  state.streak++;
+  document.getElementById('hud-streak').textContent = '🔥 ' + state.streak;
+}
+
+/* =========================================================
+   3) TOASTS Y LOGROS
+========================================================= */
+function toast(title, sub, icon='⚡'){
+  const stack = document.getElementById('toast-stack');
+  const t = document.createElement('div');
+  t.className='toast';
+  t.innerHTML = `<div class="ic">${icon}</div><div><div class="tt">${title}</div><div class="ts">${sub}</div></div>`;
+  stack.appendChild(t);
+  setTimeout(()=>t.remove(), 4200);
+}
+function unlock(id){
+  if(state.achievements.has(id)) return;
+  const a = ACHIEVEMENTS.find(x=>x.id===id);
+  if(!a) return;
+  state.achievements.add(id);
+  toast('Logro: '+a.name, a.desc + '  (+50 pts)', a.ic);
+  addPoints(50);
+}
+
+/* =========================================================
+   4) CÁLCULO FINANCIERO
+========================================================= */
+function calcMonto(C, r, t, k){
+  // Fórmula general: M = C * (1 + r/k)^(k*t)
+  return C * Math.pow(1 + (r/k), k * t);
+}
+function formatMoney(v){
+  return 'S/ ' + v.toLocaleString('es-PE',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+function formatPct(v){
+  return (v*100).toFixed(2) + '%';
+}
+function tierFor(growth){
+  if(growth >= 5)   return ['diamond','Diamond'];
+  if(growth >= 3)   return ['platinum','Platinum'];
+  if(growth >= 1.5) return ['gold','Gold'];
+  if(growth >= 0.5) return ['silver','Silver'];
+  return ['bronze','Bronze'];
+}
+
+/* =========================================================
+   5) GRÁFICA CON CHART.JS
+========================================================= */
+let chart;
+function initChart(){
+  const ctx = document.getElementById('chart').getContext('2d');
+  const grad = ctx.createLinearGradient(0,0,0,320);
+  grad.addColorStop(0,'rgba(0,240,255,0.6)');
+  grad.addColorStop(1,'rgba(0,240,255,0.02)');
+
+  chart = new Chart(ctx, {
+    type:'line',
+    data:{
+      labels:[],
+      datasets:[{
+        label:'M(t) = C(1+r/k)^(kt)',
+        data:[],
+        borderColor:'#00f0ff',
+        backgroundColor:grad,
+        borderWidth:2.5,
+        fill:true,
+        tension:0.25,
+        pointRadius:3,
+        pointBackgroundColor:'#ff2bd6',
+        pointBorderColor:'#fff',
+        pointHoverRadius:6,
+      }]
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      interaction:{intersect:false, mode:'index'},
+      plugins:{
+        legend:{
+          labels:{color:'#dfe9ff', font:{family:"'Rajdhani'", size:13, weight:'600'}}
+        },
+        tooltip:{
+          backgroundColor:'rgba(5,6,15,0.95)',
+          borderColor:'#00f0ff', borderWidth:1,
+          titleColor:'#00f0ff', bodyColor:'#dfe9ff',
+          titleFont:{family:"'Orbitron'", size:12},
+          bodyFont:{family:"'JetBrains Mono'", size:12},
+          padding:10,
+          callbacks:{
+            title:(items)=>'t = ' + parseFloat(items[0].label).toFixed(2) + ' años',
+            label:(item)=>'M = ' + formatMoney(item.parsed.y),
+          }
+        }
+      },
+      scales:{
+        x:{
+          title:{display:true, text:'Tiempo t (años)', color:'#7a8bb5', font:{family:"'Rajdhani'", size:12, weight:'600'}},
+          grid:{color:'rgba(0,240,255,0.08)'},
+          ticks:{color:'#7a8bb5', font:{family:"'JetBrains Mono'", size:11}}
+        },
+        y:{
+          title:{display:true, text:'Monto M (S/)', color:'#7a8bb5', font:{family:"'Rajdhani'", size:12, weight:'600'}},
+          grid:{color:'rgba(0,240,255,0.08)'},
+          ticks:{color:'#7a8bb5', font:{family:"'JetBrains Mono'", size:11},
+            callback:(v)=>'S/ ' + (v>=1000 ? (v/1000).toFixed(1)+'K' : v.toFixed(0))}
+        }
+      },
+      animation:{duration:800, easing:'easeOutQuart'}
+    }
+  });
+}
+function updateChart(C, r, t, k){
+  const labels = [], data = [];
+  // Generamos 40 puntos para que la curva se vea suave sin importar el valor de k
+  const points = 40;
+  for(let i=0; i<=points; i++){
+    const time = (t * i) / points;
+    labels.push(time.toFixed(2));
+    data.push(calcMonto(C, r, time, k));
+  }
+  chart.data.labels = labels;
+  chart.data.datasets[0].data = data;
+  chart.data.datasets[0].label = `M(t) = ${formatMoney(C)} · (1+${(r*100).toFixed(2)}%/${k})^(${k}·t)`;
+  chart.update();
+}
+
+/* =========================================================
+   6) TABLA DE SIMULACIONES
+========================================================= */
+function renderTable(){
+  const tb = document.getElementById('tbody');
+  if(state.simulations.length === 0){
+    tb.innerHTML = '<tr class="empty-row"><td colspan="9">Aún no hay simulaciones. Pulsa ⚡ Simular para empezar.</td></tr>';
+    return;
+  }
+  tb.innerHTML = state.simulations.map((s,i)=>{
+    const growth = s.M / s.C;
+    const [tierCls, tierName] = tierFor(growth - 1);
+    return `<tr class="${i===state.simulations.length-1?'new-row':''}">
+      <td style="color:#7a8bb5">${i+1}</td>
+      <td>${formatMoney(s.C)}</td>
+      <td>${(s.r*100).toFixed(2)}%</td>
+      <td style="color:#c8baff">${s.k}</td>
+      <td>${s.t}</td>
+      <td style="color:#9dff5b;font-weight:600">${formatMoney(s.M)}</td>
+      <td style="color:#ffd24a">${formatMoney(s.M - s.C)}</td>
+      <td style="color:#ff2bd6">×${growth.toFixed(2)}</td>
+      <td><span class="badge-tier ${tierCls}">${tierName}</span></td>
+    </tr>`;
+  }).reverse().join('');
+}
+
+/* =========================================================
+   7) INSIGHTS
+========================================================= */
+function updateInsights(C,r,k,t,M){
+  document.getElementById('ins-m0').textContent  = formatMoney(C);
+  document.getElementById('ins-mt').textContent  = formatMoney(M);
+  document.getElementById('ins-delta').textContent = formatMoney(M-C);
+  // Tasa efectiva anual (TEA) = (1 + r/k)^k - 1
+  const eff = Math.pow(1 + r/k, k) - 1;
+  document.getElementById('ins-eff').textContent = formatPct(eff);
+}
+
+/* =========================================================
+   8) SIMULAR
+========================================================= */
+function simulate(){
+  const C = parseFloat(document.getElementById('inp-C').value);
+  const rPct = parseFloat(document.getElementById('inp-r').value);
+  const k = parseInt(document.getElementById('inp-k').value);
+  const t = parseInt(document.getElementById('inp-t').value);
+
+  if(!C || C <= 0){ toast('Dato inválido','El capital debe ser mayor a 0','⚠️'); return; }
+  if(isNaN(rPct) || rPct < 0){ toast('Dato inválido','La tasa debe ser ≥ 0','⚠️'); return; }
+  if(!k || k < 1){ toast('Dato inválido','k debe ser ≥ 1','⚠️'); return; }
+  if(!t || t < 1){ toast('Dato inválido','El tiempo debe ser ≥ 1 año','⚠️'); return; }
+
+  const r = rPct/100;
+  const M = calcMonto(C, r, t, k);
+  const interest = M - C;
+  const growth = M / C;
+
+  // Resultado destacado
+  document.getElementById('res-amount').textContent = formatMoney(M);
+  document.getElementById('res-interest').textContent = formatMoney(interest);
+  document.getElementById('res-growth').textContent = '×' + growth.toFixed(3) + ' (' + formatPct(growth-1) + ')';
+
+  // Tabla
+  state.simulations.push({C, r, k, t, M, interest, growth});
+  renderTable();
+
+  // Gráfica
+  updateChart(C, r, t, k);
+
+  // Insights
+  updateInsights(C, r, k, t, M);
+
+  // Gamificación
+  addPoints(10 + Math.floor(t/2));
+  bumpStreak();
+
+  // Logros
+  unlock('first');
+  if(t >= 10) unlock('x10');
+  if(growth >= 2) unlock('x2');
+  if(growth >= 5) unlock('x5');
+  if(rPct >= 30) unlock('hi30');
+  if(k >= 12) unlock('freq');
+  if(C > 100000) unlock('mega');
+  if(state.simulations.length >= 10) unlock('pro');
+
+  toast('Simulación registrada',`M = ${formatMoney(M)}  (+${10+Math.floor(t/2)} pts)`,'✅');
+}
+
+/* =========================================================
+   9) EXPORTAR CSV
+========================================================= */
+function exportCSV(){
+  if(state.simulations.length === 0){
+    toast('Sin datos','Realiza al menos una simulación','ℹ️');
+    return;
+  }
+  let csv = 'N,C,r(%) ,k,t,M,Interes,Crecimiento\n';
+  state.simulations.forEach((s,i)=>{
+    csv += `${i+1},${s.C},${(s.r*100).toFixed(2)},${s.k},${s.t},${s.M.toFixed(2)},${s.interest.toFixed(2)},x${s.growth.toFixed(3)}\n`;
+  });
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'USIL_simulaciones_interes_compuesto.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('Exportado','Archivo CSV descargado','⬇️');
+}
+
+/* =========================================================
+   10) EVENTOS
+========================================================= */
+document.getElementById('btn-simulate').addEventListener('click', simulate);
+document.getElementById('btn-clear').addEventListener('click', ()=>{
+  document.getElementById('inp-C').value = 1000;
+  document.getElementById('inp-r').value = 8;
+  document.getElementById('inp-k').value = 12;
+  document.getElementById('inp-t').value = 10;
+  toast('Campos reseteados','Valores por defecto restaurados','⟲');
+});
+document.getElementById('btn-export').addEventListener('click', exportCSV);
+document.getElementById('btn-purge').addEventListener('click', ()=>{
+  if(state.simulations.length===0) return;
+  state.simulations = [];
+  renderTable();
+  toast('Registro limpio','Tabla vaciada','🗑');
+});
+
+// Presets
+document.querySelectorAll('.preset').forEach(p=>{
+  p.addEventListener('click', ()=>{
+    if(p.dataset.c) document.getElementById('inp-C').value = p.dataset.c;
+    if(p.dataset.r) document.getElementById('inp-r').value = p.dataset.r;
+    if(p.dataset.k) document.getElementById('inp-k').value = p.dataset.k;
+    if(p.dataset.t) document.getElementById('inp-t').value = p.dataset.t;
+  });
+});
+
+// Enter = simular
+['inp-C','inp-r','inp-k','inp-t'].forEach(id=>{
+  document.getElementById(id).addEventListener('keydown', e=>{
+    if(e.key==='Enter') simulate();
+  });
+});
+
+/* =========================================================
+   INIT
+========================================================= */
+initChart();
+// Simulación inicial demostrativa
+setTimeout(simulate, 400);
+</script>
+</body>
+</html>
