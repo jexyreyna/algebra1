@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tangente paralela a una recta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #14172B;
+    --panel: #1E2240;
+    --panel-2: #242952;
+    --border: #313866;
+    --text: #F2EFE6;
+    --text-dim: #A8ACC8;
+    --gold: #E8B84B;
+    --coral: #F0665C;
+    --teal: #5FC9B8;
+    --grid: #2A2F55;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(circle at 15% 8%, #1c2145 0%, transparent 45%),
+      var(--bg);
+    color:var(--text);
+    font-family:'Inter', sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:36px 24px 64px;}
+
+  /* Header */
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12.5px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--gold);
+    margin-bottom:10px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .eyebrow::before{content:"";width:22px;height:1px;background:var(--gold);display:inline-block;}
+  h1{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:clamp(28px,4vw,42px);
+    line-height:1.08;
+    margin:0 0 14px;
+    letter-spacing:-.01em;
+  }
+  h1 em{color:var(--gold);font-style:italic;font-weight:500;}
+  .lede{
+    color:var(--text-dim);
+    font-size:15.5px;
+    line-height:1.6;
+    max-width:640px;
+    margin:0 0 28px;
+  }
+
+  /* Statement card */
+  .statement{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:20px 24px;
+    margin-bottom:32px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:28px;
+    align-items:center;
+  }
+  .statement-item{display:flex;flex-direction:column;gap:6px;}
+  .statement-label{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.1em;
+    color:var(--text-dim);
+  }
+  .statement-eq{
+    font-family:'JetBrains Mono',monospace;
+    font-size:19px;
+    font-weight:700;
+  }
+  .statement-eq.parabola{color:var(--teal);}
+  .statement-eq.line{color:var(--coral);}
+
+  /* Layout */
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start;}
+  @media (max-width:920px){ .grid{grid-template-columns:1fr;} }
+
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:22px 24px 26px;
+  }
+  .panel h2{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:18px;
+    margin:0 0 4px;
+  }
+  .panel .sub{color:var(--text-dim);font-size:13px;margin:0 0 18px;}
+
+  /* Controls */
+  .control-group{margin-bottom:20px;}
+  .control-group:last-child{margin-bottom:0;}
+  .control-title{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:var(--text-dim);
+    margin-bottom:10px;
+    display:flex;align-items:center;gap:8px;
+  }
+  .dot{width:9px;height:9px;border-radius:50%;display:inline-block;}
+  .dot.teal{background:var(--teal);}
+  .dot.coral{background:var(--coral);}
+
+  .slider-row{
+    display:grid;
+    grid-template-columns:22px 1fr 58px;
+    align-items:center;
+    gap:10px;
+    margin-bottom:10px;
+  }
+  .slider-row label{
+    font-family:'JetBrains Mono',monospace;
+    font-size:14px;
+    font-weight:700;
+    color:var(--text);
+  }
+  input[type=range]{
+    -webkit-appearance:none;
+    width:100%;
+    height:4px;
+    border-radius:2px;
+    background:var(--grid);
+    outline:none;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    width:16px;height:16px;border-radius:50%;
+    background:var(--gold);
+    cursor:pointer;
+    border:2px solid #14172B;
+    box-shadow:0 0 0 1px var(--gold);
+  }
+  input[type=range]::-moz-range-thumb{
+    width:16px;height:16px;border-radius:50%;
+    background:var(--gold);cursor:pointer;border:2px solid #14172B;
+  }
+  .slider-val{
+    font-family:'JetBrains Mono',monospace;
+    font-size:13px;
+    text-align:right;
+    background:var(--panel-2);
+    border:1px solid var(--border);
+    border-radius:6px;
+    padding:4px 6px;
+    color:var(--text);
+  }
+
+  .error-box{
+    background:rgba(240,102,92,.1);
+    border:1px solid var(--coral);
+    color:var(--coral);
+    border-radius:10px;
+    padding:12px 14px;
+    font-size:13.5px;
+    line-height:1.5;
+    margin-top:6px;
+  }
+
+  /* Steps */
+  .step{
+    display:grid;
+    grid-template-columns:26px 1fr;
+    gap:12px;
+    padding:14px 0;
+    border-top:1px solid var(--border);
+  }
+  .step:first-of-type{border-top:none;padding-top:0;}
+  .step-num{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:17px;
+    color:var(--gold);
+    line-height:1.3;
+  }
+  .step-body h3{
+    margin:0 0 6px;
+    font-size:14px;
+    font-weight:600;
+    color:var(--text);
+  }
+  .step-body p{
+    margin:0 0 8px;
+    font-size:13.5px;
+    color:var(--text-dim);
+    line-height:1.55;
+  }
+  .eqline{
+    font-family:'JetBrains Mono',monospace;
+    font-size:14px;
+    background:var(--panel-2);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:8px 12px;
+    display:inline-block;
+    margin:2px 6px 2px 0;
+  }
+  .eqline.result{border-color:var(--gold);color:var(--gold);font-weight:700;}
+
+  .result-card{
+    margin-top:18px;
+    background:linear-gradient(135deg, rgba(232,184,74,.12), rgba(232,184,74,.03));
+    border:1px solid var(--gold);
+    border-radius:12px;
+    padding:16px 18px;
+  }
+  .result-card .rc-label{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.1em;
+    color:var(--gold);
+    margin-bottom:6px;
+  }
+  .result-card .rc-eq{
+    font-family:'JetBrains Mono',monospace;
+    font-size:21px;
+    font-weight:700;
+    color:var(--text);
+  }
+
+  /* Graph panel */
+  .graph-panel{position:sticky;top:20px;}
+  svg{width:100%;height:auto;display:block;}
+  .legend{display:flex;gap:18px;flex-wrap:wrap;margin-top:14px;}
+  .legend-item{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--text-dim);font-family:'JetBrains Mono',monospace;}
+  .legend-swatch{width:16px;height:3px;border-radius:2px;}
+
+  .slope-badge{
+    display:flex;align-items:center;gap:10px;
+    margin-top:16px;
+    padding:10px 14px;
+    background:var(--panel-2);
+    border:1px solid var(--border);
+    border-radius:10px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:13px;
+  }
+  .slope-badge .m{color:var(--coral);font-weight:700;}
+  .slope-badge .m2{color:var(--gold);font-weight:700;}
+  .slope-badge .eqmark{color:var(--teal);font-size:16px;}
+
+  footer{
+    margin-top:36px;
+    text-align:center;
+    color:var(--text-dim);
+    font-size:12px;
+    font-family:'JetBrains Mono',monospace;
+    letter-spacing:.04em;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow">Geometría analítica · Rectas tangentes</div>
+  <h1>Tangente <em>paralela</em> a una recta dada</h1>
+  <p class="lede">Ajusta los coeficientes de la parábola y de la recta para ver cómo cambia, paso a paso, la ecuación de la tangente que corre paralela a ella.</p>
+
+  <div class="statement">
+    <div class="statement-item">
+      <span class="statement-label">Curva</span>
+      <span class="statement-eq parabola" id="eq-parabola">y = 2x² − 9x − 1</span>
+    </div>
+    <div class="statement-item">
+      <span class="statement-label">Recta de referencia</span>
+      <span class="statement-eq line" id="eq-line">x + y = 6</span>
+    </div>
+  </div>
+
+  <div class="grid">
+
+    <!-- LEFT: controls + steps -->
+    <div>
+      <div class="panel" style="margin-bottom:24px;">
+        <h2>Parámetros</h2>
+        <p class="sub">Define la parábola y = ax² + bx + c, y la recta Ax + By = C.</p>
+
+        <div class="control-group">
+          <div class="control-title"><span class="dot teal"></span>Parábola y = ax² + bx + c</div>
+          <div class="slider-row">
+            <label>a</label>
+            <input type="range" id="a" min="-5" max="5" step="0.5" value="2">
+            <div class="slider-val" id="a-val">2</div>
+          </div>
+          <div class="slider-row">
+            <label>b</label>
+            <input type="range" id="b" min="-15" max="15" step="0.5" value="-9">
+            <div class="slider-val" id="b-val">-9</div>
+          </div>
+          <div class="slider-row">
+            <label>c</label>
+            <input type="range" id="c" min="-15" max="15" step="0.5" value="-1">
+            <div class="slider-val" id="c-val">-1</div>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <div class="control-title"><span class="dot coral"></span>Recta Ax + By = C</div>
+          <div class="slider-row">
+            <label>A</label>
+            <input type="range" id="A" min="-5" max="5" step="0.5" value="1">
+            <div class="slider-val" id="A-val">1</div>
+          </div>
+          <div class="slider-row">
+            <label>B</label>
+            <input type="range" id="B" min="-5" max="5" step="0.5" value="1">
+            <div class="slider-val" id="B-val">1</div>
+          </div>
+          <div class="slider-row">
+            <label>C</label>
+            <input type="range" id="C" min="-20" max="20" step="0.5" value="6">
+            <div class="slider-val" id="C-val">6</div>
+          </div>
+        </div>
+
+        <div id="error-slot"></div>
+      </div>
+
+      <div class="panel" id="steps-panel">
+        <h2>Solución paso a paso</h2>
+        <p class="sub">El razonamiento se recalcula en vivo con tus valores.</p>
+        <div id="steps"></div>
+        <div class="result-card">
+          <div class="rc-label">Ecuación de la recta tangente</div>
+          <div class="rc-eq" id="final-answer">y = −x − 9</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: graph -->
+    <div class="panel graph-panel">
+      <h2>Vista gráfica</h2>
+      <p class="sub">Parábola, recta de referencia y tangente en el punto de tangencia.</p>
+      <svg id="graph" viewBox="0 0 560 500" xmlns="http://www.w3.org/2000/svg"></svg>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-swatch" style="background:var(--teal);"></span>Parábola</div>
+        <div class="legend-item"><span class="legend-swatch" style="background:var(--coral);"></span>Recta dada</div>
+        <div class="legend-item"><span class="legend-swatch" style="background:var(--gold);"></span>Tangente</div>
+      </div>
+      <div class="slope-badge">
+        <span>pendiente recta <span class="m" id="badge-mline">−1</span></span>
+        <span class="eqmark">=</span>
+        <span>pendiente tangente <span class="m2" id="badge-mtan">−1</span></span>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>y = ax² + bx + c &nbsp;·&nbsp; Ax + By = C &nbsp;·&nbsp; paralelismo ⇒ pendientes iguales</footer>
+</div>
+
+<script>
+const ids = ['a','b','c','A','B','C'];
+const state = {};
+ids.forEach(id=>{
+  const el = document.getElementById(id);
+  state[id] = parseFloat(el.value);
+  el.addEventListener('input', ()=>{
+    state[id] = parseFloat(el.value);
+    document.getElementById(id+'-val').textContent = fmtNum(state[id]);
+    render();
+  });
+  document.getElementById(id+'-val').textContent = fmtNum(state[id]);
+});
+
+function fmtNum(n){
+  n = Math.round(n*1000)/1000;
+  if(Object.is(n,-0)) n = 0;
+  return (n % 1 === 0) ? n.toString() : n.toFixed(2).replace(/0+$/,'').replace(/\.$/,'');
+}
+
+// pretty-print a coefficient*variable term, handling sign and 1/-1
+function term(coef, variable, isFirst){
+  const n = Math.round(coef*1000)/1000;
+  if(n === 0) return '';
+  const sign = n < 0 ? '−' : (isFirst ? '' : '+');
+  const abs = Math.abs(n);
+  const coefStr = (abs === 1 && variable !== '') ? '' : fmtNum(abs);
+  const sep = isFirst ? sign : ' ' + sign + ' ';
+  return sep + coefStr + variable;
+}
+
+function polyString(a,b,c){
+  let s = '';
+  let first = true;
+  if(a !== 0){ s += term(a,'x²',first); first = false; }
+  if(b !== 0){ s += term(b,'x',first); first = false; }
+  if(c !== 0){ s += term(c,'',first); first = false; }
+  if(s === '') s = '0';
+  s = s.replace(/^−/, '−').replace(/^\+ /,'');
+  return s.trim();
+}
+
+function lineString(A,B,C){
+  let s = '';
+  let first = true;
+  if(A !== 0){ s += term(A,'x',first); first = false; }
+  if(B !== 0){ s += term(B,'y',first); first = false; }
+  if(s === '') s = '0';
+  return s.trim() + ' = ' + fmtNum(C);
+}
+
+function slopeInterceptString(m,n){
+  let s = 'y = ';
+  s += term(m,'x',true);
+  if(n !== 0){ s += term(n,'',false); }
+  else if (m===0) { s += fmtNum(0); }
+  return s.replace('y = +','y = ');
+}
+
+function render(){
+  const {a,b,c,A,B,C} = state;
+  document.getElementById('eq-parabola').textContent = 'y = ' + polyString(a,b,c);
+  document.getElementById('eq-line').textContent = lineString(A,B,C);
+
+  const errSlot = document.getElementById('error-slot');
+  const stepsPanel = document.getElementById('steps-panel');
+  errSlot.innerHTML = '';
+
+  if(a === 0){
+    errSlot.innerHTML = '<div class="error-box">Con a = 0 la curva deja de ser una parábola (sería una recta). Elige un valor de a distinto de 0.</div>';
+    stepsPanel.style.display = 'none';
+    document.getElementById('graph').innerHTML = '';
+    return;
+  }
+  if(B === 0){
+    errSlot.innerHTML = '<div class="error-box">Con B = 0 la recta Ax + By = C es vertical (pendiente indefinida). Ninguna tangente de esta parábola puede ser paralela a una recta vertical. Elige B ≠ 0.</div>';
+    stepsPanel.style.display = 'none';
+    document.getElementById('graph').innerHTML = '';
+    return;
+  }
+  stepsPanel.style.display = '';
+
+  const mLine = -A/B;
+  const x0 = (mLine - b) / (2*a);
+  const y0 = a*x0*x0 + b*x0 + c;
+  const nTan = y0 - mLine*x0;
+
+  // Steps
+  const steps = document.getElementById('steps');
+  steps.innerHTML = `
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h3>Pendiente de la recta de referencia</h3>
+        <p>Despejamos y de <span class="eqline">${lineString(A,B,C)}</span> para leer su pendiente.</p>
+        <div class="eqline">${slopeInterceptString(mLine, C/B)}</div>
+        <div class="eqline result">m = ${fmtNum(mLine)}</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h3>Derivada e igualdad de pendientes</h3>
+        <p>La pendiente de la tangente en cualquier punto x es y′. Como debe ser paralela, la igualamos a m.</p>
+        <div class="eqline">y′ = ${term(2*a,'x',true).trim()}${term(b,'',false)}</div>
+        <div class="eqline">${term(2*a,'x',true).trim()}${term(b,'',false)} = ${fmtNum(mLine)}</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h3>Punto de tangencia</h3>
+        <p>Resolvemos para x, y evaluamos en la parábola para obtener y.</p>
+        <div class="eqline">x₀ = ${fmtNum(x0)}</div>
+        <div class="eqline">y₀ = ${fmtNum(y0)}</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h3>Ecuación de la tangente</h3>
+        <p>Usamos punto-pendiente con (x₀, y₀) y m, y simplificamos.</p>
+        <div class="eqline">y − (${fmtNum(y0)}) = ${fmtNum(mLine)}(x − (${fmtNum(x0)}))</div>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('final-answer').textContent = slopeInterceptString(mLine, nTan);
+  document.getElementById('badge-mline').textContent = fmtNum(mLine);
+  document.getElementById('badge-mtan').textContent = fmtNum(mLine);
+
+  drawGraph(a,b,c,mLine,C/B,x0,y0,nTan);
+}
+
+function drawGraph(a,b,c,mLine,bLine,x0,y0,nTan){
+  const svg = document.getElementById('graph');
+  const W = 560, H = 500;
+  const vertexX = -b/(2*a);
+
+  let xs = [vertexX, x0, vertexX-3.5, vertexX+3.5, x0-2.5, x0+2.5];
+  let xMin = Math.min(...xs) - 1;
+  let xMax = Math.max(...xs) + 1;
+  if(xMax - xMin < 6){ const mid=(xMax+xMin)/2; xMin=mid-3; xMax=mid+3; }
+
+  const samples = [];
+  const N = 80;
+  for(let i=0;i<=N;i++){
+    const x = xMin + (xMax-xMin)*i/N;
+    samples.push([x, a*x*x+b*x+c]);
+  }
+  let yMin = Math.min(...samples.map(p=>p[1]));
+  let yMax = Math.max(...samples.map(p=>p[1]));
+  const lineYAtMin = mLine*xMin + bLine, lineYAtMax = mLine*xMax + bLine;
+  yMin = Math.min(yMin, lineYAtMin, lineYAtMax, y0);
+  yMax = Math.max(yMax, lineYAtMin, lineYAtMax, y0);
+  const pad = (yMax-yMin)*0.12 || 2;
+  yMin -= pad; yMax += pad;
+
+  const padPx = 42;
+  const sx = x => padPx + (x-xMin)/(xMax-xMin) * (W-2*padPx);
+  const sy = y => (H-padPx) - (y-yMin)/(yMax-yMin) * (H-2*padPx);
+
+  // grid step: choose "nice" step
+  function niceStep(range){
+    const raw = range/8;
+    const mag = Math.pow(10, Math.floor(Math.log10(raw)));
+    const norm = raw/mag;
+    let step;
+    if(norm < 1.5) step = 1; else if(norm < 3.5) step = 2; else if(norm < 7.5) step = 5; else step = 10;
+    return step*mag;
+  }
+  const stepX = niceStep(xMax-xMin);
+  const stepY = niceStep(yMax-yMin);
+
+  let grid = '';
+  for(let gx = Math.ceil(xMin/stepX)*stepX; gx <= xMax; gx += stepX){
+    grid += `<line x1="${sx(gx)}" y1="${padPx}" x2="${sx(gx)}" y2="${H-padPx}" stroke="var(--grid)" stroke-width="1"/>`;
+  }
+  for(let gy = Math.ceil(yMin/stepY)*stepY; gy <= yMax; gy += stepY){
+    grid += `<line x1="${padPx}" y1="${sy(gy)}" x2="${W-padPx}" y2="${sy(gy)}" stroke="var(--grid)" stroke-width="1"/>`;
+  }
+
+  let axes = '';
+  if(xMin <= 0 && xMax >= 0){
+    axes += `<line x1="${sx(0)}" y1="${padPx}" x2="${sx(0)}" y2="${H-padPx}" stroke="#4A5090" stroke-width="1.5"/>`;
+  }
+  if(yMin <= 0 && yMax >= 0){
+    axes += `<line x1="${padPx}" y1="${sy(0)}" x2="${W-padPx}" y2="${sy(0)}" stroke="#4A5090" stroke-width="1.5"/>`;
+  }
+
+  const parabolaPath = 'M ' + samples.map(p=>`${sx(p[0]).toFixed(1)},${sy(p[1]).toFixed(1)}`).join(' L ');
+  const linePath = `M ${sx(xMin)},${sy(lineYAtMin)} L ${sx(xMax)},${sy(lineYAtMax)}`;
+
+  const tanSpan = (xMax-xMin)*0.4;
+  const tx1 = x0-tanSpan, tx2 = x0+tanSpan;
+  const tanPath = `M ${sx(tx1)},${sy(mLine*tx1+nTan)} L ${sx(tx2)},${sy(mLine*tx2+nTan)}`;
+
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.innerHTML = `
+    ${grid}
+    ${axes}
+    <path d="${parabolaPath}" fill="none" stroke="var(--teal)" stroke-width="2.5"/>
+    <path d="${linePath}" fill="none" stroke="var(--coral)" stroke-width="2" stroke-dasharray="6 5"/>
+    <path d="${tanPath}" fill="none" stroke="var(--gold)" stroke-width="2.5"/>
+    <circle cx="${sx(x0)}" cy="${sy(y0)}" r="6" fill="var(--gold)" stroke="#14172B" stroke-width="2">
+      <animate attributeName="r" values="5;8;5" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <text x="${sx(x0)+12}" y="${sy(y0)-10}" fill="var(--gold)" font-family="JetBrains Mono, monospace" font-size="12" font-weight="700">
+      (${fmtNum(x0)}, ${fmtNum(y0)})
+    </text>
+  `;
+}
+
+render();
+</script>
+</body>
+</html>
