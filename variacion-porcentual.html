@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Variación porcentual entre dos valores</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #EFEDE4;
+    --panel: #FBFAF6;
+    --panel-2: #F1EFE6;
+    --border: #DAD5C4;
+    --text: #262A3D;
+    --text-dim: #6C7085;
+    --gold: #B8842E;
+    --coral: #C7554A;
+    --teal: #2C8577;
+    --grid: #E3DFD0;
+    --green: #3F9D6F;
+    --red: #C7554A;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(circle at 15% 8%, #F6F3E9 0%, transparent 45%),
+      var(--bg);
+    color:var(--text);
+    font-family:'Inter', sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:36px 24px 64px;}
+
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12.5px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--gold);
+    margin-bottom:10px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .eyebrow::before{content:"";width:22px;height:1px;background:var(--gold);display:inline-block;}
+  h1{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:clamp(26px,4vw,40px);
+    line-height:1.1;
+    margin:0 0 14px;
+    letter-spacing:-.01em;
+  }
+  h1 em{color:var(--gold);font-style:italic;font-weight:500;}
+  .lede{
+    color:var(--text-dim);
+    font-size:15.5px;
+    line-height:1.6;
+    max-width:680px;
+    margin:0 0 28px;
+  }
+
+  .statement{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:20px 24px;
+    margin-bottom:32px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:28px;
+    align-items:center;
+  }
+  .statement-item{display:flex;flex-direction:column;gap:6px;}
+  .statement-label{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.1em;
+    color:var(--text-dim);
+  }
+  .statement-eq{
+    font-family:'JetBrains Mono',monospace;
+    font-size:20px;
+    font-weight:700;
+  }
+  .statement-eq.teal{color:var(--teal);}
+  .statement-eq.coral{color:var(--coral);}
+  .statement-eq.gold{color:var(--gold);}
+
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start;}
+  @media (max-width:920px){ .grid{grid-template-columns:1fr;} }
+
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:22px 24px 26px;
+  }
+  .panel h2{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:18px;
+    margin:0 0 4px;
+  }
+  .panel .sub{color:var(--text-dim);font-size:13px;margin:0 0 18px;}
+
+  .control-group{margin-bottom:20px;}
+  .control-group:last-child{margin-bottom:0;}
+  .control-title{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:var(--text-dim);
+    margin-bottom:10px;
+    display:flex;align-items:center;gap:8px;
+  }
+  .dot{width:9px;height:9px;border-radius:50%;display:inline-block;}
+  .dot.teal{background:var(--teal);}
+  .dot.coral{background:var(--coral);}
+  .dot.gold{background:var(--gold);}
+
+  .slider-row{
+    display:grid;
+    grid-template-columns:56px 1fr 78px;
+    align-items:center;
+    gap:10px;
+    margin-bottom:10px;
+  }
+  .slider-row label{
+    font-family:'JetBrains Mono',monospace;
+    font-size:13px;
+    font-weight:700;
+    color:var(--text);
+  }
+  input[type=range]{
+    -webkit-appearance:none;
+    width:100%;
+    height:4px;
+    border-radius:2px;
+    background:var(--grid);
+    outline:none;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    width:16px;height:16px;border-radius:50%;
+    background:var(--gold);
+    cursor:pointer;
+    border:2px solid #FBFAF6;
+    box-shadow:0 0 0 1px var(--gold);
+  }
+  input[type=range]::-moz-range-thumb{
+    width:16px;height:16px;border-radius:50%;
+    background:var(--gold);cursor:pointer;border:2px solid #FBFAF6;
+  }
+  .slider-val{
+    font-family:'JetBrains Mono',monospace;
+    font-size:13px;
+    text-align:right;
+    background:var(--panel-2);
+    border:1px solid var(--border);
+    border-radius:6px;
+    padding:4px 6px;
+    color:var(--text);
+  }
+
+  .btn{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12.5px;
+    letter-spacing:.03em;
+    background:var(--panel-2);
+    border:1px solid var(--border);
+    color:var(--text);
+    border-radius:8px;
+    padding:9px 14px;
+    cursor:pointer;
+    transition:border-color .15s, color .15s;
+  }
+  .btn:hover{border-color:var(--gold);color:var(--gold);}
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px;}
+
+  .step{
+    display:grid;
+    grid-template-columns:26px 1fr;
+    gap:12px;
+    padding:14px 0;
+    border-top:1px solid var(--border);
+  }
+  .step:first-of-type{border-top:none;padding-top:0;}
+  .step-num{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:17px;
+    color:var(--gold);
+    line-height:1.3;
+  }
+  .step-body h3{
+    margin:0 0 6px;
+    font-size:14px;
+    font-weight:600;
+    color:var(--text);
+  }
+  .step-body p{
+    margin:0 0 8px;
+    font-size:13.5px;
+    color:var(--text-dim);
+    line-height:1.55;
+  }
+  .eqline{
+    font-family:'JetBrains Mono',monospace;
+    font-size:14px;
+    background:var(--panel-2);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:8px 12px;
+    display:inline-block;
+    margin:2px 6px 2px 0;
+  }
+  .eqline.result{border-color:var(--gold);color:var(--gold);font-weight:700;}
+
+  .result-card{
+    margin-top:18px;
+    background:linear-gradient(135deg, rgba(184,132,46,.12), rgba(184,132,46,.02));
+    border:1px solid var(--gold);
+    border-radius:12px;
+    padding:16px 18px;
+  }
+  .result-card .rc-label{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.1em;
+    color:var(--gold);
+    margin-bottom:6px;
+  }
+  .result-card .rc-eq{
+    font-family:'JetBrains Mono',monospace;
+    font-size:23px;
+    font-weight:700;
+    color:var(--text);
+  }
+
+  /* bar viz */
+  .bars{margin-top:6px;}
+  .bar-row{margin-bottom:16px;}
+  .bar-row .blabel{
+    display:flex;justify-content:space-between;
+    font-family:'JetBrains Mono',monospace;
+    font-size:12.5px;
+    color:var(--text-dim);
+    margin-bottom:5px;
+  }
+  .bar-track{
+    width:100%;
+    height:26px;
+    background:var(--panel-2);
+    border:1px solid var(--border);
+    border-radius:6px;
+    overflow:hidden;
+  }
+  .bar-fill{
+    height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    padding-right:8px;
+    color:#fff;
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    font-weight:700;
+    transition:width .2s;
+  }
+  .bar-fill.teal{background:var(--teal);}
+  .bar-fill.coral{background:var(--coral);}
+
+  .change-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    margin-top:12px;
+    padding:10px 14px;
+    background:var(--panel-2);
+    border:1px solid var(--gold);
+    border-radius:10px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:15px;
+    font-weight:700;
+    color:var(--gold);
+  }
+
+  /* options */
+  .option{
+    display:grid;
+    grid-template-columns:34px 1fr 84px;
+    align-items:center;
+    gap:12px;
+    padding:12px 14px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    margin-bottom:10px;
+    background:var(--panel-2);
+  }
+  .option-letter{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:18px;
+    color:var(--text-dim);
+    text-align:center;
+  }
+  .option-body .eq{
+    font-family:'JetBrains Mono',monospace;
+    font-size:14px;
+    font-weight:700;
+  }
+  .option-body .note{
+    font-size:12px;
+    color:var(--text-dim);
+    margin-top:3px;
+  }
+  .badge{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11.5px;
+    font-weight:700;
+    text-align:center;
+    border-radius:6px;
+    padding:5px 6px;
+  }
+  .badge.ok{background:rgba(63,157,111,.12);color:var(--green);border:1px solid var(--green);}
+  .badge.no{background:rgba(199,85,74,.1);color:var(--red);border:1px solid var(--red);}
+  .option.is-ok{border-color:var(--green);}
+
+  footer{
+    margin-top:36px;
+    text-align:center;
+    color:var(--text-dim);
+    font-size:12px;
+    font-family:'JetBrains Mono',monospace;
+    letter-spacing:.04em;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow">Aritmética · Variación porcentual</div>
+  <h1>Variación porcentual entre <em>dos valores</em></h1>
+  <p class="lede">Cambia el valor inicial y el valor final para ver, paso a paso, cómo se calcula el porcentaje de variación — y por qué las otras opciones vienen de errores comunes.</p>
+
+  <div class="statement">
+    <div class="statement-item">
+      <span class="statement-label">Enero (valor inicial)</span>
+      <span class="statement-eq teal" id="eq-v1">S/ 15,000</span>
+    </div>
+    <div class="statement-item">
+      <span class="statement-label">Febrero (valor final)</span>
+      <span class="statement-eq coral" id="eq-v2">S/ 18,000</span>
+    </div>
+    <div class="statement-item">
+      <span class="statement-label">Variación</span>
+      <span class="statement-eq gold" id="eq-change">+20%</span>
+    </div>
+  </div>
+
+  <div class="grid">
+
+    <!-- LEFT: controls + steps -->
+    <div>
+      <div class="panel" style="margin-bottom:24px;">
+        <h2>Parámetros</h2>
+        <p class="sub">Define las ventas de enero y de febrero.</p>
+
+        <div class="control-group">
+          <div class="control-title"><span class="dot teal"></span>Ventas de enero (valor inicial)</div>
+          <div class="slider-row">
+            <label>V₁</label>
+            <input type="range" id="v1" min="1000" max="50000" step="500" value="15000">
+            <div class="slider-val" id="v1-val">15000</div>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <div class="control-title"><span class="dot coral"></span>Ventas de febrero (valor final)</div>
+          <div class="slider-row">
+            <label>V₂</label>
+            <input type="range" id="v2" min="1000" max="50000" step="500" value="18000">
+            <div class="slider-val" id="v2-val">18000</div>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn" id="btn-shuffle">Mezclar orden de opciones</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Solución paso a paso</h2>
+        <p class="sub">Se recalcula en vivo con tus valores.</p>
+        <div id="steps"></div>
+        <div class="result-card">
+          <div class="rc-label">Variación porcentual</div>
+          <div class="rc-eq" id="final-answer">+20%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: bars + options -->
+    <div>
+      <div class="panel" style="margin-bottom:24px;">
+        <h2>Comparación visual</h2>
+        <p class="sub">Las barras están a escala del valor mayor.</p>
+        <div class="bars">
+          <div class="bar-row">
+            <div class="blabel"><span>Enero</span><span id="bar-v1-label">S/ 15,000</span></div>
+            <div class="bar-track"><div class="bar-fill teal" id="bar-v1"></div></div>
+          </div>
+          <div class="bar-row">
+            <div class="blabel"><span>Febrero</span><span id="bar-v2-label">S/ 18,000</span></div>
+            <div class="bar-track"><div class="bar-fill coral" id="bar-v2"></div></div>
+          </div>
+        </div>
+        <div class="change-badge" id="change-badge">↑ Aumentó 20%</div>
+      </div>
+
+      <div class="panel">
+        <h2>¿Cuál es la variación porcentual correcta?</h2>
+        <p class="sub">Cada opción corresponde a una manera de calcular — solo una es la correcta.</p>
+        <div id="options"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>Variación % = (Valor final − Valor inicial) / Valor inicial × 100</footer>
+</div>
+
+<script>
+const state = { v1:15000, v2:18000 };
+let order = [0,1,2,3];
+
+function fmtSoles(n){
+  n = Math.round(n);
+  return 'S/ ' + n.toLocaleString('es-PE');
+}
+function fmtPct(n){
+  n = Math.round(n*10)/10;
+  const sign = n >= 0 ? '+' : '−';
+  return `${sign}${Math.abs(n) % 1 === 0 ? Math.abs(n) : Math.abs(n).toFixed(1)}%`;
+}
+
+['v1','v2'].forEach(id=>{
+  document.getElementById(id).addEventListener('input', (e)=>{
+    state[id] = parseFloat(e.target.value);
+    document.getElementById(id+'-val').textContent = state[id];
+    render();
+  });
+});
+
+document.getElementById('btn-shuffle').addEventListener('click', ()=>{
+  for(let i=order.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [order[i],order[j]] = [order[j],order[i]];
+  }
+  renderOptions();
+});
+
+function buildOptionDefs(v1,v2){
+  const diff = v2 - v1;
+  const correct = diff/v1*100;
+  const optDenomFinal = diff/v2*100;
+  const optNoSubtract = v2/v1*100;
+  const optAverage = diff/((v1+v2)/2)*100;
+  return [
+    { val: correct, note:'Divide la diferencia entre el valor inicial (enero) y multiplica por 100.', isCorrect:true },
+    { val: optDenomFinal, note:'Divide la diferencia entre el valor final (febrero) en vez del inicial.' },
+    { val: optNoSubtract, note:'Olvida restar 100%: solo calcula qué porcentaje es febrero respecto a enero.' },
+    { val: optAverage, note:'Usa el promedio de ambos valores como base, en vez del valor inicial.' },
+  ];
+}
+
+function render(){
+  const {v1,v2} = state;
+  const diff = v2-v1;
+  const pct = diff/v1*100;
+
+  document.getElementById('eq-v1').textContent = fmtSoles(v1);
+  document.getElementById('eq-v2').textContent = fmtSoles(v2);
+  document.getElementById('eq-change').textContent = fmtPct(pct);
+
+  document.getElementById('steps').innerHTML = `
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h3>Calcular la diferencia</h3>
+        <p>Restamos el valor inicial (enero) al valor final (febrero).</p>
+        <div class="eqline">Diferencia = ${fmtSoles(v2)} − ${fmtSoles(v1)}</div>
+        <div class="eqline result">Diferencia = ${fmtSoles(diff)}</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h3>Dividir entre el valor inicial</h3>
+        <p>La variación siempre se compara respecto al punto de partida (enero), no respecto al final.</p>
+        <div class="eqline">${fmtSoles(diff)} / ${fmtSoles(v1)} = ${(diff/v1).toFixed(4)}</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h3>Convertir a porcentaje</h3>
+        <p>Multiplicamos por 100 para expresar el resultado como variación porcentual.</p>
+        <div class="eqline result">Variación % = ${fmtPct(pct)}</div>
+      </div>
+    </div>
+  `;
+  document.getElementById('final-answer').textContent = fmtPct(pct);
+
+  // bars (scaled to the larger value)
+  const maxVal = Math.max(v1,v2);
+  document.getElementById('bar-v1').style.width = (v1/maxVal*100) + '%';
+  document.getElementById('bar-v2').style.width = (v2/maxVal*100) + '%';
+  document.getElementById('bar-v1-label').textContent = fmtSoles(v1);
+  document.getElementById('bar-v2-label').textContent = fmtSoles(v2);
+
+  const badge = document.getElementById('change-badge');
+  const arrow = diff > 0 ? '↑' : (diff < 0 ? '↓' : '→');
+  const verb = diff > 0 ? 'Aumentó' : (diff < 0 ? 'Disminuyó' : 'No cambió');
+  badge.textContent = `${arrow} ${verb} ${Math.abs(pct).toFixed(pct%1===0?0:1)}%`;
+
+  renderOptions();
+}
+
+function renderOptions(){
+  const {v1,v2} = state;
+  const defs = buildOptionDefs(v1,v2);
+  const correctVal = defs[0].val;
+  const letters = ['A','B','C','D'];
+  const html = order.map((defIdx, pos)=>{
+    const def = defs[defIdx];
+    const isCorrectOne = Math.abs(def.val - correctVal) < 1e-9 && def.isCorrect;
+    return `
+      <div class="option ${isCorrectOne ? 'is-ok' : ''}">
+        <div class="option-letter">${letters[pos]}</div>
+        <div class="option-body">
+          <div class="eq">${fmtPct(def.val)}</div>
+          <div class="note">${def.note}${def.isCorrect ? ' <b style="color:var(--gold)">(método correcto)</b>' : ''}</div>
+        </div>
+        <div class="badge ${isCorrectOne ? 'ok':'no'}">${isCorrectOne ? '✓ correcta' : '✗ error'}</div>
+      </div>
+    `;
+  }).join('');
+  document.getElementById('options').innerHTML = html;
+}
+
+(function shuffleInit(){
+  for(let i=order.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [order[i],order[j]] = [order[j],order[i]];
+  }
+})();
+
+render();
+</script>
+</body>
+</html>
