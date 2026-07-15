@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificador de Razonamiento Lógico V5</title>
+    <style>
+        :root { --primario: #2c3e50; --secundario: #34495e; --acento: #2980b9; --exito: #27ae60; --error: #c0392b; --fondo: #f8f9fa; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 1050px; margin: 20px auto; padding: 0 20px; color: #333; }
+        h1 { text-align: center; color: var(--primario); margin-bottom: 25px; }
+        .zona { background: var(--fondo); padding: 20px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); margin-bottom: 20px; border: 1px solid #e9ecef; }
+        .titulo-zona { font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: #6c757d; margin-top: 0; margin-bottom: 15px; font-weight: bold; border-bottom: 2px solid #dee2e6; padding-bottom: 5px; display: flex; justify-content: space-between; align-items: center; }
+        
+        /* Controles Superiores */
+        .selector-premisas { display: flex; align-items: center; gap: 10px; background: #e2e8f0; padding: 10px 15px; border-radius: 6px; margin-bottom: 20px; font-weight: bold; justify-content: center; }
+        select { padding: 8px 12px; font-size: 16px; border-radius: 4px; border: 1px solid #cbd5e1; font-weight: bold; color: var(--primario); }
+        
+        /* Estructura Vertical del Argumento */
+        .contenedor-argumento { max-width: 600px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px; }
+        .fila-input { display: flex; align-items: center; gap: 10px; }
+        .etiqueta-input { width: 100px; font-weight: bold; color: var(--secundario); text-align: right; font-size: 15px; }
+        input[type="text"] { flex: 1; padding: 12px; font-size: 18px; font-weight: bold; border: 2px solid #ced4da; border-radius: 6px; text-align: center; color: var(--primario); background: #fff; transition: 0.2s; font-family: monospace; }
+        input[type="text"]:focus { border-color: var(--acento); outline: none; box-shadow: 0 0 5px rgba(41,128,185,0.3); background: #f0f8ff; }
+        .linea-divisoria { border-bottom: 4px solid var(--primario); margin: 10px 0 10px 110px; }
+        
+        /* Teclado Virtual */
+        .teclado { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-top: 20px; padding-top: 15px; border-top: 1px dashed #cbd5e1; }
+        button { padding: 8px 12px; font-size: 15px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; transition: 0.2s; }
+        .btn-var { background: #e3f2fd; color: #0d47a1; }
+        .btn-var:hover { background: #bbdefb; }
+        .btn-const { background: #ffe0b2; color: #e65100; }
+        .btn-const:hover { background: #ffcc80; }
+        .btn-op { background: #f3e5f5; color: #4a148c; }
+        .btn-op:hover { background: #e1bee7; }
+        .btn-ctrl { background: #e0e0e0; color: #333; }
+        .btn-ctrl:hover { background: #bdbdbd; }
+        
+        /* Botones de Métodos */
+        .botones-metodos { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
+        .btn-metodo { flex: 1; min-width: 200px; padding: 14px; font-size: 15px; background: var(--primario); color: white; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.15); text-transform: uppercase; letter-spacing: 0.5px; }
+        .btn-metodo:hover { background: var(--acento); transform: translateY(-1px); }
+        .btn-metodo.activo { background: var(--acento); ring: 2px solid white; }
+        
+        /* Zona 3: Resultados */
+        .panel-resultado { padding: 20px; border-radius: 6px; margin-top: 15px; display: none; }
+        .valido { background: #d4edda; border-left: 6px solid var(--exito); color: #155724; }
+        .invalido { background: #f8d7da; border-left: 6px solid var(--error); color: #721c24; }
+        .panel-resultado h2 { margin: 0 0 10px 0; font-size: 22px; display: flex; align-items: center; gap: 10px; }
+        .panel-resultado p { font-size: 16px; line-height: 1.6; margin-bottom: 15px; }
+        
+        /* Tablas */
+        table { width: 100%; border-collapse: collapse; background: white; text-align: center; margin-top: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); font-size: 14px; }
+        th, td { padding: 10px; border: 1px solid #dee2e6; }
+        th { background: var(--secundario); color: white; }
+        .val-v { background-color: #d4edda; color: #155724; font-weight: bold; }
+        .val-f { background-color: #f8d7da; color: #721c24; font-weight: bold; }
+        .fila-contraejemplo { background-color: #ffcccc !important; outline: 2px solid #c0392b; }
+        
+        @media (max-width: 768px) { .fila-input { flex-direction: column; align-items: stretch; } .etiqueta-input { text-align: left; width: auto; } .linea-divisoria { margin-left: 0; } }
+    </style>
+</head>
+<body>
+
+    <h1>Verificador de Razonamiento Lógico V5</h1>
+
+    <div class="zona">
+        <div class="titulo-zona">
+            <span>Zona 1: Estructura Vertical del Razonamiento</span>
+            <div class="selector-premisas">
+                <label for="num-premisas">Cantidad de Premisas:</label>
+                <select id="num-premisas" onchange="generarCampos()">
+                    <option value="1">1 Premisa</option>
+                    <option value="2" selected>2 Premisas</option>
+                    <option value="3">3 Premisas</option>
+                    <option value="4">4 Premisas</option>
+                    <option value="5">5 Premisas</option>
+                    <option value="6">6 Premisas</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="contenedor-argumento" id="inputs-argumento">
+            </div>
+
+        <div class="teclado">
+            <span style="width: 100%; text-align: center; font-size: 12px; color: #666; margin-bottom: 5px;">Teclado inteligente: Haz clic en una premisa o conclusión para insertar símbolos ahí</span>
+            <button class="btn-var" onclick="insertar('p')">p</button>
+            <button class="btn-var" onclick="insertar('q')">q</button>
+            <button class="btn-var" onclick="insertar('r')">r</button>
+            <button class="btn-var" onclick="insertar('s')">s</button>
+            <button class="btn-var" onclick="insertar('t')">t</button>
+            <button class="btn-const" onclick="insertar('V')">V</button>
+            <button class="btn-const" onclick="insertar('F')">F</button>
+            <button class="btn-op" onclick="insertar(' ∧ ')">∧ (Y)</button>
+            <button class="btn-op" onclick="insertar(' ∨ ')">∨ (O)</button>
+            <button class="btn-op" onclick="insertar(' ⊕ ')">⊕ (XOR)</button>
+            <button class="btn-op" onclick="insertar('¬')">¬ (No)</button>
+            <button class="btn-op" onclick="insertar(' → ')">→</button>
+            <button class="btn-op" onclick="insertar(' ↔ ')">↔</button>
+            <button class="btn-op" onclick="insertar('(')">(</button>
+            <button class="btn-op" onclick="insertar(')')">)</button>
+            <button class="btn-ctrl" onclick="borrarUltimo()">⌫</button>
+            <button class="btn-ctrl" style="background:#ffc107; color:#000;" onclick="cargarModusPonens()">Ejemplo: Modus Ponens</button>
+        </div>
+    </div>
+
+    <div class="zona">
+        <div class="titulo-zona">Zona 2: Selección de Técnica de Demostración</div>
+        <div class="botones-metodos">
+            <button class="btn-metodo" onclick="ejecutarMetodo('directo')">1. Método Directo<br><small>(Asumir Premisas = V)</small></button>
+            <button class="btn-metodo" onclick="ejecutarMetodo('indirecto')">2. Método Indirecto<br><small>(Reducción al Absurdo)</small></button>
+            <button class="btn-metodo" onclick="ejecutarMetodo('tabla')">3. Tabla de Verdad<br><small>(Tautología Condicional)</small></button>
+        </div>
+    </div>
+
+    <div class="zona">
+        <div class="titulo-zona">Zona 3: Diagnóstico de Validez del Argumento</div>
+        <div id="pantalla-resultado" class="panel-resultado"></div>
+    </div>
+
+    <script>
+        let inputActivo = null;
+
+        // Inicializar la interfaz al cargar
+        window.onload = function() {
+            generarCampos();
+            cargarModusPonens();
+        };
+
+        // Genera los cajones verticales según el número de premisas
+        function generarCampos() {
+            const num = parseInt(document.getElementById("num-premisas").value);
+            const contenedor = document.getElementById("inputs-argumento");
+            
+            // Guardar valores actuales si existen
+            let valoresPremisas = [];
+            for(let i=0; i<8; i++) {
+                let el = document.getElementById(`premisa-${i}`);
+                if(el) valoresPremisas.push(el.value);
+            }
+            let valConclusion = document.getElementById("conclusiones") ? document.getElementById("conclusiones").value : "";
+
+            contenedor.innerHTML = "";
+
+            // Crear Premisas
+            for (let i = 0; i < num; i++) {
+                let val = valoresPremisas[i] || "";
+                contenedor.innerHTML += `
+                    <div class="fila-input">
+                        <div class="etiqueta-input">Premisa ${i + 1}:</div>
+                        <input type="text" id="premisa-${i}" value="${val}" placeholder="Ej: p → q" onfocus="fijarFoco(this)">
+                    </div>
+                `;
+            }
+
+            // Línea divisoria y Conclusión
+            contenedor.innerHTML += `
+                <div class="linea-divisoria"></div>
+                <div class="fila-input">
+                    <div class="etiqueta-input" style="color:var(--acento);">Conclusión:</div>
+                    <input type="text" id="conclusiones" value="${valConclusion}" placeholder="Ej: q" style="border-color:var(--acento);" onfocus="fijarFoco(this)">
+                </div>
+            `;
+
+            // Asignar foco al primer input por defecto
+            setTimeout(() => {
+                let primerInput = document.getElementById("premisa-0");
+                if(primerInput) fijarFoco(primerInput);
+            }, 50);
+        }
+
+        function fijarFoco(elemento) {
+            inputActivo = elemento;
+        }
+
+        function insertar(simbolo) {
+            if (!inputActivo) inputActivo = document.getElementById("premisa-0");
+            if (inputActivo) {
+                inputActivo.value += simbolo;
+                inputActivo.focus();
+            }
+        }
+
+        function borrarUltimo() {
+            if (!inputActivo) inputActivo = document.getElementById("premisa-0");
+            if (inputActivo) {
+                inputActivo.value = inputActivo.value.slice(0, -1).trim();
+                inputActivo.focus();
+            }
+        }
+
+        // Carga un ejemplo clásico válido (Modus Ponens)
+        function cargarModusPonens() {
+            document.getElementById("num-premisas").value = "2";
+            generarCampos();
+            setTimeout(() => {
+                document.getElementById("premisa-0").value = "p → q";
+                document.getElementById("premisa-1").value = "p";
+                document.getElementById("conclusiones").value = "q";
+                document.getElementById("pantalla-resultado").style.display = "none";
+            }, 100);
+        }
+
+        // Traductor de sintaxis a JavaScript booleano
+        function traducirJS(expresion) {
+            return expresion
+                .replace(/\bV\b/g, 'true')
+                .replace(/\bF\b/g, 'false')
+                .replace(/↔/g, ' === ')
+                .replace(/→/g, ' <= ') // En JS booleano A <= B equivale a A -> B
+                .replace(/⊕/g, ' !== ')
+                .replace(/∧/g, ' && ')
+                .replace(/∨/g, ' || ')
+                .replace(/¬/g, ' ! ');
+        }
+
+        // Obtener todas las variables únicas en el argumento
+        function obtenerVariables(premisas, conclusion) {
+            let textoTotal = premisas.join(" ") + " " + conclusion;
+            return [...new Set(textoTotal.match(/[pqrst]/g))].sort();
+        }
+
+        // MOTOR PRINCIPAL DE DEMOSTRACIÓN
+        function ejecutarMetodo(metodo) {
+            const num = parseInt(document.getElementById("num-premisas").value);
+            let premisas = [];
+            for (let i = 0; i < num; i++) {
+                let val = document.getElementById(`premisa-${i}`).value.trim();
+                if (!val) { alert(`Por favor ingresa una fórmula en la Premisa ${i+1}`); return; }
+                premisas.push(val);
+            }
+            let conclusion = document.getElementById("conclusiones").value.trim();
+            if (!conclusion) { alert("Por favor ingresa la fórmula de la Conclusión."); return; }
+
+            const variables = obtenerVariables(premisas, conclusion);
+            if (variables.length === 0) { alert("No se encontraron variables proposicionales (p, q, r, s, t)."); return; }
+
+            const panel = document.getElementById("pantalla-resultado");
+            panel.style.display = "block";
+
+            // Evaluador en todas las 2^n combinaciones
+            const numFilas = Math.pow(2, variables.length);
+            let datosFilas = [];
+
+            try {
+                for (let i = numFilas - 1; i >= 0; i--) {
+                    let entorno = {};
+                    variables.forEach((v, index) => {
+                        entorno[v] = Boolean((i >> (variables.length - 1 - index)) & 1);
+                    });
+
+                    // Evaluar premisas
+                    let valPremisas = premisas.map(p => {
+                        let evalP = traducirJS(p);
+                        for (let v in entorno) evalP = evalP.replace(new RegExp('\\b' + v + '\\b', 'g'), entorno[v]);
+                        return Function('"use strict";return (' + evalP + ')')();
+                    });
+
+                    // Evaluar conclusión
+                    let evalC = traducirJS(conclusion);
+                    for (let v in entorno) evalC = evalC.replace(new RegExp('\\b' + v + '\\b', 'g'), entorno[v]);
+                    let valConcl = Function('"use strict";return (' + evalC + ')')();
+
+                    // Conjunción de todas las premisas (P1 ∧ P2 ∧ ... ∧ Pk)
+                    let premisasJuntas = valPremisas.every(val => val === true);
+                    
+                    // Condicional del argumento (Premisas -> Conclusión)
+                    let condicionalValida = (!premisasJuntas || valConcl);
+
+                    datosFilas.push({
+                        entorno: entorno,
+                        premisas: valPremisas,
+                        premisasJuntas: premisasJuntas,
+                        conclusiones: valConcl,
+                        esValida: condicionalValida
+                    });
+                }
+            } catch (e) {
+                panel.className = "panel-resultado invalido";
+                panel.innerHTML = `<h2>✗ Error de Sintaxis</h2><p>Revisa que los paréntesis y conectores de las premisas y la conclusión estén bien escritos.</p>`;
+                return;
+            }
+
+            // ¿Es válido el argumento en general? (Si en ningún caso se da Premisas V y Conclusión F)
+            const argumentoEsValido = datosFilas.every(f => f.esValida === true);
+
+            // RENDERIZAR SEGÚN EL MÉTODO SELECCIONADO
+            if (metodo === 'directo') {
+                renderizarDirecto(datosFilas, premisas, conclusion, variables, argumentoEsValido);
+            } else if (metodo === 'indirecto') {
+                renderizarIndirecto(datosFilas, premisas, conclusion, variables, argumentoEsValido);
+            } else if (metodo === 'tabla') {
+                renderizarTabla(datosFilas, premisas, conclusion, variables, argumentoEsValido);
+            }
+        }
+
+        // 1. MÉTODO DIRECTO (Asumiendo premisas verdaderas)
+        function renderizarDirecto(datos, premisas, conclusion, variables, esValido) {
+            const panel = document.getElementById("pantalla-resultado");
+            panel.className = `panel-resultado ${esValido ? 'valido' : 'invalido'}`;
+            
+            // Filtrar solo las filas donde TODAS las premisas son Verdaderas
+            const casosPremisasV = datos.filter(d => d.premisasJuntas === true);
+            
+            let html = `<h2>${esValido ? '✓ Argumento VÁLIDO (Método Directo)' : '✗ Argumento NO VÁLIDO (Método Directo)'}</h2>`;
+            html += `<p><strong>Lógica del método:</strong> Asumimos que todas las premisas son simultáneamente Verdaderas (<strong>V</strong>) y verificamos si la conclusión es obligatoriamente Verdadero (<strong>V</strong>).</p>`;
+            
+            if (casosPremisasV.length === 0) {
+                html += `<p><em>Nota excepcional:</em> Las premisas son contradictorias entre sí (nunca son verdaderas al mismo tiempo). Por principio de explosión lógica, el argumento se considera formalmente válido pero vacío de contenido práctico.</p>`;
+            } else {
+                html += `<p>Se encontraron <strong>${casosPremisasV.length} universo(s) de asignación</strong> donde todas las premisas son Verdaderas:</p>`;
+                
+                html += `<table><thead><tr>`;
+                variables.forEach(v => html += `<th>${v}</th>`);
+                html += `<th>Premisas (P₁∧...∧Pₖ)</th><th style="background:var(--acento);">Conclusión (${conclusion})</th><th>¿Cumple Validez?</th></tr></thead><tbody>`;
+                
+                casosPremisasV.forEach(fila => {
+                    let esContraejemplo = !fila.conclusiones;
+                    html += `<tr class="${esContraejemplo ? 'fila-contraejemplo' : ''}">`;
+                    variables.forEach(v => html += `<td class="${fila.entorno[v] ? 'val-v' : 'val-f'}">${fila.entorno[v] ? 'V' : 'F'}</td>`);
+                    html += `<td class="val-v">V</td>`;
+                    html += `<td class="${fila.conclusiones ? 'val-v' : 'val-f'}" style="font-size:16px;">${fila.conclusiones ? 'V' : 'F'}</td>`;
+                    html += `<td style="font-weight:bold; color:${fila.conclusiones ? 'green' : 'red'};">${fila.conclusiones ? '✓ Correcto' : '✗ FALLA (Contraejemplo)'}</td></tr>`;
+                });
+                html += `</tbody></table>`;
+            }
+
+            if (!esValido) {
+                html += `<p style="margin-top:15px; color:#900; font-weight:bold;">Conclusión del análisis: El argumento es INVÁLIDO porque existe al menos una combinación (resaltada en rojo) donde las premisas son Verdaderas pero la conclusión es Falsa.</p>`;
+            } else {
+                html += `<p style="margin-top:15px; color:#155724; font-weight:bold;">Conclusión del análisis: Siempre que las premisas son Verdaderas, la conclusión es obligatoriamente Verdadera. El razonamiento es lógicamente perfecto.</p>`;
+            }
+            panel.innerHTML = html;
+        }
+
+        // 2. MÉTODO INDIRECTO (Reducción al Absurdo)
+        function renderizarIndirecto(datos, premisas, conclusion, variables, esValido) {
+            const panel = document.getElementById("pantalla-resultado");
+            panel.className = `panel-resultado ${esValido ? 'valido' : 'invalido'}`;
+            
+            // Buscar si existe un caso absurdo donde Premisas = V y Conclusión = F
+            const casoAbsurdo = datos.find(d => d.premisasJuntas === true && d.conclusiones === false);
+
+            let html = `<h2>${esValido ? '✓ Argumento VÁLIDO (Reducción al Absurdo)' : '✗ Argumento NO VÁLIDO (Reducción al Absurdo)'}</h2>`;
+            html += `<p><strong>Lógica del método indirecto:</strong> Asumimos deliberadamente lo contrario: que la Conclusión es Falsa (<strong>F</strong>) mientras las Premisas son Verdaderas (<strong>V</strong>). Si esto genera una imposibilidad o contradicción, el argumento es válido.</p>`;
+
+            if (esValido) {
+                html += `<div style="background:#e8f5e9; padding:15px; border-radius:6px; border:1px solid #27ae60; color:#1b5e20;">
+                            <h3 style="margin-top:0;">¡Contradicción Lógica Demostrada!</h3>
+                            <p>Al intentar forzar que la conclusión (<code>${conclusion}</code>) sea Falsa, el motor evaluó las ${datos.length} combinaciones posibles y demostró que es <strong>matemáticamente imposible</strong> mantener todas las premisas en Verdadero al mismo tiempo.</p>
+                            <p style="margin-bottom:0;"><strong>Resultado:</strong> Como suponer la falsedad del argumento conduce a un absurdo, queda demostrado que el razonamiento original es <strong>VÁLIDO</strong>.</p>
+                         </div>`;
+            } else {
+                html += `<div style="background:#ffebee; padding:15px; border-radius:6px; border:1px solid #c0392b; color:#721c24;">
+                            <h3 style="margin-top:0;">¡No hubo contradicción! (Se encontró un Contraejemplo)</h3>
+                            <p>El algoritmo intentó hacer la conclusión Falsa y las premisas Verdaderas... <strong>¡y lo logró con éxito sin ninguna contradicción!</strong></p>
+                            <p>Esto sucede específicamente bajo la siguiente asignación de variables:</p>
+                            <ul style="font-size:18px; font-family:monospace; font-weight:bold;">`;
+                for (let v in casoAbsurdo.entorno) {
+                    html += `<li>${v} = ${casoAbsurdo.entorno[v] ? 'V (Verdadero)' : 'F (Falso)'}</li>`;
+                }
+                html += `   </ul>
+                            <p style="margin-bottom:0;"><strong>Resultado:</strong> Al ser posible que la conclusión sea falsa siendo las premisas verdaderas, el razonamiento es una <strong>FALACIA / ARGUMENTO INVÁLIDO</strong>.</p>
+                         </div>`;
+            }
+            panel.innerHTML = html;
+        }
+
+        // 3. MÉTODO POR TABLA DE VERDAD (Tautología)
+        function renderizarTabla(datos, premisas, conclusion, variables, esValido) {
+            const panel = document.getElementById("pantalla-resultado");
+            panel.className = `panel-resultado ${esValido ? 'valido' : 'invalido'}`;
+            
+            let condicionalTexto = `(${premisas.join(" ∧ ")}) → (${conclusion})`;
+
+            let html = `<h2>${esValido ? '✓ Argumento VÁLIDO (Es una Tautología)' : '✗ Argumento NO VÁLIDO (No es Tautología)'}</h2>`;
+            html += `<p><strong>Lógica por Tabla de Verdad:</strong> Se construye el condicional donde todas las premisas en conjunción son el antecedente y la conclusión es el consecuente: <br><code style="font-size:16px; color:var(--acento); font-weight:bold;">${condicionalTexto}</code>.<br>Para que sea válido, la columna final debe ser 100% Verdadero (Tautología).</p>`;
+            
+            html += `<div style="overflow-x:auto;"><table><thead><tr>`;
+            variables.forEach(v => html += `<th>${v}</th>`);
+            premisas.forEach((p, idx) => html += `<th>P${idx+1}: ${p}</th>`);
+            html += `<th>Conjunción Premisas</th><th style="background:var(--acento);">Conclusión: ${conclusion}</th><th style="background:#2c3e50; font-size:15px;">Razonamiento:<br>Premisas → Concl.</th></tr></thead><tbody>`;
+
+            datos.forEach(fila => {
+                let esContraejemplo = !fila.esValida;
+                html += `<tr class="${esContraejemplo ? 'fila-contraejemplo' : ''}">`;
+                
+                // Variables
+                variables.forEach(v => html += `<td class="${fila.entorno[v] ? 'val-v' : 'val-f'}">${fila.entorno[v] ? 'V' : 'F'}</td>`);
+                // Premisas individuales
+                fila.premisas.forEach(pVal => html += `<td class="${pVal ? 'val-v' : 'val-f'}">${pVal ? 'V' : 'F'}</td>`);
+                // Conjunción premisas
+                html += `<td class="${fila.premisasJuntas ? 'val-v' : 'val-f'}" style="font-weight:bold;">${fila.premisasJuntas ? 'V' : 'F'}</td>`;
+                // Conclusión
+                html += `<td class="${fila.conclusiones ? 'val-v' : 'val-f'}" style="font-weight:bold; background:#eaf2f8;">${fila.conclusiones ? 'V' : 'F'}</td>`;
+                // Resultado Condicional
+                html += `<td class="${fila.esValida ? 'val-v' : 'val-f'}" style="font-size:16px; border-left:3px solid #333;">${fila.esValida ? 'V' : 'F (Falla)'}</td>`;
+                
+                html += `</tr>`;
+            });
+
+            html += `</tbody></table></div>`;
+
+            if (esValido) {
+                html += `<p style="margin-top:15px; color:#155724; font-weight:bold;">Como puedes observar en la última columna, el condicional del argumento arrojó Verdadero (V) en las ${datos.length} filas posibles. Es una TAUTOLOGÍA, lo que certifica un razonamiento formal perfecto.</p>`;
+            } else {
+                html += `<p style="margin-top:15px; color:#900; font-weight:bold;">El condicional no es una tautología. En la(s) fila(s) resaltada(s) en rojo, las premisas se cumplen (V) pero la conclusión no (F), rompiendo la implicación lógica e invalidando el razonamiento.</p>`;
+            }
+            panel.innerHTML = html;
+        }
+    </script>
+</body>
+</html>

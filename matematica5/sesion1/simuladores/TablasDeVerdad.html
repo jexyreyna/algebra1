@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabla de Verdad con JavaScript Puro</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 800px; margin: 20px auto; padding: 0 20px; color: #333; }
+        h1 { text-align: center; color: #2c3e50; }
+        .panel { background: #f8f9fa; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        input[type="text"] { width: 100%; padding: 12px; font-size: 18px; margin-bottom: 15px; border: 2px solid #ced4da; border-radius: 4px; box-sizing: border-box; text-align: center; }
+        .btn-group { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 15px; }
+        button { padding: 10px 15px; font-size: 16px; font-weight: bold; border: none; border-radius: 4px; cursor: pointer; transition: 0.2s; }
+        .btn-var { background: #e3f2fd; color: #0d47a1; }
+        .btn-var:hover { background: #bbdefb; }
+        .btn-op { background: #f3e5f5; color: #4a148c; }
+        .btn-op:hover { background: #e1bee7; }
+        .btn-action { background: #2e7d32; color: white; width: 100%; font-size: 18px; margin-top: 10px; }
+        .btn-action:hover { background: #1b5e20; }
+        .btn-clear { background: #c62828; color: white; }
+        .btn-clear:hover { background: #8e0000; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        th, td { padding: 12px; text-align: center; border: 1px solid #dee2e6; }
+        th { background: #2c3e50; color: white; }
+        .val-v { background-color: #d4edda; color: #155724; font-weight: bold; }
+        .val-f { background-color: #f8d7da; color: #721c24; font-weight: bold; }
+        #diagnostico { font-size: 18px; font-weight: bold; text-align: center; margin-top: 15px; padding: 10px; border-radius: 4px; display: none; }
+        .tautologia { background: #d4edda; color: #155724; }
+        .contradiccion { background: #f8d7da; color: #721c24; }
+        .contingencia { background: #fff3cd; color: #856404; }
+    </style>
+</head>
+<body>
+
+    <h1>Generador de Tablas de Verdad </h1>
+    
+    <div class="panel">
+        <input type="text" id="formula" value="(p ∧ q) → r" placeholder="Introduce una proposición...">
+        
+        <div class="btn-group">
+            <button class="btn-var" onclick="insertar('p')">p</button>
+            <button class="btn-var" onclick="insertar('q')">q</button>
+            <button class="btn-var" onclick="insertar('r')">r</button>
+            <button class="btn-var" onclick="insertar('s')">s</button>
+            <button class="btn-var" onclick="insertar('t')">t</button>
+        </div>
+        
+        <div class="btn-group">
+            <button class="btn-op" onclick="insertar(' ∧ ')">∧ (Y)</button>
+            <button class="btn-op" onclick="insertar(' ∨ ')">∨ (O)</button>
+            <button class="btn-op" onclick="insertar(' ⊕ ')">⊕ (XOR)</button>
+            <button class="btn-op" onclick="insertar('¬')">¬ (No)</button>
+            <button class="btn-op" onclick="insertar(' → ')">→ (Entonces)</button>
+            <button class="btn-op" onclick="insertar(' ↔ ')">↔ (Si y solo si)</button>
+            <button class="btn-op" onclick="insertar('(')">(</button>
+            <button class="btn-op" onclick="insertar(')')">)</button>
+            <button class="btn-clear" onclick="borrarUltimo()">⌫</button>
+            <button class="btn-clear" onclick="limpiar()">Limpiar</button>
+        </div>
+
+        <button class="btn-action" onclick="generarTabla()">Generar Tabla de Verdad</button>
+    </div>
+
+    <div id="diagnostico"></div>
+    <div id="contenedor-tabla"></div>
+
+    <script>
+        function insertar(simbolo) {
+            document.getElementById("formula").value += simbolo;
+        }
+
+        function limpiar() {
+            document.getElementById("formula").value = "";
+            document.getElementById("contenedor-tabla").innerHTML = "";
+            document.getElementById("diagnostico").style.display = "none";
+        }
+
+        function borrarUltimo() {
+            let actual = document.getElementById("formula").value;
+            document.getElementById("formula").value = actual.slice(0, -1).trim();
+        }
+
+        function generarTabla() {
+            const formula = document.getElementById("formula").value.trim();
+            const contenedor = document.getElementById("contenedor-tabla");
+            const diagnostico = document.getElementById("diagnostico");
+
+            if (!formula) return;
+
+            // Extraer variables únicas y ordenarlas
+            const variables = [...new Set(formula.match(/[pqrst]/g))].sort();
+            if (variables.length === 0) {
+                contenedor.innerHTML = "<p style='color:red; text-align:center;'>Error: No se detectaron proposiciones simples (p, q, r, s, t).</p>";
+                return;
+            }
+
+            // Traducir símbolos a sintaxis de JavaScript
+            // El operador <= en boleanos JS actúa exactamente como la implicación lógica
+            let expJS = formula
+                .replace(/↔/g, ' === ')
+                .replace(/→/g, ' <= ')
+                .replace(/⊕/g, ' !== ')
+                .replace(/∧/g, ' && ')
+                .replace(/∨/g, ' || ')
+                .replace(/¬/g, ' ! ');
+
+            let htmlTabla = "<table><thead><tr>";
+            variables.forEach(v => htmlTabla += `<th>${v}</th>`);
+            htmlTabla += `<th>${formula}</th></tr></thead><tbody>`;
+
+            let resultados = [];
+            const numFilas = Math.pow(2, variables.length);
+
+            try {
+                for (let i = numFilas - 1; i >= 0; i--) {
+                    let filaHTML = "<tr>";
+                    let entorno = {};
+
+                    variables.forEach((v, index) => {
+                        // Generar combinaciones de V y F
+                        let val = Boolean((i >> (variables.length - 1 - index)) & 1);
+                        entorno[v] = val;
+                        let clase = val ? "val-v" : "val-f";
+                        filaHTML += `<td class='${clase}'>${val ? 'V' : 'F'}</td>`;
+                    });
+
+                    // Reemplazar el nombre de las variables por sus valores en la expresión
+                    let expEvaluar = expJS;
+                    for (let varName in entorno) {
+                        let regex = new RegExp('\\b' + varName + '\\b', 'g');
+                        expEvaluar = expEvaluar.replace(regex, entorno[varName]);
+                    }
+
+                    // Evaluar la expresión
+                    let res = Function('"use strict";return (' + expEvaluar + ')')();
+                    resultados.append ? resultados.append(res) : resultados.push(res);
+
+                    let claseRes = res ? "val-v" : "val-f";
+                    filaHTML += `<td class='${claseRes}'>${res ? 'V' : 'F'}</td></tr>`;
+                    htmlTabla += filaHTML;
+                }
+
+                htmlTabla += "</tbody></table>";
+                contenedor.innerHTML = htmlTabla;
+
+                // Clasificación de la proposición
+                diagnostico.style.display = "block";
+                if (resultados.every(r => r === true)) {
+                    diagnostico.className = "tautologia";
+                    diagnostico.innerHTML = "Resultado: Tautología (Siempre Verdadero)";
+                } else if (resultados.every(r => r === false)) {
+                    diagnostico.className = "contradiccion";
+                    diagnostico.innerHTML = "Resultado: Contradicción (Siempre Falso)";
+                } else {
+                    diagnostico.className = "contingencia";
+                    diagnostico.innerHTML = "Resultado: Contingencia (Valores Mixtos)";
+                }
+
+            } catch (e) {
+                contenedor.innerHTML = "<p style='color:red; text-align:center;'>Error de sintaxis en la proposición. Verifica los paréntesis y conectores.</p>";
+                diagnostico.style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>

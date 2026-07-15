@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nueva Esperanza - Razones de Cambio</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #1f2937;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.95;
+        }
+
+        .help-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .help-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        .instruction-panel {
+            position: fixed;
+            top: 0;
+            right: -500px;
+            width: 450px;
+            height: 100vh;
+            background: white;
+            box-shadow: -5px 0 20px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            transition: right 0.3s ease;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .instruction-panel.open {
+            right: 0;
+        }
+
+        .instruction-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .instruction-header h2 {
+            font-size: 20px;
+            color: #667eea;
+        }
+
+        .close-instruction {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #6b7280;
+        }
+
+        .instruction-tabs {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-button {
+            padding: 12px;
+            background: #f3f4f6;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #374151;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .tab-button:hover {
+            background: #e5e7eb;
+        }
+
+        .tab-button.active {
+            background: #667eea;
+            color: white;
+            border-color: #764ba2;
+        }
+
+        .tab-content {
+            display: none;
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .tab-content h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .tab-content p {
+            font-size: 13px;
+            color: #374151;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .tab-content ul, .tab-content ol {
+            margin-left: 15px;
+            font-size: 13px;
+            color: #374151;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .tab-content li {
+            margin-bottom: 6px;
+        }
+
+        .concept-box {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border-left: 4px solid #667eea;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            font-size: 12px;
+            color: #374151;
+        }
+
+        .concept-box strong {
+            color: #667eea;
+        }
+
+        .formula-box {
+            background: #f0f4ff;
+            border: 1px solid #ddd6fe;
+            padding: 10px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            color: #374151;
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+
+        .example-box {
+            background: #f0fdf4;
+            border-left: 4px solid #10b981;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            color: #374151;
+            margin-bottom: 10px;
+        }
+
+        .example-box strong {
+            color: #10b981;
+        }
+
+        .tip-box {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            color: #374151;
+            margin-bottom: 10px;
+        }
+
+        .tip-box strong {
+            color: #d97706;
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        .overlay.open {
+            display: block;
+        }
+
+        .content {
+            padding: 30px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .panel {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .panel-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .panel-title::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 20px;
+            background: #667eea;
+            border-radius: 2px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            margin-bottom: 15px;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: center;
+            border-bottom: 1px solid #d1d5db;
+        }
+
+        th {
+            background: #e5e7eb;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        input[type="number"], input[type="range"] {
+            width: 100%;
+            padding: 6px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 12px;
+        }
+
+        input[type="range"] {
+            padding: 0;
+            height: 6px;
+            cursor: pointer;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        button {
+            padding: 10px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .button-group button {
+            padding: 8px;
+            font-size: 11px;
+        }
+
+        .graph-container {
+            grid-column: 1 / -1;
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        svg {
+            width: 100%;
+            height: auto;
+        }
+
+        .calculation-panel {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .calc-card {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border: 1px solid #ddd6fe;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .calc-card h3 {
+            font-size: 15px;
+            color: #667eea;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .formula {
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #374151;
+            margin-bottom: 10px;
+            line-height: 1.5;
+            border-left: 3px solid #667eea;
+        }
+
+        .result {
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #1f2937;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .interpretation {
+            font-size: 13px;
+            color: #4b5563;
+            line-height: 1.5;
+            font-style: italic;
+        }
+
+        .activity-section {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+            border: 1px solid #ddd6fe;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .activity-section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .challenge {
+            background: white;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+        }
+
+        .challenge p {
+            margin-bottom: 10px;
+            font-size: 13px;
+            color: #374151;
+        }
+
+        .challenge input, .challenge select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+
+        .feedback {
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            margin-top: 8px;
+            display: none;
+        }
+
+        .feedback.success {
+            background: #d1fae5;
+            color: #065f46;
+            display: block;
+        }
+
+        .feedback.error {
+            background: #fee2e2;
+            color: #991b1b;
+            display: block;
+        }
+
+        .warning {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            color: #78350f;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 1024px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+
+            .instruction-panel {
+                width: 100%;
+                right: -100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .help-button {
+                width: 40px;
+                height: 40px;
+                font-size: 18px;
+                top: 15px;
+                right: 15px;
+            }
+
+            .content {
+                padding: 15px;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay" id="overlay" onclick="closeInstructions()"></div>
+
+    <div class="container">
+        <div class="header">
+            <button class="help-button" onclick="toggleInstructions()" title="Abrir panel de ayuda">?</button>
+            <h1>🏘️ Nueva Esperanza</h1>
+            <p>Análisis interactivo de razones de cambio en indicadores de pobreza</p>
+            <div class="warning" style="margin-top: 15px; background: rgba(255,255,255,0.15); border-left-color: white; color: white;">
+                ⚠️ Datos simulados para propósitos educativos únicamente
+            </div>
+        </div>
+
+        <!-- Panel de Instrucciones -->
+        <div class="instruction-panel" id="instructionPanel">
+            <div class="instruction-header">
+                <h2>📚 Centro de Aprendizaje</h2>
+                <button class="close-instruction" onclick="closeInstructions()">✕</button>
+            </div>
+
+            <div class="instruction-tabs">
+                <button class="tab-button active" onclick="switchTab('inicio')">🚀 Inicio Rápido</button>
+                <button class="tab-button" onclick="switchTab('conceptos')">📖 Conceptos Clave</button>
+                <button class="tab-button" onclick="switchTab('guia')">🎯 Guía de Uso</button>
+                <button class="tab-button" onclick="switchTab('formulas')">📐 Fórmulas</button>
+                <button class="tab-button" onclick="switchTab('ejemplos')">💡 Ejemplos</button>
+                <button class="tab-button" onclick="switchTab('interpretacion')">🔍 Interpretación</button>
+                <button class="tab-button" onclick="switchTab('glosario')">📕 Glosario</button>
+            </div>
+
+            <!-- TAB: Inicio Rápido -->
+            <div class="tab-content active" id="tab-inicio">
+                <h3>Bienvenido a Nueva Esperanza</h3>
+                <p>Este es un simulador interactivo que te ayudará a comprender las <strong>razones de cambio</strong> en el contexto real de una comunidad.</p>
+                
+                <div class="tip-box">
+                    <strong>💡 Tip:</strong> Comienza modificando los datos en la tabla de la izquierda. Los cambios se verán inmediatamente en la gráfica.
+                </div>
+
+                <h3 style="margin-top: 15px;">Pasos Básicos:</h3>
+                <ol>
+                    <li><strong>Observa los datos:</strong> La tabla muestra porcentajes de pobreza por año</li>
+                    <li><strong>Selecciona años:</strong> Elige dos años para comparar</li>
+                    <li><strong>Analiza la gráfica:</strong> Visualiza la tendencia y las rectas (secante y tangente)</li>
+                    <li><strong>Interpreta resultados:</strong> Lee las explicaciones en los paneles de cálculo</li>
+                    <li><strong>Experimenta:</strong> Usa los botones de generación de escenarios</li>
+                </ol>
+
+                <div class="concept-box">
+                    <strong>¿Qué es una razón de cambio?</strong><br>
+                    Es la velocidad o rapidez con que una cantidad cambia respecto a otra. En este caso, medimos cuántos puntos porcentuales cambia la pobreza por cada año que pasa.
+                </div>
+            </div>
+
+            <!-- TAB: Conceptos Clave -->
+            <div class="tab-content" id="tab-conceptos">
+                <h3>Razón de Cambio Promedio</h3>
+                <p>Mide el cambio <strong>promedio</strong> de una variable en un intervalo de tiempo.</p>
+                <div class="concept-box">
+                    <strong>Geométricamente:</strong> Es la pendiente de la recta secante que une dos puntos de la gráfica.
+                </div>
+
+                <h3 style="margin-top: 15px;">Razón de Cambio Instantánea</h3>
+                <p>Mide el cambio <strong>exacto</strong> en un momento específico.</p>
+                <div class="concept-box">
+                    <strong>Geométricamente:</strong> Es la pendiente de la recta tangente a la curva en un punto.
+                </div>
+
+                <h3 style="margin-top: 15px;">Razón de Cambio Porcentual</h3>
+                <p>Expresa el cambio como un <strong>porcentaje relativo</strong> al valor inicial.</p>
+                <div class="concept-box">
+                    <strong>Diferencia importante:</strong> Una disminución de 3 puntos porcentuales NO es lo mismo que una disminución del 3%.
+                </div>
+
+                <div class="example-box">
+                    <strong>Ejemplo:</strong> Si la pobreza baja de 30% a 27%, el cambio es de -3 puntos porcentuales, pero porcentualmente es una reducción del 10%.
+                </div>
+            </div>
+
+            <!-- TAB: Guía de Uso -->
+            <div class="tab-content" id="tab-guia">
+                <h3>1. Modificar Datos</h3>
+                <p>En el panel izquierdo "Datos de Pobreza (%):", puedes:</p>
+                <ul>
+                    <li>Escribir valores directamente en los campos numéricos</li>
+                    <li>Deslizar los controles (sliders)</li>
+                    <li>Usar botones de generación automática</li>
+                </ul>
+
+                <h3 style="margin-top: 15px;">2. Seleccionar Años</h3>
+                <p>En el panel derecho "Selecciona Años para Análisis":</p>
+                <ul>
+                    <li><strong>Año inicial (t₁):</strong> Inicio del período de análisis</li>
+                    <li><strong>Año final (t₂):</strong> Fin del período de análisis</li>
+                    <li><strong>Año instantáneo:</strong> Para calcular razón instantánea</li>
+                    <li><strong>Valor h:</strong> Tamaño del intervalo para la aproximación</li>
+                </ul>
+
+                <h3 style="margin-top: 15px;">3. Leer la Gráfica</h3>
+                <p>La gráfica muestra tres elementos:</p>
+                <ul>
+                    <li>🔵 <strong>Puntos azules:</strong> Datos reales observados</li>
+                    <li>🔷 <strong>Línea azul:</strong> Tendencia suave (interpolación)</li>
+                    <li>🟠 <strong>Línea naranja:</strong> Recta secante (cambio promedio)</li>
+                    <li>🟢 <strong>Línea verde:</strong> Recta tangente (cambio instantáneo)</li>
+                </ul>
+            </div>
+
+            <!-- TAB: Fórmulas -->
+            <div class="tab-content" id="tab-formulas">
+                <h3>Razón de Cambio Promedio</h3>
+                <div class="formula-box">
+                    RCP = [P(t₂) - P(t₁)] / (t₂ - t₁)<br><br>
+                    Donde:<br>
+                    P(t) = Porcentaje en el año t<br>
+                    t₁ = Año inicial<br>
+                    t₂ = Año final
+                </div>
+
+                <h3 style="margin-top: 15px;">Razón de Cambio Instantánea</h3>
+                <div class="formula-box">
+                    RCI = lim[h→0] [P(t+h) - P(t)] / h<br><br>
+                    Aproximación numérica:<br>
+                    RCI ≈ [P(t+h) - P(t)] / h
+                </div>
+
+                <h3 style="margin-top: 15px;">Razón de Cambio Porcentual</h3>
+                <div class="formula-box">
+                    RCP% = [P(t₂) - P(t₁)] / P(t₁) × 100%
+                </div>
+
+                <div class="tip-box">
+                    <strong>⚠️ Nota:</strong> Las fórmulas aparecen con los valores reales en los paneles de cálculo debajo de la gráfica.
+                </div>
+            </div>
+
+            <!-- TAB: Ejemplos -->
+            <div class="tab-content" id="tab-ejemplos">
+                <h3>Ejemplo 1: Cambio Promedio</h3>
+                <div class="example-box">
+                    <strong>Datos:</strong> Pobreza 2018 = 28.5% | Pobreza 2024 = 24.6%<br><br>
+                    <strong>Cálculo:</strong> RCP = (24.6 - 28.5) / (2024 - 2018)<br>
+                    = -3.9 / 6 = -0.65<br><br>
+                    <strong>Interpretación:</strong> En promedio, la pobreza disminuyó 0.65 puntos porcentuales por año durante 2018-2024.
+                </div>
+
+                <h3 style="margin-top: 15px;">Ejemplo 2: Cambio Porcentual</h3>
+                <div class="example-box">
+                    <strong>Cálculo:</strong> RCP% = (24.6 - 28.5) / 28.5 × 100<br>
+                    = -3.9 / 28.5 × 100 = -13.68%<br><br>
+                    <strong>Interpretación:</strong> Respecto al 2018, la pobreza disminuyó un 13.68%.
+                </div>
+
+                <h3 style="margin-top: 15px;">Ejemplo 3: La Diferencia</h3>
+                <div class="example-box">
+                    <strong>Si pobreza baja de 30% a 27%:</strong><br>
+                    • Cambio absoluto: -3 puntos porcentuales<br>
+                    • Cambio relativo: -10% (porque 3/30 × 100 = 10%)
+                </div>
+            </div>
+
+            <!-- TAB: Interpretación -->
+            <div class="tab-content" id="tab-interpretacion">
+                <h3>Interpretando Pendientes Positivas</h3>
+                <div class="concept-box">
+                    <strong>Pendiente positiva:</strong> El indicador AUMENTA. Más personas en pobreza. ⬈
+                </div>
+
+                <h3 style="margin-top: 15px;">Interpretando Pendientes Negativas</h3>
+                <div class="concept-box">
+                    <strong>Pendiente negativa:</strong> El indicador DISMINUYE. Menos personas en pobreza. ⬇
+                </div>
+
+                <h3 style="margin-top: 15px;">Pendientes Mayores en Magnitud</h3>
+                <div class="concept-box">
+                    <strong>|Pendiente| grande:</strong> Cambio RÁPIDO. La situación mejora o empeora aceleradamente.
+                </div>
+
+                <h3 style="margin-top: 15px;">Pendientes Menores en Magnitud</h3>
+                <div class="concept-box">
+                    <strong>|Pendiente| pequeña:</strong> Cambio LENTO. La situación es relativamente estable.
+                </div>
+
+                <div class="tip-box">
+                    <strong>💡 Consejo:</strong> Observa visualmente la gráfica primero, luego comprueba con los números en los cálculos.
+                </div>
+            </div>
+
+            <!-- TAB: Glosario -->
+            <div class="tab-content" id="tab-glosario">
+                <h3 style="color: #667eea; font-size: 14px;">Derivada</h3>
+                <p>Razón de cambio instantánea de una función. Representa la pendiente de la recta tangente en un punto.</p>
+
+                <h3 style="color: #667eea; font-size: 14px; margin-top: 12px;">Pendiente</h3>
+                <p>Inclinación de una recta. Se calcula como el cambio vertical dividido el cambio horizontal.</p>
+
+                <h3 style="color: #667eea; font-size: 14px; margin-top: 12px;">Recta Secante</h3>
+                <p>Línea que cruza una curva en dos puntos. Su pendiente es la razón de cambio promedio.</p>
+
+                <h3 style="color: #667eea; font-size: 14px; margin-top: 12px;">Recta Tangente</h3>
+                <p>Línea que toca una curva en un solo punto. Su pendiente es la razón de cambio instantánea.</p>
+
+                <h3 style="color: #667eea; font-size: 14px; margin-top: 12px;">Interpolación</h3>
+                <p>Técnica de estimar valores entre puntos conocidos usando funciones suaves.</p>
+
+                <h3 style="color: #667eea; font-size: 14px; margin-top: 12px;">Pobreza</h3>
+                <p>Condición de insuficiencia de recursos para satisfacer necesidades básicas.</p>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Panel de Datos -->
+            <div class="panel">
+                <div class="panel-title">Datos de Pobreza (%)</div>
+                <table id="dataTable">
+                    <thead>
+                        <tr>
+                            <th>Año</th>
+                            <th>%</th>
+                            <th>Control</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>2018</td>
+                            <td><input type="number" class="poverty-value" min="5" max="50" value="28.5" data-year="2018"></td>
+                            <td><input type="range" class="poverty-slider" min="5" max="50" value="28.5" data-year="2018"></td>
+                        </tr>
+                        <tr>
+                            <td>2019</td>
+                            <td><input type="number" class="poverty-value" min="5" max="50" value="27.1" data-year="2019"></td>
+                            <td><input type="range" class="poverty-slider" min="5" max="50" value="27.1" data-year="2019"></td>
+                        </tr>
+                        <tr>
+                            <td>2020</td>
+                            <td><input type="number" class="poverty-value" min="5" max="50" value="30.3" data-year="2020"></td>
+                            <td><input type="range" class="poverty-slider" min="5" max="50" value="30.3" data-year="2020"></td>
+                        </tr>
+                        <tr>
+                            <td>2021</td>
+                            <td><input type="number" class="poverty-value" min="5" max="50" value="29.4" data-year="2021"></td>
+                            <td><input type="range" class="poverty-slider" min="5" max="50" value="29.4" data-year="2021"></td>
+                        </tr>
+                        <tr>
+                            <td>2022</td>
+                            <td><input type="number" class="poverty-value" min="5" max="50" value="27.8" data-year="2022"></td>
+                            <td><input type="range" class="poverty-slider" min="5" max="50" value="27.8" data-year="2022"></td>
+                        </tr>
+                        <tr>
+                            <td>2023</td>
+                            <td><input type="number" class="poverty-value" min="5" max="50" value="25.9" data-year="2023"></td>
+                            <td><input type="range" class="poverty-slider" min="5" max="50" value="25.9" data-year="2023"></td>
+                        </tr>
+                        <tr>
+                            <td>2024</td>
+                            <td><input type="number" class="poverty-value" min="5" max="50" value="24.6" data-year="2024"></td>
+                            <td><input type="range" class="poverty-slider" min="5" max="50" value="24.6" data-year="2024"></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="button-group">
+                    <button onclick="restoreData()">Restaurar</button>
+                    <button onclick="generateRandom()">Aleatorio</button>
+                    <button onclick="generateDecreasing()">Disminuye</button>
+                    <button onclick="generateIncreasing()">Aumenta</button>
+                    <button onclick="generateStable()">Estable</button>
+                    <button onclick="generateFluctuating()">Fluctúa</button>
+                </div>
+            </div>
+
+            <!-- Panel de Controles de Cálculo -->
+            <div class="panel">
+                <div class="panel-title">Selecciona Años para Análisis</div>
+
+                <div style="margin-bottom: 15px;">
+                    <label style="font-size: 12px; color: #6b7280; margin-bottom: 5px; display: block;">Año inicial (t₁):</label>
+                    <select id="year1" style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 6px;" onchange="updateCalculations()">
+                        <option value="2018">2018</option>
+                        <option value="2019">2019</option>
+                        <option value="2020">2020</option>
+                        <option value="2021">2021</option>
+                        <option value="2022">2022</option>
+                        <option value="2023">2023</option>
+                    </select>
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <label style="font-size: 12px; color: #6b7280; margin-bottom: 5px; display: block;">Año final (t₂):</label>
+                    <select id="year2" style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 6px;" onchange="updateCalculations()">
+                        <option value="2019">2019</option>
+                        <option value="2020">2020</option>
+                        <option value="2021">2021</option>
+                        <option value="2022">2022</option>
+                        <option value="2023">2023</option>
+                        <option value="2024" selected>2024</option>
+                    </select>
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <label style="font-size: 12px; color: #6b7280; margin-bottom: 5px; display: block;">Año para análisis instantáneo:</label>
+                    <input type="range" id="instantYear" min="2018" max="2024" step="0.1" value="2021" style="width: 100%;" onchange="updateInstantaneous()">
+                    <div style="text-align: center; font-weight: 600; color: #667eea; margin-top: 8px;">
+                        <span id="instantYearDisplay">2021.0</span>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <label style="font-size: 12px; color: #6b7280; margin-bottom: 5px; display: block;">Valor de h (tamaño del intervalo):</label>
+                    <select id="hValue" style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 6px;" onchange="updateInstantaneous()">
+                        <option value="1">h = 1.0 año</option>
+                        <option value="0.5">h = 0.5 años</option>
+                        <option value="0.1">h = 0.1 años</option>
+                        <option value="0.01">h = 0.01 años</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Gráfica SVG -->
+            <div class="graph-container">
+                <div class="panel-title">Evolución del Indicador de Pobreza</div>
+                <svg id="graph" viewBox="0 0 900 500" style="min-height: 400px;">
+                    <defs>
+                        <pattern id="grid" width="50" height="35" patternUnits="userSpaceOnUse">
+                            <path d="M 50 0 L 0 0 0 35" fill="none" stroke="#e5e7eb" stroke-width="0.5"/>
+                        </pattern>
+                    </defs>
+                    <rect width="900" height="500" fill="#fafbfc" />
+                    <rect width="900" height="500" fill="url(#grid)" />
+
+                    <line x1="80" y1="450" x2="850" y2="450" stroke="#1f2937" stroke-width="2"/>
+                    <line x1="80" y1="50" x2="80" y2="450" stroke="#1f2937" stroke-width="2"/>
+
+                    <text x="875" y="470" font-size="14" fill="#1f2937" font-weight="600">Año</text>
+                    <text x="40" y="30" font-size="14" fill="#1f2937" font-weight="600">%</text>
+
+                    <text x="130" y="470" font-size="12" text-anchor="middle" fill="#6b7280">2018</text>
+                    <text x="180" y="470" font-size="12" text-anchor="middle" fill="#6b7280">2019</text>
+                    <text x="230" y="470" font-size="12" text-anchor="middle" fill="#6b7280">2020</text>
+                    <text x="280" y="470" font-size="12" text-anchor="middle" fill="#6b7280">2021</text>
+                    <text x="330" y="470" font-size="12" text-anchor="middle" fill="#6b7280">2022</text>
+                    <text x="380" y="470" font-size="12" text-anchor="middle" fill="#6b7280">2023</text>
+                    <text x="430" y="470" font-size="12" text-anchor="middle" fill="#6b7280">2024</text>
+
+                    <text x="70" y="455" font-size="11" text-anchor="end" fill="#6b7280">5%</text>
+                    <text x="70" y="335" font-size="11" text-anchor="end" fill="#6b7280">20%</text>
+                    <text x="70" y="215" font-size="11" text-anchor="end" fill="#6b7280">35%</text>
+                    <text x="70" y="95" font-size="11" text-anchor="end" fill="#6b7280">50%</text>
+
+                    <path id="trendLine" d="" fill="none" stroke="#667eea" stroke-width="3" opacity="0.8"/>
+
+                    <line id="secantLine" x1="0" y1="0" x2="0" y2="0" stroke="#f59e0b" stroke-width="2" stroke-dasharray="5,5" display="none"/>
+
+                    <line id="tangentLine" x1="0" y1="0" x2="0" y2="0" stroke="#10b981" stroke-width="2" stroke-dasharray="5,5" display="none"/>
+
+                    <g id="dataPoints"></g>
+
+                    <circle id="movingPoint" cx="0" cy="0" r="6" fill="#764ba2" stroke="white" stroke-width="2" display="none"/>
+
+                    <g transform="translate(600, 70)">
+                        <rect x="0" y="0" width="240" height="120" fill="white" stroke="#d1d5db" stroke-width="1" rx="6"/>
+                        <circle cx="15" cy="20" r="3" fill="#667eea"/>
+                        <text x="30" y="24" font-size="12" fill="#1f2937">Datos observados</text>
+                        <line x1="15" y1="45" x2="35" y2="45" stroke="#667eea" stroke-width="3"/>
+                        <text x="45" y="49" font-size="12" fill="#1f2937">Tendencia suave</text>
+                        <line x1="15" y1="70" x2="35" y2="70" stroke="#f59e0b" stroke-width="2" stroke-dasharray="5,5"/>
+                        <text x="45" y="74" font-size="12" fill="#1f2937">Recta secante</text>
+                        <line x1="15" y1="95" x2="35" y2="95" stroke="#10b981" stroke-width="2" stroke-dasharray="5,5"/>
+                        <text x="45" y="99" font-size="12" fill="#1f2937">Recta tangente</text>
+                    </g>
+                </svg>
+            </div>
+
+            <!-- Cálculos -->
+            <div class="calculation-panel">
+                <div class="calc-card">
+                    <h3>📊 Razón de Cambio Promedio</h3>
+                    <div class="formula">
+                        RCP = [P(t₂) - P(t₁)] / (t₂ - t₁)<br>
+                        <br>
+                        RCP = [<span id="p2Text">24.6</span> - <span id="p1Text">28.5</span>] / (<span id="t2Text">2024</span> - <span id="t1Text">2018</span>)<br>
+                        <br>
+                        RCP = <span id="numeratorAvg">-3.9</span> / <span id="denominatorAvg">6</span>
+                    </div>
+                    <div class="result">
+                        Resultado: <span id="resultAvg">-0.65</span> puntos porcentuales/año
+                    </div>
+                    <div class="interpretation">
+                        <span id="interpretAvg">Entre 2018 y 2024, el porcentaje de pobreza disminuyó en promedio 0.65 puntos porcentuales por año.</span>
+                    </div>
+                </div>
+
+                <div class="calc-card">
+                    <h3>🎯 Razón de Cambio Instantánea</h3>
+                    <div class="formula">
+                        Aproximación mediante cociente incremental:<br>
+                        <br>
+                        RCI ≈ [P(t+h) - P(t)] / h<br>
+                        <br>
+                        RCI ≈ [<span id="pthText">-</span>] / <span id="hText">1</span>
+                    </div>
+                    <div class="result">
+                        Resultado: <span id="resultInst">-</span> puntos porcentuales/año
+                    </div>
+                    <div class="interpretation">
+                        <span id="interpretInst">En ese instante, el indicador está presentando una variación.</span>
+                    </div>
+                </div>
+
+                <div class="calc-card">
+                    <h3>📈 Razón de Cambio Porcentual</h3>
+                    <div class="formula">
+                        RCP% = [P(t₂) - P(t₁)] / P(t₁) × 100<br>
+                        <br>
+                        RCP% = [<span id="p2TextPct">24.6</span> - <span id="p1TextPct">28.5</span>] / <span id="p1TextPctDenom">28.5</span> × 100
+                    </div>
+                    <div class="result">
+                        Resultado: <span id="resultPct">-13.68</span> %
+                    </div>
+                    <div class="interpretation">
+                        <span id="interpretPct">Entre 2018 y 2024, el indicador de pobreza disminuyó aproximadamente 13.68% respecto del valor registrado en 2018.</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actividades -->
+            <div class="activity-section">
+                <h3>🎯 Actividades de Interpretación</h3>
+
+                <div class="challenge">
+                    <p><strong>Reto 1:</strong> Selecciona dos años en los que el indicador haya disminuido. Calcula la razón de cambio promedio.</p>
+                    <select id="reto1Year1" style="width: 48%; margin-right: 2%;" onchange="updateReto1()">
+                        <option value="2018">2018</option>
+                        <option value="2019">2019</option>
+                        <option value="2020">2020</option>
+                        <option value="2021">2021</option>
+                        <option value="2022">2022</option>
+                        <option value="2023">2023</option>
+                    </select>
+                    <select id="reto1Year2" style="width: 48%;" onchange="updateReto1()">
+                        <option value="2019">2019</option>
+                        <option value="2020">2020</option>
+                        <option value="2021">2021</option>
+                        <option value="2022">2022</option>
+                        <option value="2023">2023</option>
+                        <option value="2024" selected>2024</option>
+                    </select>
+                    <div id="feedback1" class="feedback"></div>
+                </div>
+
+                <div class="challenge">
+                    <p><strong>Reto 2:</strong> ¿Cuál es la diferencia entre una disminución de 3 puntos porcentuales y una disminución del 3%?</p>
+                    <textarea id="reto2Answer" style="width: 100%; height: 80px; padding: 8px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 12px;" placeholder="Escribe tu explicación..."></textarea>
+                    <button onclick="checkReto2()" style="width: 100%; margin-top: 8px;">Verificar Respuesta</button>
+                    <div id="feedback2" class="feedback"></div>
+                </div>
+
+                <div class="challenge">
+                    <p><strong>Reto 3:</strong> ¿Qué representa la pendiente negativa de la recta secante?</p>
+                    <select id="reto3Answer" style="width: 100%;">
+                        <option value="">-- Selecciona una respuesta --</option>
+                        <option value="A">A) Que el cálculo está mal hecho</option>
+                        <option value="B">B) Que el indicador está disminuyendo</option>
+                        <option value="C">C) Que el indicador está aumentando</option>
+                        <option value="D">D) Que no hay cambio en el indicador</option>
+                    </select>
+                    <button onclick="checkReto3()" style="width: 100%; margin-top: 8px;">Verificar Respuesta</button>
+                    <div id="feedback3" class="feedback"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const initialData = {
+            2018: 28.5,
+            2019: 27.1,
+            2020: 30.3,
+            2021: 29.4,
+            2022: 27.8,
+            2023: 25.9,
+            2024: 24.6
+        };
+
+        let data = { ...initialData };
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById('tab-' + tab).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function toggleInstructions() {
+            const panel = document.getElementById('instructionPanel');
+            const overlay = document.getElementById('overlay');
+            panel.classList.toggle('open');
+            overlay.classList.toggle('open');
+        }
+
+        function closeInstructions() {
+            const panel = document.getElementById('instructionPanel');
+            const overlay = document.getElementById('overlay');
+            panel.classList.remove('open');
+            overlay.classList.remove('open');
+        }
+
+        document.querySelectorAll('.poverty-value').forEach(input => {
+            input.addEventListener('input', function() {
+                const year = this.dataset.year;
+                const value = parseFloat(this.value);
+                data[year] = value;
+                document.querySelector(`.poverty-slider[data-year="${year}"]`).value = value;
+                updateAll();
+            });
+        });
+
+        document.querySelectorAll('.poverty-slider').forEach(slider => {
+            slider.addEventListener('input', function() {
+                const year = this.dataset.year;
+                const value = parseFloat(this.value);
+                data[year] = value;
+                document.querySelector(`.poverty-value[data-year="${year}"]`).value = value;
+                updateAll();
+            });
+        });
+
+        function restoreData() {
+            data = { ...initialData };
+            updateInputs();
+            updateAll();
+        }
+
+        function generateRandom() {
+            Object.keys(data).forEach(year => {
+                data[year] = Math.round((Math.random() * 45 + 5) * 10) / 10;
+            });
+            updateInputs();
+            updateAll();
+        }
+
+        function generateDecreasing() {
+            let value = 45;
+            Object.keys(data).forEach(year => {
+                value -= Math.random() * 3;
+                data[year] = Math.max(5, Math.round(value * 10) / 10);
+            });
+            updateInputs();
+            updateAll();
+        }
+
+        function generateIncreasing() {
+            let value = 15;
+            Object.keys(data).forEach(year => {
+                value += Math.random() * 3;
+                data[year] = Math.min(50, Math.round(value * 10) / 10);
+            });
+            updateInputs();
+            updateAll();
+        }
+
+        function generateStable() {
+            const baseValue = 25 + Math.random() * 10;
+            Object.keys(data).forEach(year => {
+                data[year] = Math.round((baseValue + (Math.random() - 0.5) * 2) * 10) / 10;
+            });
+            updateInputs();
+            updateAll();
+        }
+
+        function generateFluctuating() {
+            let value = 25;
+            Object.keys(data).forEach(year => {
+                value += (Math.random() - 0.5) * 5;
+                data[year] = Math.max(5, Math.min(50, Math.round(value * 10) / 10));
+            });
+            updateInputs();
+            updateAll();
+        }
+
+        function updateInputs() {
+            Object.keys(data).forEach(year => {
+                document.querySelector(`.poverty-value[data-year="${year}"]`).value = data[year];
+                document.querySelector(`.poverty-slider[data-year="${year}"]`).value = data[year];
+            });
+        }
+
+        function hermiteInterpolation(p0, p1, p2, p3, t) {
+            const t2 = t * t;
+            const t3 = t2 * t;
+            const v0 = (p2 - p0) * 0.5;
+            const v1 = (p3 - p1) * 0.5;
+            return (2 * p1 - 2 * p2 + v0 + v1) * t3 + (-3 * p1 + 3 * p2 - 2 * v0 - v1) * t2 + v0 * t + p1;
+        }
+
+        function interpolateValue(year) {
+            const years = Object.keys(data).map(Number).sort((a, b) => a - b);
+            if (year < years[0]) return data[years[0]];
+            if (year > years[years.length - 1]) return data[years[years.length - 1]];
+
+            let i = 0;
+            while (i < years.length - 1 && year > years[i + 1]) i++;
+
+            if (year === years[i]) return data[years[i]];
+
+            const t = year - years[i];
+            const p0 = i === 0 ? data[years[0]] : data[years[i - 1]];
+            const p1 = data[years[i]];
+            const p2 = data[years[i + 1]];
+            const p3 = i === years.length - 2 ? data[years[years.length - 1]] : data[years[i + 2]];
+
+            return hermiteInterpolation(p0, p1, p2, p3, t);
+        }
+
+        function getDerivative(year, h = 0.01) {
+            return (interpolateValue(year + h) - interpolateValue(year - h)) / (2 * h);
+        }
+
+        function dataToSvg(year, percentage) {
+            const x = 80 + (year - 2018) * 50;
+            const y = 450 - (percentage - 5) * (400 / 45);
+            return { x, y };
+        }
+
+        function updateGraph() {
+            const years = [2018, 2019, 2020, 2021, 2022, 2023, 2024];
+            
+            const pointsGroup = document.getElementById('dataPoints');
+            pointsGroup.innerHTML = '';
+
+            years.forEach(year => {
+                const { x, y } = dataToSvg(year, data[year]);
+                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                circle.setAttribute('cx', x);
+                circle.setAttribute('cy', y);
+                circle.setAttribute('r', 5);
+                circle.setAttribute('fill', '#667eea');
+                circle.setAttribute('stroke', 'white');
+                circle.setAttribute('stroke-width', 2);
+                circle.setAttribute('cursor', 'pointer');
+                pointsGroup.appendChild(circle);
+
+                circle.addEventListener('mouseover', function() {
+                    this.setAttribute('r', 7);
+                });
+                circle.addEventListener('mouseout', function() {
+                    this.setAttribute('r', 5);
+                });
+            });
+
+            let trendPath = '';
+            for (let t = 2018; t <= 2024; t += 0.05) {
+                const value = interpolateValue(t);
+                const { x, y } = dataToSvg(t, value);
+                trendPath += (trendPath ? 'L' : 'M') + x + ' ' + y;
+            }
+            document.getElementById('trendLine').setAttribute('d', trendPath);
+
+            updateSecant();
+            updateTangent();
+        }
+
+        function updateSecant() {
+            const year1 = parseInt(document.getElementById('year1').value);
+            const year2 = parseInt(document.getElementById('year2').value);
+
+            const p1 = dataToSvg(year1, data[year1]);
+            const p2 = dataToSvg(year2, data[year2]);
+
+            const secantLine = document.getElementById('secantLine');
+            secantLine.setAttribute('x1', p1.x);
+            secantLine.setAttribute('y1', p1.y);
+            secantLine.setAttribute('x2', p2.x);
+            secantLine.setAttribute('y2', p2.y);
+            secantLine.removeAttribute('display');
+        }
+
+        function updateTangent() {
+            const instantYear = parseFloat(document.getElementById('instantYear').value);
+            const derivative = getDerivative(instantYear, 0.01);
+            
+            const point = dataToSvg(instantYear, interpolateValue(instantYear));
+            
+            const dx = 100;
+            const dy = derivative * 50 * dx / 50;
+
+            const tangentLine = document.getElementById('tangentLine');
+            tangentLine.setAttribute('x1', point.x - dx);
+            tangentLine.setAttribute('y1', point.y + dy);
+            tangentLine.setAttribute('x2', point.x + dx);
+            tangentLine.setAttribute('y2', point.y - dy);
+            tangentLine.removeAttribute('display');
+
+            const movingPoint = document.getElementById('movingPoint');
+            movingPoint.setAttribute('cx', point.x);
+            movingPoint.setAttribute('cy', point.y);
+            movingPoint.removeAttribute('display');
+        }
+
+        function updateCalculations() {
+            const year1 = parseInt(document.getElementById('year1').value);
+            const year2 = parseInt(document.getElementById('year2').value);
+
+            const p1 = data[year1];
+            const p2 = data[year2];
+
+            const avgRate = (p2 - p1) / (year2 - year1);
+            const numeratorAvg = (p2 - p1).toFixed(2);
+            const denominatorAvg = (year2 - year1);
+
+            document.getElementById('p1Text').textContent = p1.toFixed(1);
+            document.getElementById('p2Text').textContent = p2.toFixed(1);
+            document.getElementById('t1Text').textContent = year1;
+            document.getElementById('t2Text').textContent = year2;
+            document.getElementById('numeratorAvg').textContent = numeratorAvg;
+            document.getElementById('denominatorAvg').textContent = denominatorAvg;
+            document.getElementById('resultAvg').textContent = avgRate.toFixed(2);
+
+            const trend = avgRate < -0.1 ? 'disminuyó' : avgRate > 0.1 ? 'aumentó' : 'se mantuvo relativamente estable';
+            document.getElementById('interpretAvg').textContent = 
+                `Entre ${year1} y ${year2}, el porcentaje de pobreza ${trend} en promedio ${Math.abs(avgRate).toFixed(2)} puntos porcentuales por año.`;
+
+            const pctRate = ((p2 - p1) / p1) * 100;
+            document.getElementById('p1TextPct').textContent = p1.toFixed(1);
+            document.getElementById('p2TextPct').textContent = p2.toFixed(1);
+            document.getElementById('p1TextPctDenom').textContent = p1.toFixed(1);
+            document.getElementById('numeratorPct').textContent = (p2 - p1).toFixed(2);
+            document.getElementById('denominatorPct').textContent = p1.toFixed(2);
+            document.getElementById('resultPct').textContent = pctRate.toFixed(2);
+
+            document.getElementById('interpretPct').textContent = 
+                `Entre ${year1} y ${year2}, el indicador de pobreza ${pctRate < 0 ? 'disminuyó' : 'aumentó'} aproximadamente ${Math.abs(pctRate).toFixed(2)}% respecto del valor registrado en ${year1}.`;
+
+            updateGraph();
+        }
+
+        function updateInstantaneous() {
+            const instantYear = parseFloat(document.getElementById('instantYear').value);
+            const h = parseFloat(document.getElementById('hValue').value);
+
+            document.getElementById('instantYearDisplay').textContent = instantYear.toFixed(1);
+
+            const pT = interpolateValue(instantYear).toFixed(2);
+            const pTH = interpolateValue(instantYear + h).toFixed(2);
+            const derivative = getDerivative(instantYear, h);
+
+            document.getElementById('pthText').textContent = pTH;
+            document.getElementById('hText').textContent = h;
+            document.getElementById('resultInst').textContent = derivative.toFixed(2);
+
+            let trend = '';
+            if (derivative < -0.1) trend = 'disminuyendo';
+            else if (derivative > 0.1) trend = 'aumentando';
+            else trend = 'presenta una relativa estabilidad';
+
+            document.getElementById('interpretInst').textContent = 
+                `En el año ${instantYear.toFixed(1)}, el indicador está ${trend} a una velocidad aproximada de ${Math.abs(derivative).toFixed(2)} puntos porcentuales por año.`;
+
+            updateGraph();
+        }
+
+        function updateReto1() {
+            const year1 = parseInt(document.getElementById('reto1Year1').value);
+            const year2 = parseInt(document.getElementById('reto1Year2').value);
+
+            if (data[year1] > data[year2]) {
+                const expectedRate = ((data[year2] - data[year1]) / (year2 - year1)).toFixed(2);
+                const feedback = document.getElementById('feedback1');
+                feedback.textContent = `✓ Correcto. La razón de cambio promedio es ${expectedRate} puntos porcentuales/año.`;
+                feedback.className = 'feedback success';
+            } else if (year2 === year1) {
+                const feedback = document.getElementById('feedback1');
+                feedback.textContent = '⚠️ Debes seleccionar años diferentes.';
+                feedback.className = 'feedback error';
+            } else {
+                const feedback = document.getElementById('feedback1');
+                feedback.textContent = '✗ Estos años no muestran una disminución. Intenta nuevamente.';
+                feedback.className = 'feedback error';
+            }
+        }
+
+        function checkReto2() {
+            const answer = document.getElementById('reto2Answer').value.toLowerCase();
+            const feedback = document.getElementById('feedback2');
+
+            if (answer.length > 20) {
+                feedback.textContent = `✓ Excelente reflexión. Recuerda: puntos porcentuales es medida absoluta, porcentaje es relativa.`;
+                feedback.className = 'feedback success';
+            } else {
+                feedback.textContent = '⚠️ Escribe una explicación más completa.';
+                feedback.className = 'feedback error';
+            }
+        }
+
+        function checkReto3() {
+            const answer = document.getElementById('reto3Answer').value;
+            const feedback = document.getElementById('feedback3');
+
+            if (answer === 'B') {
+                feedback.textContent = '✓ ¡Correcto! Pendiente negativa = indicador disminuyendo.';
+                feedback.className = 'feedback success';
+            } else {
+                feedback.textContent = '✗ Recuerda: pendiente negativa significa Y disminuye cuando X aumenta.';
+                feedback.className = 'feedback error';
+            }
+        }
+
+        function updateAll() {
+            updateCalculations();
+            updateInstantaneous();
+        }
+
+        updateAll();
+    </script>
+</body>
+</html>

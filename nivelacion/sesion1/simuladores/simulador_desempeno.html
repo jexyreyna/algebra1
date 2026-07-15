@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Rendimiento Académico</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header-label {
+            font-size: 12px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .header-title {
+            font-size: 28px;
+            color: #1a1a1a;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        .section {
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        .input-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 0;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-group label {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+
+        .input-group input {
+            padding: 12px;
+            border: 0.5px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #378ADD;
+            box-shadow: 0 0 0 3px rgba(55, 138, 221, 0.1);
+        }
+
+        .calculation-box {
+            background: linear-gradient(135deg, rgba(100, 200, 255, 0.1), rgba(100, 255, 200, 0.1));
+            border: 1px solid rgba(100, 200, 255, 0.3);
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 24px;
+        }
+
+        .calculation-box-final {
+            background: linear-gradient(135deg, rgba(255, 150, 100, 0.15), rgba(255, 100, 150, 0.15));
+            border: 1px solid rgba(255, 150, 100, 0.4);
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 24px;
+        }
+
+        .calculation-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 14px;
+            text-transform: uppercase;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        .calculation-formula {
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: #1a1a1a;
+            line-height: 1.6;
+        }
+
+        .result-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: #f5f5f5;
+            border-radius: 8px;
+        }
+
+        .result-content {
+            flex: 1;
+        }
+
+        .result-label {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+        }
+
+        .result-value {
+            font-size: 22px;
+            color: #1a1a1a;
+            font-weight: 500;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .result-card {
+            border-radius: 12px;
+            padding: 18px;
+            text-align: center;
+            border: 0.5px solid #e0e0e0;
+        }
+
+        .result-card.success {
+            background: rgba(100, 200, 100, 0.1);
+            border-color: rgba(100, 200, 100, 0.3);
+        }
+
+        .result-card.accent {
+            background: rgba(55, 138, 221, 0.1);
+            border-color: rgba(55, 138, 221, 0.3);
+        }
+
+        .result-card.warning {
+            background: rgba(255, 180, 0, 0.1);
+            border-color: rgba(255, 180, 0, 0.3);
+        }
+
+        .result-card.danger {
+            background: rgba(226, 75, 74, 0.1);
+            border-color: rgba(226, 75, 74, 0.3);
+        }
+
+        .card-label {
+            font-size: 11px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .card-value {
+            font-size: 40px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .result-card.success .card-label {
+            color: #2d7f3f;
+        }
+
+        .result-card.success .card-value {
+            color: #2d7f3f;
+        }
+
+        .result-card.accent .card-label {
+            color: #378ADD;
+        }
+
+        .result-card.accent .card-value {
+            color: #378ADD;
+        }
+
+        .result-card.warning .card-label {
+            color: #cc8800;
+        }
+
+        .result-card.warning .card-value {
+            color: #cc8800;
+        }
+
+        .result-card.danger .card-label {
+            color: #b71c1c;
+        }
+
+        .result-card.danger .card-value {
+            color: #b71c1c;
+        }
+
+        .interpretation-box {
+            background: #f5f5f5;
+            border-radius: 12px;
+            border: 0.5px solid #e0e0e0;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .interpretation-label {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 8px;
+        }
+
+        .interpretation-text {
+            font-size: 16px;
+            color: #1a1a1a;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            .header-title {
+                font-size: 24px;
+            }
+
+            .input-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .card-value {
+                font-size: 32px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-label">📊 Simulador de Rendimiento</div>
+            <h1 class="header-title">Cálculo de Notas Finales</h1>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Prácticas Calificadas</div>
+            <div class="input-grid">
+                <div class="input-group">
+                    <label>PC1 (20%)</label>
+                    <input type="number" id="pc1" min="0" max="20" value="14">
+                </div>
+                <div class="input-group">
+                    <label>PC2 (30%)</label>
+                    <input type="number" id="pc2" min="0" max="20" value="15">
+                </div>
+                <div class="input-group">
+                    <label>PC3 (50%)</label>
+                    <input type="number" id="pc3" min="0" max="20" value="16">
+                </div>
+            </div>
+        </div>
+
+        <div class="calculation-box">
+            <div class="calculation-label">⚙️ Cálculo de Promedio PC</div>
+            
+            <div class="calculation-formula">
+                <div>Prom PC = (0.2 × <span id="displayPC1">14</span>) + (0.3 × <span id="displayPC2">15</span>) + (0.5 × <span id="displayPC3">16</span>)</div>
+                <div style="margin-top: 6px;">Prom PC = <span id="sumPC" style="font-weight: 500;">15.3</span></div>
+            </div>
+            
+            <div class="result-row">
+                <div class="result-content">
+                    <div class="result-label">Promedio redondeado</div>
+                    <div class="result-value" id="promPC">15</div>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-size: 11px; color: #999;">Nota base</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Evaluación Final</div>
+            <div class="input-group">
+                <label>TR / Examen Final (40%)</label>
+                <input type="number" id="tr" min="0" max="20" value="17">
+            </div>
+        </div>
+
+        <div class="calculation-box-final">
+            <div class="calculation-label">📈 Cálculo de Nota Final</div>
+            
+            <div class="calculation-formula">
+                <div>Nota Final = (0.6 × <span id="displayPromPC" style="font-weight: 500;">15</span>) + (0.4 × <span id="displayTR">17</span>)</div>
+                <div style="margin-top: 6px;">Nota Final = <span id="sumFinal" style="font-weight: 500;">15.8</span></div>
+            </div>
+        </div>
+
+        <div class="results-grid">
+            <div class="result-card success">
+                <div class="card-label">Promedio PC</div>
+                <p class="card-value" id="finalPromPC">15</p>
+            </div>
+            
+            <div id="notaFinalContainer" class="result-card accent">
+                <div class="card-label">Nota Final</div>
+                <p class="card-value" id="finalNota">16</p>
+            </div>
+        </div>
+
+        <div class="interpretation-box">
+            <div class="interpretation-label">Interpretación</div>
+            <p class="interpretation-text" id="interpretacion">Buen desempeño</p>
+        </div>
+    </div>
+
+    <script>
+        const pc1Input = document.getElementById('pc1');
+        const pc2Input = document.getElementById('pc2');
+        const pc3Input = document.getElementById('pc3');
+        const trInput = document.getElementById('tr');
+
+        const displayPC1 = document.getElementById('displayPC1');
+        const displayPC2 = document.getElementById('displayPC2');
+        const displayPC3 = document.getElementById('displayPC3');
+        const displayTR = document.getElementById('displayTR');
+
+        const sumPC = document.getElementById('sumPC');
+        const promPC = document.getElementById('promPC');
+        const finalPromPC = document.getElementById('finalPromPC');
+
+        const displayPromPC = document.getElementById('displayPromPC');
+        const sumFinal = document.getElementById('sumFinal');
+        const finalNota = document.getElementById('finalNota');
+
+        const notaFinalContainer = document.getElementById('notaFinalContainer');
+        const interpretacion = document.getElementById('interpretacion');
+
+        function calcular() {
+            const pc1 = parseFloat(pc1Input.value) || 0;
+            const pc2 = parseFloat(pc2Input.value) || 0;
+            const pc3 = parseFloat(pc3Input.value) || 0;
+            const tr = parseFloat(trInput.value) || 0;
+
+            const prompcRaw = (0.2 * pc1) + (0.3 * pc2) + (0.5 * pc3);
+            const prompcRedondeado = Math.round(prompcRaw);
+
+            const notaFinalRaw = (0.6 * prompcRedondeado) + (0.4 * tr);
+            const notaFinalRedondeada = Math.round(notaFinalRaw);
+
+            displayPC1.textContent = pc1;
+            displayPC2.textContent = pc2;
+            displayPC3.textContent = pc3;
+            displayTR.textContent = tr;
+
+            sumPC.textContent = prompcRaw.toFixed(1);
+            promPC.textContent = prompcRedondeado;
+            finalPromPC.textContent = prompcRedondeado;
+
+            displayPromPC.textContent = prompcRedondeado;
+            sumFinal.textContent = notaFinalRaw.toFixed(1);
+            finalNota.textContent = notaFinalRedondeada;
+
+            notaFinalContainer.className = 'result-card ' + getColorClass(notaFinalRedondeada);
+            interpretacion.textContent = getInterpretacion(notaFinalRedondeada);
+        }
+
+        function getColorClass(nota) {
+            if (nota >= 17) return 'success';
+            if (nota >= 14) return 'accent';
+            if (nota >= 11) return 'warning';
+            return 'danger';
+        }
+
+        function getInterpretacion(nota) {
+            if (nota >= 17) return '🎯 Excelente desempeño - Aprobado con distinción';
+            if (nota >= 14) return '✓ Buen desempeño - Aprobado';
+            if (nota >= 11) return '⚠ Desempeño regular - Aprobado con dificultad';
+            return '✗ Desempeño insuficiente - Reprobado';
+        }
+
+        pc1Input.addEventListener('input', calcular);
+        pc2Input.addEventListener('input', calcular);
+        pc3Input.addEventListener('input', calcular);
+        trInput.addEventListener('input', calcular);
+
+        calcular();
+    </script>
+</body>
+</html>

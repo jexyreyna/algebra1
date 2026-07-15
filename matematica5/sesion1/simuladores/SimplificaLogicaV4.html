@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asistente y Demostrador Lógico V4 (Integral)</title>
+    <style>
+        :root { --primario: #2c3e50; --secundario: #34495e; --acento: #2980b9; --exito: #27ae60; --fondo: #f8f9fa; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 1150px; margin: 20px auto; padding: 0 20px; color: #333; }
+        h1 { text-align: center; color: var(--primario); margin-bottom: 25px; }
+        .zona { background: var(--fondo); padding: 20px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); margin-bottom: 20px; border: 1px solid #e9ecef; }
+        .titulo-zona { font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: #6c757d; margin-top: 0; margin-bottom: 15px; font-weight: bold; border-bottom: 2px solid #dee2e6; padding-bottom: 5px; }
+        
+        /* Zona 1: Ingreso */
+        input[type="text"] { width: 100%; padding: 14px; font-size: 22px; font-weight: bold; margin-bottom: 15px; border: 2px solid #ced4da; border-radius: 6px; box-sizing: border-box; text-align: center; color: var(--primario); background: #fff; }
+        .btn-group { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 15px; }
+        button { padding: 10px 14px; font-size: 15px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; transition: 0.2s; }
+        .btn-var { background: #e3f2fd; color: #0d47a1; }
+        .btn-var:hover { background: #bbdefb; }
+        .btn-const { background: #ffe0b2; color: #e65100; }
+        .btn-const:hover { background: #ffcc80; }
+        .btn-op { background: #f3e5f5; color: #4a148c; }
+        .btn-op:hover { background: #e1bee7; }
+        .btn-ctrl { background: #e0e0e0; color: #333; }
+        .btn-ctrl:hover { background: #bdbdbd; }
+        .btn-verificar { background: var(--exito); color: white; font-size: 16px; padding: 12px 20px; width: 100%; box-shadow: 0 2px 4px rgba(0,0,0,0.15); }
+        .btn-verificar:hover { background: #1e8449; }
+        
+        /* Zona 2: Doble Columna y Grupos */
+        .contenedor-columnas { display: flex; gap: 20px; }
+        .columna-leyes { flex: 1.3; display: flex; flex-direction: column; gap: 15px; max-height: 520px; overflow-y: auto; padding-right: 5px; }
+        .columna-pizarra { flex: 1.5; background: #fff; border: 2px solid #dee2e6; border-radius: 6px; padding: 15px; min-height: 380px; max-height: 520px; overflow-y: auto; }
+        
+        .grupo-leyes { background: #fff; border: 1px solid #ced4da; border-radius: 6px; padding: 10px; }
+        .grupo-titulo { font-size: 12px; font-weight: bold; color: var(--primario); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; border-left: 3px solid var(--acento); padding-left: 8px; }
+        .grupo-botones { display: flex; flex-direction: column; gap: 6px; }
+        
+        .btn-ley { background: #f8f9fa; border: 1px solid #cbd5e1; color: var(--primario); text-align: left; padding: 9px 12px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
+        .btn-ley:hover { background: var(--acento); color: #fff; border-color: var(--acento); }
+        .btn-ley span { font-size: 11px; opacity: 0.85; font-weight: normal; font-family: monospace; }
+        
+        /* Pizarra e Historial */
+        .paso-item { padding: 12px 10px; border-bottom: 1px dashed #ced4da; font-size: 16px; display: flex; justify-content: space-between; align-items: center; }
+        .paso-num { font-weight: bold; color: #6c757d; font-size: 14px; }
+        .paso-formula { font-family: monospace; font-size: 20px; font-weight: bold; color: #1e88e5; }
+        .paso-ley { font-size: 13px; background: #e8f5e9; color: #2e7d32; padding: 4px 10px; border-radius: 12px; font-weight: bold; }
+        
+        /* Zona 3: Leyenda y Tabla */
+        .caja-leyenda { background: #fff3cd; border-left: 5px solid #ffc107; padding: 15px; border-radius: 4px; color: #856404; transition: 0.3s; }
+        .caja-leyenda h3 { margin: 0 0 8px 0; font-size: 18px; }
+        .caja-leyenda p { margin: 0; font-size: 15px; line-height: 1.5; }
+        
+        table { width: 100%; margin-top: 15px; border-collapse: collapse; background: white; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        th, td { padding: 8px; border: 1px solid #dee2e6; }
+        th { background: var(--primario); color: white; }
+        .val-v { background-color: #d4edda; color: #155724; font-weight: bold; }
+        .val-f { background-color: #f8d7da; color: #721c24; font-weight: bold; }
+        
+        @media (max-width: 850px) { .contenedor-columnas { flex-direction: column; } }
+    </style>
+</head>
+<body>
+
+    <h1>Demostrador de Equivalencias Lógicas V4</h1>
+
+    <div class="zona">
+        <div class="titulo-zona">Zona 1: Ingreso de Proposición Compuesta</div>
+        <input type="text" id="formula" value="p ∨ (p ∧ q)" placeholder="Escribe o construye la expresión...">
+        
+        <div class="btn-group">
+            <button class="btn-var" onclick="insertar('p')">p</button>
+            <button class="btn-var" onclick="insertar('q')">q</button>
+            <button class="btn-var" onclick="insertar('r')">r</button>
+            <button class="btn-var" onclick="insertar('s')">s</button>
+            <button class="btn-var" onclick="insertar('t')">t</button>
+            <button class="btn-const" onclick="insertar('V')">V (Verdadero)</button>
+            <button class="btn-const" onclick="insertar('F')">F (Falso)</button>
+        </div>
+        <div class="btn-group">
+            <button class="btn-op" onclick="insertar(' ∧ ')">∧ (Y)</button>
+            <button class="btn-op" onclick="insertar(' ∨ ')">∨ (O)</button>
+            <button class="btn-op" onclick="insertar(' ⊕ ')">⊕ (XOR)</button>
+            <button class="btn-op" onclick="insertar('¬')">¬ (No)</button>
+            <button class="btn-op" onclick="insertar(' → ')">→</button>
+            <button class="btn-op" onclick="insertar(' ↔ ')">↔</button>
+            <button class="btn-op" onclick="insertar('(')">(</button>
+            <button class="btn-op" onclick="insertar(')')">)</button>
+            <button class="btn-ctrl" onclick="borrarUltimo()">⌫</button>
+            <button class="btn-ctrl" style="background:#ffc107; color:#000;" onclick="reiniciar()">Reiniciar Pizarra</button>
+        </div>
+
+        <button class="btn-verificar" onclick="verificarEquivalencia()">✓ Verificar Equivalencia Lógica (Tabla de Verdad)</button>
+    </div>
+
+    <div class="zona">
+        <div class="titulo-zona">Zona 2: Leyes de Equivalencia y Pizarra de Demostración</div>
+        <div class="contenedor-columnas">
+            
+            <div class="columna-leyes">
+                
+                <div class="grupo-leyes">
+                    <div class="grupo-titulo">I. Conectores Condicionales</div>
+                    <div class="grupo-botones">
+                        <button class="btn-ley" onclick="aplicarLey('implicacion')">Implicación Material <span>A → B ≡ ¬A ∨ B</span></button>
+                        <button class="btn-ley" onclick="aplicarLey('bicondicional')">Equivalencia Bicondicional <span>A ↔ B ≡ (A → B) ∧ (B → A)</span></button>
+                    </div>
+                </div>
+
+                <div class="grupo-leyes">
+                    <div class="grupo-titulo">II. Negaciones y De Morgan</div>
+                    <div class="grupo-botones">
+                        <button class="btn-ley" onclick="aplicarLey('demorgan_y')">De Morgan (Conjunción) <span>¬(A ∧ B) ≡ ¬A ∨ ¬B</span></button>
+                        <button class="btn-ley" onclick="aplicarLey('demorgan_o')">De Morgan (Disyunción) <span>¬(A ∨ B) ≡ ¬A ∧ ¬B</span></button>
+                        <button class="btn-ley" onclick="aplicarLey('doble_negacion')">Doble Negación <span>¬¬A ≡ A</span></button>
+                    </div>
+                </div>
+
+                <div class="grupo-leyes">
+                    <div class="grupo-titulo">III. Distributividad y Absorción</div>
+                    <div class="grupo-botones">
+                        <button class="btn-ley" onclick="aplicarLey('distributiva_o')">Distributiva (∨ sobre ∧) <span>A ∨ (B ∧ C) ≡ (A ∨ B) ∧ (A ∨ C)</span></button>
+                        <button class="btn-ley" onclick="aplicarLey('distributiva_y')">Distributiva (∧ sobre ∨) <span>A ∧ (B ∨ C) ≡ (A ∧ B) ∨ (A ∧ C)</span></button>
+                        <button class="btn-ley" onclick="aplicarLey('absorcion_o')">Absorción (Disyunción) <span>A ∨ (A ∧ B) ≡ A</span></button>
+                        <button class="btn-ley" onclick="aplicarLey('absorcion_y')">Absorción (Conjunción) <span>A ∧ (A ∨ B) ≡ A</span></button>
+                    </div>
+                </div>
+
+                <div class="grupo-leyes">
+                    <div class="grupo-titulo">IV. Idempotencia e Identidad</div>
+                    <div class="grupo-botones">
+                        <button class="btn-ley" onclick="aplicarLey('idempotencia_o')">Idempotencia (Disyunción) <span>A ∨ A ≡ A</span></button>
+                        <button class="btn-ley" onclick="aplicarLey('idempotencia_y')">Idempotencia (Conjunción) <span>A ∧ A ≡ A</span></button>
+                        <button class="btn-ley" onclick="aplicarLey('identidad_o')">Identidad (Disyunción) <span>A ∨ F ≡ A  |  A ∨ V ≡ V</span></button>
+                        <button class="btn-ley" onclick="aplicarLey('identidad_y')">Identidad (Conjunción) <span>A ∧ V ≡ A  |  A ∧ F ≡ F</span></button>
+                    </div>
+                </div>
+
+                <div class="grupo-leyes">
+                    <div class="grupo-titulo">V. Leyes del Complemento</div>
+                    <div class="grupo-botones">
+                        <button class="btn-ley" onclick="aplicarLey('tercio_excluido')">Tercio Excluido <span>A ∨ ¬A ≡ V</span></button>
+                        <button class="btn-ley" onclick="aplicarLey('no_contradiccion')">No Contradicción <span>A ∧ ¬A ≡ F</span></button>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="columna-pizarra" id="pizarra"></div>
+        </div>
+    </div>
+
+    <div class="zona">
+        <div class="titulo-zona">Zona 3: Leyenda Explicativa y Auditoría de Equivalencia</div>
+        <div class="caja-leyenda" id="leyenda">
+            <h3>Selecciona una ley para comenzar</h3>
+            <p>El sistema evaluará si la regla seleccionada puede aplicarse sobre la estructura de tu expresión actual. Los cambios se registrarán en la pizarra de la derecha.</p>
+        </div>
+    </div>
+
+    <script>
+        let historial = [];
+        
+        window.onload = function() {
+            reiniciar();
+        };
+
+        function insertar(simbolo) {
+            document.getElementById("formula").value += simbolo;
+        }
+
+        function borrarUltimo() {
+            let val = document.getElementById("formula").value;
+            document.getElementById("formula").value = val.slice(0, -1).trim();
+        }
+
+        function reiniciar() {
+            let expr = document.getElementById("formula").value.trim();
+            if(!expr) expr = "p ∨ (p ∧ q)";
+            historial = [{ formula: expr, ley: "Expresión Inicial" }];
+            renderizarPizarra();
+            
+            const leyenda = document.getElementById("leyenda");
+            leyenda.style.background = "#fff3cd";
+            leyenda.style.borderLeftColor = "#ffc107";
+            leyenda.style.color = "#856404";
+            actualizarLeyenda("Inicio de Demostración", "Se ha establecido la expresión base en la pizarra. Selecciona una ley lógica de la columna izquierda para simplificar o transformar la fórmula.", "");
+        }
+
+        function renderizarPizarra() {
+            const piz = document.getElementById("pizarra");
+            piz.innerHTML = "";
+            historial.forEach((item, index) => {
+                piz.innerHTML += `
+                    <div class="paso-item">
+                        <span class="paso-num">Paso ${index}</span>
+                        <span class="paso-formula">${item.formula}</span>
+                        <span class="paso-ley">${item.ley}</span>
+                    </div>
+                `;
+            });
+            piz.scrollTop = piz.scrollHeight;
+        }
+
+        function actualizarLeyenda(titulo, desc, regla) {
+            document.getElementById("leyenda").innerHTML = `
+                <h3>${titulo} ${regla ? '— <code>' + regla + '</code>' : ''}</h3>
+                <p>${desc}</p>
+            `;
+        }
+
+        function limpiarEstetica(str) {
+            let res = str;
+            res = res.replace(/\(\s*(¬*\s*[pqrstVF])\s*\)/g, "$1");
+            res = res.replace(/¬\s*\(\s*(¬*\s*[pqrstVF])\s*\)/g, "¬$1");
+            res = res.replace(/\(\(\s*([^\(\)]+?)\s*\)\)/g, "($1)");
+            return res.trim();
+        }
+
+        function aplicarLey(tipo) {
+            let actual = historial[historial.length - 1].formula;
+            let modificada = actual;
+            let exito = false;
+            let tit = "", desc = "", reg = "";
+
+            // Operando universal con soporte para constantes V y F
+            const op = "(?:¬*\\s*\\((?:[^()]+|\\([^()]*\\))*\\)|¬*\\s*[pqrstVF])";
+
+            switch(tipo) {
+                case 'implicacion':
+                    let regImp = new RegExp("(" + op + ")\\s*→\\s*(" + op + ")", "g");
+                    if(regImp.test(actual)) {
+                        modificada = actual.replace(regImp, "¬($1) ∨ ($2)");
+                        exito = true;
+                        tit = "Implicación Material"; reg = "A → B ≡ ¬A ∨ B";
+                        desc = "La condicional se transforma en una disyunción negando el antecedente y manteniendo intacto el consecuente.";
+                    }
+                    break;
+
+                case 'demorgan_y':
+                    let regY = new RegExp("¬\\s*\\(\\s*(" + op + ")\\s*∧\\s*(" + op + ")\\s*\\)", "g");
+                    if(regY.test(actual)) {
+                        modificada = actual.replace(regY, "(¬$1 ∨ ¬$2)");
+                        exito = true;
+                        tit = "Ley de De Morgan (Conjunción)"; reg = "¬(A ∧ B) ≡ ¬A ∨ ¬B";
+                        desc = "La negación exterior entra al paréntesis, negando cada término individual y cambiando el operador de conjunción (∧) por disyunción (∨).";
+                    }
+                    break;
+
+                case 'demorgan_o':
+                    let regO = new RegExp("¬\\s*\\(\\s*(" + op + ")\\s*∨\\s*(" + op + ")\\s*\\)", "g");
+                    if(regO.test(actual)) {
+                        modificada = actual.replace(regO, "(¬$1 ∧ ¬$2)");
+                        exito = true;
+                        tit = "Ley de De Morgan (Disyunción)"; reg = "¬(A ∨ B) ≡ ¬A ∧ ¬B";
+                        desc = "La negación exterior se distribuye negando ambos términos y transformando la disyunción (∨) en conjunción (∧).";
+                    }
+                    break;
+
+                case 'doble_negacion':
+                    if(/¬\s*¬/.test(actual) || /¬\s*\(\s*¬/.test(actual)) {
+                        modificada = actual
+                            .replace(/¬\s*¬\s*([pqrstVF]|\((?:[^()]+|\([^()]*\))*\))/g, "$1")
+                            .replace(/¬\s*\(\s*¬\s*([pqrstVF]|\((?:[^()]+|\([^()]*\))*\))\s*\)/g, "$1");
+                        exito = true;
+                        tit = "Doble Negación (Involución)"; reg = "¬¬A ≡ A";
+                        desc = "La negación de una negación es matemáticamente equivalente a la proposición original afirmativa.";
+                    }
+                    break;
+
+                case 'idempotencia_o':
+                    let regIdemO = new RegExp("(" + op + ")\\s*∨\\s*\\1", "g");
+                    if(regIdemO.test(actual)) {
+                        modificada = actual.replace(regIdemO, "$1");
+                        exito = true;
+                        tit = "Ley de Idempotencia (Disyunción)"; reg = "A ∨ A ≡ A";
+                        desc = "Una proposición en disyunción consigo misma es redundante; se simplifica conservando únicamente una de ellas.";
+                    }
+                    break;
+
+                case 'idempotencia_y':
+                    let regIdemY = new RegExp("(" + op + ")\\s*∧\\s*\\1", "g");
+                    if(regIdemY.test(actual)) {
+                        modificada = actual.replace(regIdemY, "$1");
+                        exito = true;
+                        tit = "Ley de Idempotencia (Conjunción)"; reg = "A ∧ A ≡ A";
+                        desc = "La conjunción de una variable consigo misma no aporta nueva información veritativa y se simplifica al término original.";
+                    }
+                    break;
+                    
+                case 'bicondicional':
+                    let regBic = new RegExp("(" + op + ")\\s*↔\\s*(" + op + ")", "g");
+                    if(regBic.test(actual)) {
+                        modificada = actual.replace(regBic, "(($1 → $2) ∧ ($2 → $1))");
+                        exito = true;
+                        tit = "Equivalencia Bicondicional"; reg = "A ↔ B ≡ (A → B) ∧ (B → A)";
+                        desc = "El bicondicional desglosa una doble implicación en dos implicaciones materiales unidas por una conjunción lógica.";
+                    }
+                    break;
+
+                // NUEVAS LEYES AGREGADAS
+                case 'absorcion_o':
+                    let rAbsO1 = new RegExp("(" + op + ")\\s*∨\\s*\\(\\s*\\1\\s*∧\\s*(" + op + ")\\s*\\)", "g");
+                    let rAbsO2 = new RegExp("\\(\\s*(" + op + ")\\s*∧\\s*(" + op + ")\\s*\\)\\s*∨\\s*\\1", "g");
+                    let rAbsO3 = new RegExp("(" + op + ")\\s*∨\\s*\\(\\s*(" + op + ")\\s*∧\\s*\\1\\s*\\)", "g");
+                    let rAbsO4 = new RegExp("\\(\\s*(" + op + ")\\s*∧\\s*(" + op + ")\\s*\\)\\s*∨\\s*\\2", "g");
+                    if(rAbsO1.test(actual) || rAbsO2.test(actual) || rAbsO3.test(actual) || rAbsO4.test(actual)) {
+                        modificada = actual.replace(rAbsO1, "$1").replace(rAbsO2, "$1").replace(rAbsO3, "$1").replace(rAbsO4, "$2");
+                        exito = true;
+                        tit = "Ley de Absorción (Disyunción)"; reg = "A ∨ (A ∧ B) ≡ A";
+                        desc = "Si una proposición está en disyunción con una conjunción que la contiene, absorbe todo el paréntesis.";
+                    }
+                    break;
+
+                case 'absorcion_y':
+                    let rAbsY1 = new RegExp("(" + op + ")\\s*∧\\s*\\(\\s*\\1\\s*∨\\s*(" + op + ")\\s*\\)", "g");
+                    let rAbsY2 = new RegExp("\\(\\s*(" + op + ")\\s*∨\\s*(" + op + ")\\s*\\)\\s*∧\\s*\\1", "g");
+                    let rAbsY3 = new RegExp("(" + op + ")\\s*∧\\s*\\(\\s*(" + op + ")\\s*∨\\s*\\1\\s*\\)", "g");
+                    let rAbsY4 = new RegExp("\\(\\s*(" + op + ")\\s*∨\\s*(" + op + ")\\s*\\)\\s*∧\\s*\\2", "g");
+                    if(rAbsY1.test(actual) || rAbsY2.test(actual) || rAbsY3.test(actual) || rAbsY4.test(actual)) {
+                        modificada = actual.replace(rAbsY1, "$1").replace(rAbsY2, "$1").replace(rAbsY3, "$1").replace(rAbsY4, "$2");
+                        exito = true;
+                        tit = "Ley de Absorción (Conjunción)"; reg = "A ∧ (A ∨ B) ≡ A";
+                        desc = "Si una proposición está en conjunción con una disyunción que la contiene, absorbe todo el paréntesis.";
+                    }
+                    break;
+
+                case 'distributiva_o':
+                    let rDistO1 = new RegExp("(" + op + ")\\s*∨\\s*\\(\\s*(" + op + ")\\s*∧\\s*(" + op + ")\\s*\\)", "g");
+                    let rDistO2 = new RegExp("\\(\\s*(" + op + ")\\s*∧\\s*(" + op + ")\\s*\\)\\s*∨\\s*(" + op + ")", "g");
+                    if(rDistO1.test(actual) || rDistO2.test(actual)) {
+                        modificada = actual.replace(rDistO1, "($1 ∨ $2) ∧ ($1 ∨ $3)").replace(rDistO2, "($3 ∨ $1) ∧ ($3 ∨ $2)");
+                        exito = true;
+                        tit = "Ley Distributiva (∨ sobre ∧)"; reg = "A ∨ (B ∧ C) ≡ (A ∨ B) ∧ (A ∨ C)";
+                        desc = "La disyunción se distribuye dentro del paréntesis creando dos disyunciones unidas por una conjunción.";
+                    }
+                    break;
+
+                case 'distributiva_y':
+                    let rDistY1 = new RegExp("(" + op + ")\\s*∧\\s*\\(\\s*(" + op + ")\\s*∨\\s*(" + op + ")\\s*\\)", "g");
+                    let rDistY2 = new RegExp("\\(\\s*(" + op + ")\\s*∨\\s*(" + op + ")\\s*\\)\\s*∧\\s*(" + op + ")", "g");
+                    if(rDistY1.test(actual) || rDistY2.test(actual)) {
+                        modificada = actual.replace(rDistY1, "($1 ∧ $2) ∨ ($1 ∧ $3)").replace(rDistY2, "($3 ∧ $1) ∨ ($3 ∧ $2)");
+                        exito = true;
+                        tit = "Ley Distributiva (∧ sobre ∨)"; reg = "A ∧ (B ∨ C) ≡ (A ∧ B) ∨ (A ∧ C)";
+                        desc = "La conjunción se distribuye dentro del paréntesis creando dos conjunciones unidas por una disyunción.";
+                    }
+                    break;
+
+                case 'identidad_o':
+                    let rIdO1 = new RegExp("(" + op + ")\\s*∨\\s*F", "g"), rIdO2 = new RegExp("F\\s*∨\\s*(" + op + ")", "g");
+                    let rIdO3 = new RegExp("(" + op + ")\\s*∨\\s*V", "g"), rIdO4 = new RegExp("V\\s*∨\\s*(" + op + ")", "g");
+                    if(rIdO1.test(actual) || rIdO2.test(actual) || rIdO3.test(actual) || rIdO4.test(actual)) {
+                        modificada = actual.replace(rIdO1, "$1").replace(rIdO2, "$1").replace(rIdO3, "V").replace(rIdO4, "V");
+                        exito = true;
+                        tit = "Ley de Identidad (Disyunción)"; reg = "A ∨ F ≡ A  |  A ∨ V ≡ V";
+                        desc = "El Falso (F) es el elemento neutro en la disyunción. Operar con Verdadero (V) da siempre Verdadero como resultado final.";
+                    }
+                    break;
+
+                case 'identidad_y':
+                    let rIdY1 = new RegExp("(" + op + ")\\s*∧\\s*V", "g"), rIdY2 = new RegExp("V\\s*∧\\s*(" + op + ")", "g");
+                    let rIdY3 = new RegExp("(" + op + ")\\s*∧\\s*F", "g"), rIdY4 = new RegExp("F\\s*∧\\s*(" + op + ")", "g");
+                    if(rIdY1.test(actual) || rIdY2.test(actual) || rIdY3.test(actual) || rIdY4.test(actual)) {
+                        modificada = actual.replace(rIdY1, "$1").replace(rIdY2, "$1").replace(rIdY3, "F").replace(rIdY4, "F");
+                        exito = true;
+                        tit = "Ley de Identidad (Conjunción)"; reg = "A ∧ V ≡ A  |  A ∧ F ≡ F";
+                        desc = "El Verdadero (V) es el elemento neutro en la conjunción. Operar con Falso (F) anula toda la expresión a Falso.";
+                    }
+                    break;
+
+                case 'tercio_excluido':
+                    let rTer1 = new RegExp("(" + op + ")\\s*∨\\s*¬\\s*\\1", "g"), rTer2 = new RegExp("¬\\s*(" + op + ")\\s*∨\\s*\\1", "g");
+                    if(rTer1.test(actual) || rTer2.test(actual)) {
+                        modificada = actual.replace(rTer1, "V").replace(rTer2, "V");
+                        exito = true;
+                        tit = "Ley del Tercio Excluido"; reg = "A ∨ ¬A ≡ V";
+                        desc = "La disyunción de una proposición con su propia negación cubre todas las posibilidades, siendo siempre una tautología (V).";
+                    }
+                    break;
+
+                case 'no_contradiccion':
+                    let rCon1 = new RegExp("(" + op + ")\\s*∧\\s*¬\\s*\\1", "g"), rCon2 = new RegExp("¬\\s*(" + op + ")\\s*∧\\s*\\1", "g");
+                    if(rCon1.test(actual) || rCon2.test(actual)) {
+                        modificada = actual.replace(rCon1, "F").replace(rCon2, "F");
+                        exito = true;
+                        tit = "Ley de No Contradicción"; reg = "A ∧ ¬A ≡ F";
+                        desc = "Es imposible que una proposición sea verdadera y falsa al mismo tiempo; su conjunción es siempre una contradicción (F).";
+                    }
+                    break;
+            }
+
+            modificada = limpiarEstetica(modificada);
+
+            const leyenda = document.getElementById("leyenda");
+            leyenda.style.background = "#fff3cd";
+            leyenda.style.borderLeftColor = "#ffc107";
+            leyenda.style.color = "#856404";
+
+            if(exito && modificada !== actual) {
+                document.getElementById("formula").value = modificada;
+                historial.push({ formula: modificada, ley: tit });
+                renderizarPizarra();
+                actualizarLeyenda(tit, desc, reg);
+            } else {
+                actualizarLeyenda("Sin Cambios", "No se encontró ningún patrón en la expresión actual ('<code>" + actual + "</code>') que coincida con la estructura requerida para aplicar esta ley lógica.", "");
+            }
+        }
+
+        function verificarEquivalencia() {
+            if (historial.length === 0) return;
+
+            const exprInicial = historial[0].formula;
+            const exprActual = historial[historial.length - 1].formula;
+            const leyenda = document.getElementById("leyenda");
+
+            const variables = [...new Set((exprInicial + exprActual).match(/[pqrst]/g))].sort();
+            
+            if (variables.length === 0) {
+                actualizarLeyenda("Error de Validación", "No se encontraron proposiciones simples (p, q, r, s, t) para generar la tabla de verdad.", "");
+                return;
+            }
+
+            function traducirJS(formula) {
+                return formula
+                    .replace(/\bV\b/g, 'true')
+                    .replace(/\bF\b/g, 'false')
+                    .replace(/↔/g, ' === ')
+                    .replace(/→/g, ' <= ')
+                    .replace(/⊕/g, ' !== ')
+                    .replace(/∧/g, ' && ')
+                    .replace(/∨/g, ' || ')
+                    .replace(/¬/g, ' ! ');
+            }
+
+            const jsInicial = traducirJS(exprInicial);
+            const jsActual = traducirJS(exprActual);
+
+            let htmlTabla = "<table><thead><tr>";
+            variables.forEach(v => htmlTabla += `<th>${v}</th>`);
+            htmlTabla += `<th style='background:#16a085;'>Inicial: ${exprInicial}</th>`;
+            htmlTabla += `<th style='background:#2980b9;'>Actual: ${exprActual}</th>`;
+            htmlTabla += "<th>¿Coinciden?</th></tr></thead><tbody>";
+
+            let equivalentes = true;
+            const numFilas = Math.pow(2, variables.length);
+
+            try {
+                for (let i = numFilas - 1; i >= 0; i--) {
+                    let entorno = {};
+                    let filaHTML = "<tr>";
+
+                    variables.forEach((v, index) => {
+                        let val = Boolean((i >> (variables.length - 1 - index)) & 1);
+                        entorno[v] = val;
+                        filaHTML += `<td class='${val ? "val-v" : "val-f"}'>${val ? 'V' : 'F'}</td>`;
+                    });
+
+                    let evalInicial = jsInicial;
+                    let evalActual = jsActual;
+                    for (let varName in entorno) {
+                        let regex = new RegExp('\\b' + varName + '\\b', 'g');
+                        evalInicial = evalInicial.replace(regex, entorno[varName]);
+                        evalActual = evalActual.replace(regex, entorno[varName]);
+                    }
+
+                    let resInicial = Function('"use strict";return (' + evalInicial + ')')();
+                    let resActual = Function('"use strict";return (' + evalActual + ')')();
+                    
+                    let coinciden = (resInicial === resActual);
+                    if (!coinciden) equivalentes = false;
+
+                    filaHTML += `<td class='${resInicial ? "val-v" : "val-f"}'>${resInicial ? 'V' : 'F'}</td>`;
+                    filaHTML += `<td class='${resActual ? "val-v" : "val-f"}'>${resActual ? 'V' : 'F'}</td>`;
+                    filaHTML += `<td style='font-weight:bold; background:${coinciden ? "#d4edda" : "#f8d7da"}; color:${coinciden ? "#155724" : "#721c24"};'>${coinciden ? '✓ Sí' : '✗ No'}</td></tr>`;
+                    
+                    htmlTabla += filaHTML;
+                }
+                htmlTabla += "</tbody></table>";
+
+                leyenda.style.background = equivalentes ? "#d4edda" : "#f8d7da";
+                leyenda.style.borderLeftColor = equivalentes ? "#28a745" : "#dc3545";
+                leyenda.style.color = equivalentes ? "#155724" : "#721c24";
+                
+                const titulo = equivalentes ? "¡Certificado: Equivalencia Lógica Validada (100% Idénticas)!" : "¡Advertencia: Discrepancia Lógica Detectada!";
+                const desc = equivalentes 
+                    ? `Las tablas de verdad coinciden en las <strong>${numFilas} combinaciones posibles</strong>. Has demostrado formalmente que <code>${exprInicial} ≡ ${exprActual}</code>.`
+                    : `Las expresiones no arrojan los mismos valores veritativos. Revisa el historial en la pizarra para identificar en qué paso se aplicó incorrectamente la ley algebraica.`;
+
+                leyenda.innerHTML = `<h3>${titulo}</h3><p>${desc}</p>${htmlTabla}`;
+
+            } catch (e) {
+                actualizarLeyenda("Error de Sintaxis", "Hubo un problema al evaluar las expresiones matemáticamente. Revisa que todos los paréntesis estén cerrados correctamente.", "");
+            }
+        }
+    </script>
+</body>
+</html>
