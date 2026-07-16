@@ -210,6 +210,7 @@
             display: grid;
             grid-template-columns: 1fr;
             gap: 14px;
+            margin-bottom: 16px;
         }
 
         .option {
@@ -258,7 +259,6 @@
             cursor: pointer;
             font-weight: 700;
             font-size: 13px;
-            margin-top: 16px;
             width: 100%;
             transition: all 0.3s ease;
             text-transform: uppercase;
@@ -289,205 +289,21 @@
             background: linear-gradient(135deg, rgba(167, 243, 208, 0.3) 0%, rgba(186, 230, 253, 0.3) 100%);
             border: 2px solid #a7f3d0;
             color: #047857;
+            display: block;
         }
 
         .feedback.incorrect {
             background: linear-gradient(135deg, rgba(252, 165, 165, 0.3) 0%, rgba(254, 202, 202, 0.3) 100%);
             border: 2px solid #fca5a5;
             color: #7f1d1d;
-        }
-
-        .interactive-section {
-            background: rgba(255, 255, 255, 0.65);
-            backdrop-filter: blur(20px);
-            border: 1.5px solid rgba(200, 180, 255, 0.3);
-            border-radius: 20px;
-            padding: 50px;
-            margin-top: 60px;
-            color: #2d3748;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .interactive-section::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, rgba(216, 180, 255, 0.1) 0%, transparent 70%);
-            border-radius: 50%;
-            pointer-events: none;
-        }
-
-        .interactive-section h2 {
-            font-size: 36px;
-            margin-bottom: 40px;
-            background: linear-gradient(135deg, #b896ff 0%, #93c5fd 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            position: relative;
-            z-index: 2;
-        }
-
-        .interactive-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
-            gap: 28px;
-            position: relative;
-            z-index: 2;
-        }
-
-        .calculator {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(245, 240, 255, 0.8) 100%);
-            border: 1.5px solid #e9d5ff;
-            border-radius: 16px;
-            padding: 28px;
-            transition: all 0.4s ease;
-            position: relative;
-        }
-
-        .calculator::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, #c4b5fd, transparent);
-            border-radius: 16px 16px 0 0;
-        }
-
-        .calculator:hover {
-            transform: translateY(-8px);
-            border-color: #d8b4ff;
-            box-shadow: 0 20px 50px rgba(200, 150, 255, 0.15);
-        }
-
-        .calc-title {
-            font-size: 16px;
-            font-weight: 800;
-            color: #8b5cf6;
-            margin-bottom: 22px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .calc-function-display {
-            background: linear-gradient(135deg, rgba(216, 180, 255, 0.2) 0%, rgba(179, 230, 255, 0.2) 100%);
-            border: 1.5px solid #e9d5ff;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            text-align: center;
-            font-size: 1.1em;
-            min-height: 70px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #6b7280;
-        }
-
-        .calc-function-display .mjx-chtml {
-            font-size: 1.1em !important;
-        }
-
-        .input-group {
-            margin-bottom: 16px;
-        }
-
-        .input-label {
-            font-size: 12px;
-            color: #7c3aed;
-            margin-bottom: 8px;
             display: block;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
 
-        input[type="number"] {
-            width: 100%;
-            padding: 12px;
-            background: rgba(255, 255, 255, 0.8);
-            border: 1.5px solid #e9d5ff;
-            border-radius: 8px;
-            color: #7c3aed;
-            font-size: 14px;
-            font-family: 'Courier New', monospace;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        input[type="number"]:focus {
-            outline: none;
-            border-color: #d8b4ff;
-            background: rgba(255, 255, 255, 0.95);
-            box-shadow: 0 0 15px rgba(200, 150, 255, 0.2);
-        }
-
-        .calc-result {
-            background: linear-gradient(135deg, rgba(216, 180, 255, 0.15) 0%, rgba(179, 230, 255, 0.15) 100%);
-            border-left: 4px solid #c4b5fd;
-            padding: 16px;
-            border-radius: 10px;
-            margin-top: 14px;
-        }
-
-        .result-label {
-            font-size: 11px;
-            color: #6b7280;
-            margin-bottom: 8px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .result-value {
-            font-size: 1.05em;
-            color: #8b5cf6;
-            font-weight: 800;
-            font-family: 'Courier New', monospace;
-            text-align: center;
-        }
-
-        .comparison-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 40px;
-            font-size: 13px;
-            position: relative;
-            z-index: 2;
-        }
-
-        .comparison-table th {
-            background: linear-gradient(135deg, rgba(216, 180, 255, 0.2) 0%, rgba(179, 230, 255, 0.2) 100%);
-            color: #7c3aed;
-            padding: 16px;
-            text-align: left;
-            border-bottom: 2px solid #e9d5ff;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .comparison-table td {
-            padding: 14px 16px;
-            border-bottom: 1px solid #f3e8ff;
-            color: #4b5563;
-            font-weight: 500;
-        }
-
-        .comparison-table tr:hover {
-            background: rgba(216, 180, 255, 0.08);
-        }
-
-        .comparison-table .mjx-chtml {
-            font-size: 1em !important;
+        .feedback.info {
+            background: linear-gradient(135deg, rgba(191, 219, 254, 0.3) 0%, rgba(186, 230, 253, 0.3) 100%);
+            border: 2px solid #bfdbfe;
+            color: #1e40af;
+            display: block;
         }
 
         @media (max-width: 768px) {
@@ -497,14 +313,6 @@
 
             .rules-grid {
                 grid-template-columns: 1fr;
-            }
-
-            .interactive-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .interactive-section {
-                padding: 30px;
             }
 
             .rule-card {
@@ -543,22 +351,9 @@
                         $$f(x) = 5x^3$$
                     </div>
 
-                    <div class="options-grid" id="quiz1">
-                        <label class="option">
-                            <input type="radio" name="q1" value="15x^2">
-                            <span class="option-label">$$15x^2$$</span>
-                        </label>
-                        <label class="option">
-                            <input type="radio" name="q1" value="15x^4">
-                            <span class="option-label">$$15x^4$$</span>
-                        </label>
-                        <label class="option">
-                            <input type="radio" name="q1" value="5x^2">
-                            <span class="option-label">$$5x^2$$</span>
-                        </label>
-                    </div>
+                    <div class="options-grid" id="quiz1"></div>
 
-                    <button class="check-button" onclick="checkAnswer('q1', '15x^2', 1)">Verificar</button>
+                    <button class="check-button" onclick="checkAnswer('q1', 1)">Verificar Respuesta</button>
                     <div class="feedback" id="feedback1"></div>
                 </div>
             </div>
@@ -583,22 +378,9 @@
                         $$f(x) = 3e^x$$
                     </div>
 
-                    <div class="options-grid" id="quiz2">
-                        <label class="option">
-                            <input type="radio" name="q2" value="3e^x">
-                            <span class="option-label">$$3e^x$$</span>
-                        </label>
-                        <label class="option">
-                            <input type="radio" name="q2" value="e^x">
-                            <span class="option-label">$$e^x$$</span>
-                        </label>
-                        <label class="option">
-                            <input type="radio" name="q2" value="3">
-                            <span class="option-label">$$3$$</span>
-                        </label>
-                    </div>
+                    <div class="options-grid" id="quiz2"></div>
 
-                    <button class="check-button" onclick="checkAnswer('q2', '3e^x', 2)">Verificar</button>
+                    <button class="check-button" onclick="checkAnswer('q2', 2)">Verificar Respuesta</button>
                     <div class="feedback" id="feedback2"></div>
                 </div>
             </div>
@@ -623,22 +405,9 @@
                         $$f(x) = 2\ln(x)$$
                     </div>
 
-                    <div class="options-grid" id="quiz3">
-                        <label class="option">
-                            <input type="radio" name="q3" value="2/x">
-                            <span class="option-label">$$\frac{2}{x}$$</span>
-                        </label>
-                        <label class="option">
-                            <input type="radio" name="q3" value="1/x">
-                            <span class="option-label">$$\frac{1}{x}$$</span>
-                        </label>
-                        <label class="option">
-                            <input type="radio" name="q3" value="2">
-                            <span class="option-label">$$2$$</span>
-                        </label>
-                    </div>
+                    <div class="options-grid" id="quiz3"></div>
 
-                    <button class="check-button" onclick="checkAnswer('q3', '2/x', 3)">Verificar</button>
+                    <button class="check-button" onclick="checkAnswer('q3', 3)">Verificar Respuesta</button>
                     <div class="feedback" id="feedback3"></div>
                 </div>
             </div>
@@ -663,22 +432,9 @@
                         $$f(x) = 4\sin(x)$$
                     </div>
 
-                    <div class="options-grid" id="quiz4">
-                        <label class="option">
-                            <input type="radio" name="q4" value="4cos(x)">
-                            <span class="option-label">$$4\cos(x)$$</span>
-                        </label>
-                        <label class="option">
-                            <input type="radio" name="q4" value="cos(x)">
-                            <span class="option-label">$$\cos(x)$$</span>
-                        </label>
-                        <label class="option">
-                            <input type="radio" name="q4" value="-4sin(x)">
-                            <span class="option-label">$$-4\sin(x)$$</span>
-                        </label>
-                    </div>
+                    <div class="options-grid" id="quiz4"></div>
 
-                    <button class="check-button" onclick="checkAnswer('q4', '4cos(x)', 4)">Verificar</button>
+                    <button class="check-button" onclick="checkAnswer('q4', 4)">Verificar Respuesta</button>
                     <div class="feedback" id="feedback4"></div>
                 </div>
             </div>
@@ -703,22 +459,9 @@
                         $$f(x) = 2\cos(x)$$
                     </div>
 
-                    <div class="options-grid" id="quiz5">
-                        <label class="option">
-                            <input type="radio" name="q5" value="-2sin(x)">
-                            <span class="option-label">$$-2\sin(x)$$</span>
-                        </label>
-                        <label class="option">
-                            <input type="radio" name="q5" value="2sin(x)">
-                            <span class="option-label">$$2\sin(x)$$</span>
-                        </label>
-                        <label class="option">
-                            <input type="radio" name="q5" value="-sin(x)">
-                            <span class="option-label">$$-\sin(x)$$</span>
-                        </label>
-                    </div>
+                    <div class="options-grid" id="quiz5"></div>
 
-                    <button class="check-button" onclick="checkAnswer('q5', '-2sin(x)', 5)">Verificar</button>
+                    <button class="check-button" onclick="checkAnswer('q5', 5)">Verificar Respuesta</button>
                     <div class="feedback" id="feedback5"></div>
                 </div>
             </div>
@@ -743,315 +486,282 @@
                         $$f(x) = 2 \cdot 3^x$$
                     </div>
 
-                    <div class="options-grid" id="quiz6">
-                        <label class="option">
-                            <input type="radio" name="q6" value="2*3^x*ln(3)">
-                            <span class="option-label">$$2 \cdot 3^x \cdot \ln(3)$$</span>
-                        </label>
-                        <label class="option">
-                            <input type="radio" name="q6" value="3^x*ln(3)">
-                            <span class="option-label">$$3^x \cdot \ln(3)$$</span>
-                        </label>
-                        <label class="option">
-                            <input type="radio" name="q6" value="2*ln(3)">
-                            <span class="option-label">$$2\ln(3)$$</span>
-                        </label>
-                    </div>
+                    <div class="options-grid" id="quiz6"></div>
 
-                    <button class="check-button" onclick="checkAnswer('q6', '2*3^x*ln(3)', 6)">Verificar</button>
+                    <button class="check-button" onclick="checkAnswer('q6', 6)">Verificar Respuesta</button>
                     <div class="feedback" id="feedback6"></div>
                 </div>
             </div>
-        </div>
 
-        <!-- Sección Interactiva -->
-        <div class="interactive-section">
-            <h2>🚀 Calculadora Interactiva</h2>
-            <div class="interactive-grid">
-                <!-- Calc 1: Potencia -->
-                <div class="calculator">
-                    <div class="calc-title">Potencia</div>
-                    <div class="input-group">
-                        <label class="input-label">Coeficiente (k):</label>
-                        <input type="number" id="power_k" value="5" step="0.1" oninput="calcPower()">
-                    </div>
-                    <div class="input-group">
-                        <label class="input-label">Exponente (n):</label>
-                        <input type="number" id="power_n" value="3" step="0.1" oninput="calcPower()">
-                    </div>
-                    <div class="calc-function-display">
-                        <span id="power_func"></span>
-                    </div>
-                    <div class="calc-result">
-                        <div class="result-label">Derivada</div>
-                        <div class="result-value" id="power_derivative"></div>
-                    </div>
-                    <div class="calc-result">
-                        <div class="result-label">En x = 2</div>
-                        <div class="result-value" id="power_result">240</div>
-                    </div>
+            <!-- Regla 7: Raíz Cuadrada -->
+            <div class="rule-card">
+                <div class="rule-number">7</div>
+                <div class="rule-title">Raíz Cuadrada</div>
+                
+                <div class="rule-formula">
+                    $$\frac{d}{dx}[\sqrt{x}] = \frac{1}{2\sqrt{x}}$$
                 </div>
 
-                <!-- Calc 2: Exponencial e -->
-                <div class="calculator">
-                    <div class="calc-title">Exponencial e</div>
-                    <div class="input-group">
-                        <label class="input-label">Coeficiente (k):</label>
-                        <input type="number" id="exp_k" value="3" step="0.1" oninput="calcExp()">
-                    </div>
-                    <div class="calc-function-display">
-                        <span id="exp_func"></span>
-                    </div>
-                    <div class="calc-result">
-                        <div class="result-label">Derivada</div>
-                        <div class="result-value" id="exp_derivative"></div>
-                    </div>
-                    <div class="calc-result">
-                        <div class="result-label">En x = 1</div>
-                        <div class="result-value" id="exp_result">8.155</div>
-                    </div>
+                <div class="rule-description">
+                    La raíz cuadrada es equivalente a x^(1/2), por lo que aplicamos la regla de potencia.
                 </div>
 
-                <!-- Calc 3: Logaritmo -->
-                <div class="calculator">
-                    <div class="calc-title">Logaritmo Natural</div>
-                    <div class="input-group">
-                        <label class="input-label">Coeficiente (k):</label>
-                        <input type="number" id="ln_k" value="2" step="0.1" oninput="calcLn()">
+                <div class="example-section">
+                    <div class="example-title">¿Cuál es la derivada?</div>
+                    
+                    <div class="function-display">
+                        $$f(x) = 3\sqrt{x}$$
                     </div>
-                    <div class="calc-function-display">
-                        <span id="ln_func"></span>
-                    </div>
-                    <div class="calc-result">
-                        <div class="result-label">Derivada</div>
-                        <div class="result-value" id="ln_derivative"></div>
-                    </div>
-                    <div class="calc-result">
-                        <div class="result-label">En x = 4</div>
-                        <div class="result-value" id="ln_result">0.5</div>
-                    </div>
-                </div>
 
-                <!-- Calc 4: Exponencial General -->
-                <div class="calculator">
-                    <div class="calc-title">Exponencial General</div>
-                    <div class="input-group">
-                        <label class="input-label">Coeficiente (k):</label>
-                        <input type="number" id="exp_g_k" value="2" step="0.1" oninput="calcExpGeneral()">
-                    </div>
-                    <div class="input-group">
-                        <label class="input-label">Base (a):</label>
-                        <input type="number" id="exp_a" value="3" step="0.1" min="0.1" oninput="calcExpGeneral()">
-                    </div>
-                    <div class="calc-function-display">
-                        <span id="exp_g_func"></span>
-                    </div>
-                    <div class="calc-result">
-                        <div class="result-label">Derivada</div>
-                        <div class="result-value" id="exp_g_derivative"></div>
-                    </div>
-                    <div class="calc-result">
-                        <div class="result-label">En x = 1</div>
-                        <div class="result-value" id="exp_g_result">6.597</div>
-                    </div>
-                </div>
+                    <div class="options-grid" id="quiz7"></div>
 
-                <!-- Calc 5: Seno -->
-                <div class="calculator">
-                    <div class="calc-title">Seno</div>
-                    <div class="input-group">
-                        <label class="input-label">Coeficiente (k):</label>
-                        <input type="number" id="sin_k" value="4" step="0.1" oninput="calcSin()">
-                    </div>
-                    <div class="calc-function-display">
-                        <span id="sin_func"></span>
-                    </div>
-                    <div class="calc-result">
-                        <div class="result-label">Derivada</div>
-                        <div class="result-value" id="sin_derivative"></div>
-                    </div>
-                    <div class="calc-result">
-                        <div class="result-label">En x = 0</div>
-                        <div class="result-value" id="sin_result">4.0</div>
-                    </div>
-                </div>
-
-                <!-- Calc 6: Coseno -->
-                <div class="calculator">
-                    <div class="calc-title">Coseno</div>
-                    <div class="input-group">
-                        <label class="input-label">Coeficiente (k):</label>
-                        <input type="number" id="cos_k" value="2" step="0.1" oninput="calcCos()">
-                    </div>
-                    <div class="calc-function-display">
-                        <span id="cos_func"></span>
-                    </div>
-                    <div class="calc-result">
-                        <div class="result-label">Derivada</div>
-                        <div class="result-value" id="cos_derivative"></div>
-                    </div>
-                    <div class="calc-result">
-                        <div class="result-label">En x = 0</div>
-                        <div class="result-value" id="cos_result">0.0</div>
-                    </div>
+                    <button class="check-button" onclick="checkAnswer('q7', 7)">Verificar Respuesta</button>
+                    <div class="feedback" id="feedback7"></div>
                 </div>
             </div>
 
-            <!-- Tabla Comparativa -->
-            <table class="comparison-table">
-                <thead>
-                    <tr>
-                        <th>Función Original</th>
-                        <th>Su Derivada</th>
-                        <th>Dominio</th>
-                        <th>Notas Importantes</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>$$f(x) = kx^n$$</td>
-                        <td>$$f'(x) = knx^{n-1}$$</td>
-                        <td>$$\mathbb{R}$$</td>
-                        <td>Para todo n real</td>
-                    </tr>
-                    <tr>
-                        <td>$$f(x) = ke^x$$</td>
-                        <td>$$f'(x) = ke^x$$</td>
-                        <td>$$\mathbb{R}$$</td>
-                        <td>Función igual a su derivada</td>
-                    </tr>
-                    <tr>
-                        <td>$$f(x) = k\ln(x)$$</td>
-                        <td>$$f'(x) = \frac{k}{x}$$</td>
-                        <td>$$x > 0$$</td>
-                        <td>Derivada recíproca</td>
-                    </tr>
-                    <tr>
-                        <td>$$f(x) = k\sin(x)$$</td>
-                        <td>$$f'(x) = k\cos(x)$$</td>
-                        <td>$$\mathbb{R}$$</td>
-                        <td>Ciclo trigonométrico</td>
-                    </tr>
-                    <tr>
-                        <td>$$f(x) = k\cos(x)$$</td>
-                        <td>$$f'(x) = -k\sin(x)$$</td>
-                        <td>$$\mathbb{R}$$</td>
-                        <td>Signo negativo importante</td>
-                    </tr>
-                    <tr>
-                        <td>$$f(x) = k \cdot a^x$$</td>
-                        <td>$$f'(x) = k \cdot a^x \ln(a)$$</td>
-                        <td>$$\mathbb{R}$$</td>
-                        <td>a > 0, a ≠ 1</td>
-                    </tr>
-                </tbody>
-            </table>
+            <!-- Regla 8: Tangente -->
+            <div class="rule-card">
+                <div class="rule-number">8</div>
+                <div class="rule-title">Función Tangente</div>
+                
+                <div class="rule-formula">
+                    $$\frac{d}{dx}[\tan(x)] = \sec^2(x)$$
+                </div>
+
+                <div class="rule-description">
+                    La derivada de tangente es secante al cuadrado. Recuerda que sec(x) = 1/cos(x).
+                </div>
+
+                <div class="example-section">
+                    <div class="example-title">¿Cuál es la derivada?</div>
+                    
+                    <div class="function-display">
+                        $$f(x) = 5\tan(x)$$
+                    </div>
+
+                    <div class="options-grid" id="quiz8"></div>
+
+                    <button class="check-button" onclick="checkAnswer('q8', 8)">Verificar Respuesta</button>
+                    <div class="feedback" id="feedback8"></div>
+                </div>
+            </div>
+
+            <!-- Regla 9: Combinación -->
+            <div class="rule-card">
+                <div class="rule-number">9</div>
+                <div class="rule-title">Combinación: Potencia × Exponencial</div>
+                
+                <div class="rule-formula">
+                    $$\frac{d}{dx}[kx^n \cdot e^x] \text{ (usando regla del producto)}$$
+                </div>
+
+                <div class="rule-description">
+                    Cuando combinamos funciones usamos la regla del producto: (fg)' = f'g + fg'
+                </div>
+
+                <div class="example-section">
+                    <div class="example-title">¿Cuál es la derivada?</div>
+                    
+                    <div class="function-display">
+                        $$f(x) = x^2 e^x$$
+                    </div>
+
+                    <div class="options-grid" id="quiz9"></div>
+
+                    <button class="check-button" onclick="checkAnswer('q9', 9)">Verificar Respuesta</button>
+                    <div class="feedback" id="feedback9"></div>
+                </div>
+            </div>
+
+            <!-- Regla 10: Potencia Negativa -->
+            <div class="rule-card">
+                <div class="rule-number">10</div>
+                <div class="rule-title">Potencia Negativa</div>
+                
+                <div class="rule-formula">
+                    $$\frac{d}{dx}[x^{-n}] = -nx^{-n-1}$$
+                </div>
+
+                <div class="rule-description">
+                    La regla de potencia también aplica para exponentes negativos. Equivale a derivar 1/x^n.
+                </div>
+
+                <div class="example-section">
+                    <div class="example-title">¿Cuál es la derivada?</div>
+                    
+                    <div class="function-display">
+                        $$f(x) = 4x^{-2}$$
+                    </div>
+
+                    <div class="options-grid" id="quiz10"></div>
+
+                    <button class="check-button" onclick="checkAnswer('q10', 10)">Verificar Respuesta</button>
+                    <div class="feedback" id="feedback10"></div>
+                </div>
+            </div>
+
+            <!-- Regla 11: Arcoseno -->
+            <div class="rule-card">
+                <div class="rule-number">11</div>
+                <div class="rule-title">Arcoseno (Inversa de Seno)</div>
+                
+                <div class="rule-formula">
+                    $$\frac{d}{dx}[\arcsin(x)] = \frac{1}{\sqrt{1-x^2}}$$
+                </div>
+
+                <div class="rule-description">
+                    Las funciones trigonométricas inversas tienen derivadas específicas. Esta es la del arcoseno.
+                </div>
+
+                <div class="example-section">
+                    <div class="example-title">¿Cuál es la derivada?</div>
+                    
+                    <div class="function-display">
+                        $$f(x) = 2\arcsin(x)$$
+                    </div>
+
+                    <div class="options-grid" id="quiz11"></div>
+
+                    <button class="check-button" onclick="checkAnswer('q11', 11)">Verificar Respuesta</button>
+                    <div class="feedback" id="feedback11"></div>
+                </div>
+            </div>
+
+            <!-- Regla 12: Logaritmo General -->
+            <div class="rule-card">
+                <div class="rule-number">12</div>
+                <div class="rule-title">Logaritmo en base a</div>
+                
+                <div class="rule-formula">
+                    $$\frac{d}{dx}[\log_a(x)] = \frac{1}{x \ln(a)}, \quad a > 0, a \neq 1$$
+                </div>
+
+                <div class="rule-description">
+                    El logaritmo en cualquier base tiene una derivada que depende del logaritmo natural.
+                </div>
+
+                <div class="example-section">
+                    <div class="example-title">¿Cuál es la derivada?</div>
+                    
+                    <div class="function-display">
+                        $$f(x) = 3\log_2(x)$$
+                    </div>
+
+                    <div class="options-grid" id="quiz12"></div>
+
+                    <button class="check-button" onclick="checkAnswer('q12', 12)">Verificar Respuesta</button>
+                    <div class="feedback" id="feedback12"></div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        function checkAnswer(questionName, correctAnswer, questionNumber) {
+        // Base de datos de preguntas
+        const questions = {
+            1: {
+                correct: "15x^2",
+                options: ["15x^2", "15x^4", "5x^2"]
+            },
+            2: {
+                correct: "3e^x",
+                options: ["3e^x", "e^x", "3"]
+            },
+            3: {
+                correct: "2/x",
+                options: ["2/x", "1/x", "2"]
+            },
+            4: {
+                correct: "4cos(x)",
+                options: ["4cos(x)", "cos(x)", "-4sin(x)"]
+            },
+            5: {
+                correct: "-2sin(x)",
+                options: ["-2sin(x)", "2sin(x)", "-sin(x)"]
+            },
+            6: {
+                correct: "2*3^x*ln(3)",
+                options: ["2*3^x*ln(3)", "3^x*ln(3)", "2*ln(3)"]
+            },
+            7: {
+                correct: "3/(2√x)",
+                options: ["3/(2√x)", "3/(√x)", "3√x"]
+            },
+            8: {
+                correct: "5sec²(x)",
+                options: ["5sec²(x)", "5cos²(x)", "5tan(x)"]
+            },
+            9: {
+                correct: "(2x+x²)e^x",
+                options: ["(2x+x²)e^x", "2xe^x", "x²e^x"]
+            },
+            10: {
+                correct: "-8x^(-3)",
+                options: ["-8x^(-3)", "8x^(-3)", "-8x^(-2)"]
+            },
+            11: {
+                correct: "2/√(1-x²)",
+                options: ["2/√(1-x²)", "1/√(1-x²)", "2√(1-x²)"]
+            },
+            12: {
+                correct: "3/(x·ln(2))",
+                options: ["3/(x·ln(2))", "3/(x·ln(3))", "3·ln(2)"]
+            }
+        };
+
+        // Función para barajar array
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        // Inicializar opciones desordenadas
+        function initializeQuiz(quizNumber) {
+            const question = questions[quizNumber];
+            const shuffledOptions = shuffleArray(question.options);
+            const optionsHtml = shuffledOptions.map(option => `
+                <label class="option">
+                    <input type="radio" name="q${quizNumber}" value="${option}">
+                    <span class="option-label">$$${option}$$</span>
+                </label>
+            `).join('');
+            
+            document.getElementById(`quiz${quizNumber}`).innerHTML = optionsHtml;
+            MathJax.typesetPromise().catch(err => console.log(err));
+        }
+
+        // Verificar respuesta
+        function checkAnswer(questionName, questionNumber) {
             const selected = document.querySelector(`input[name="${questionName}"]:checked`);
             const feedback = document.getElementById(`feedback${questionNumber}`);
-            
+            const question = questions[questionNumber];
+
             if (!selected) {
-                feedback.textContent = '⚠️ Selecciona una opción';
-                feedback.className = 'feedback incorrect';
+                feedback.textContent = '⚠️ Por favor, selecciona una opción';
+                feedback.className = 'feedback info';
                 return;
             }
 
-            if (selected.value === correctAnswer) {
+            if (selected.value === question.correct) {
                 feedback.textContent = '✨ ¡Correcto! Excelente trabajo.';
                 feedback.className = 'feedback correct';
             } else {
-                feedback.textContent = `✓ La respuesta correcta es: ${correctAnswer}`;
+                feedback.textContent = `✗ Incorrecto. La respuesta correcta es: ${question.correct}`;
                 feedback.className = 'feedback incorrect';
             }
         }
 
-        function calcPower() {
-            const k = parseFloat(document.getElementById('power_k').value);
-            const n = parseFloat(document.getElementById('power_n').value);
-            
-            document.getElementById('power_func').innerHTML = `$$f(x) = ${k}x^{${n}}$$`;
-            const coeffDeriv = k * n;
-            const expDeriv = n - 1;
-            document.getElementById('power_derivative').innerHTML = `$$f'(x) = ${coeffDeriv}x^{${expDeriv}}$$`;
-            
-            const result = coeffDeriv * Math.pow(2, expDeriv);
-            document.getElementById('power_result').textContent = result.toFixed(2);
-            
-            MathJax.typesetPromise().catch(err => console.log(err));
-        }
-
-        function calcExp() {
-            const k = parseFloat(document.getElementById('exp_k').value);
-            
-            document.getElementById('exp_func').innerHTML = `$$f(x) = ${k}e^x$$`;
-            document.getElementById('exp_derivative').innerHTML = `$$f'(x) = ${k}e^x$$`;
-            
-            const result = k * Math.exp(1);
-            document.getElementById('exp_result').textContent = result.toFixed(3);
-            
-            MathJax.typesetPromise().catch(err => console.log(err));
-        }
-
-        function calcLn() {
-            const k = parseFloat(document.getElementById('ln_k').value);
-            
-            document.getElementById('ln_func').innerHTML = `$$f(x) = ${k}\\ln(x)$$`;
-            document.getElementById('ln_derivative').innerHTML = `$$f'(x) = \\frac{${k}}{x}$$`;
-            
-            const result = k / 4;
-            document.getElementById('ln_result').textContent = result.toFixed(3);
-            
-            MathJax.typesetPromise().catch(err => console.log(err));
-        }
-
-        function calcExpGeneral() {
-            const k = parseFloat(document.getElementById('exp_g_k').value);
-            const a = parseFloat(document.getElementById('exp_a').value);
-            
-            document.getElementById('exp_g_func').innerHTML = `$$f(x) = ${k} \\cdot ${a}^x$$`;
-            document.getElementById('exp_g_derivative').innerHTML = `$$f'(x) = ${k} \\cdot ${a}^x \\cdot \\ln(${a})$$`;
-            
-            const result = k * Math.pow(a, 1) * Math.log(a);
-            document.getElementById('exp_g_result').textContent = result.toFixed(3);
-            
-            MathJax.typesetPromise().catch(err => console.log(err));
-        }
-
-        function calcSin() {
-            const k = parseFloat(document.getElementById('sin_k').value);
-            
-            document.getElementById('sin_func').innerHTML = `$$f(x) = ${k}\\sin(x)$$`;
-            document.getElementById('sin_derivative').innerHTML = `$$f'(x) = ${k}\\cos(x)$$`;
-            
-            const result = k * Math.cos(0);
-            document.getElementById('sin_result').textContent = result.toFixed(1);
-            
-            MathJax.typesetPromise().catch(err => console.log(err));
-        }
-
-        function calcCos() {
-            const k = parseFloat(document.getElementById('cos_k').value);
-            
-            document.getElementById('cos_func').innerHTML = `$$f(x) = ${k}\\cos(x)$$`;
-            document.getElementById('cos_derivative').innerHTML = `$$f'(x) = -${k}\\sin(x)$$`;
-            
-            const result = -k * Math.sin(0);
-            document.getElementById('cos_result').textContent = result.toFixed(1);
-            
-            MathJax.typesetPromise().catch(err => console.log(err));
-        }
-
-        // Inicializar
-        calcPower();
-        calcExp();
-        calcLn();
-        calcExpGeneral();
-        calcSin();
-        calcCos();
+        // Inicializar todos los quiz al cargar
+        window.addEventListener('load', () => {
+            for (let i = 1; i <= 12; i++) {
+                initializeQuiz(i);
+            }
+        });
     </script>
 </body>
 </html>
