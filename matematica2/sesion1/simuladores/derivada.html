@@ -275,35 +275,97 @@
             transform: translateY(0);
         }
 
+        .feedback-container {
+            margin-top: 20px;
+            min-height: 60px;
+        }
+
         .feedback {
-            margin-top: 14px;
-            padding: 14px;
-            border-radius: 10px;
-            font-size: 13px;
+            padding: 16px 20px;
+            border-radius: 12px;
+            font-size: 14px;
             font-weight: 700;
             text-align: center;
             display: none;
+            border: 2px solid;
+            animation: slideIn 0.4s ease-out;
+            line-height: 1.6;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .feedback.correct {
-            background: linear-gradient(135deg, rgba(167, 243, 208, 0.3) 0%, rgba(186, 230, 253, 0.3) 100%);
-            border: 2px solid #a7f3d0;
-            color: #047857;
+            background: linear-gradient(135deg, #dcfce7 0%, #c6f6d5 100%);
+            border-color: #22c55e;
+            color: #15803d;
             display: block;
+            box-shadow: 0 8px 20px rgba(34, 197, 94, 0.2);
         }
 
         .feedback.incorrect {
-            background: linear-gradient(135deg, rgba(252, 165, 165, 0.3) 0%, rgba(254, 202, 202, 0.3) 100%);
-            border: 2px solid #fca5a5;
-            color: #7f1d1d;
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            border-color: #ef4444;
+            color: #991b1b;
             display: block;
+            box-shadow: 0 8px 20px rgba(239, 68, 68, 0.2);
         }
 
         .feedback.info {
-            background: linear-gradient(135deg, rgba(191, 219, 254, 0.3) 0%, rgba(186, 230, 253, 0.3) 100%);
-            border: 2px solid #bfdbfe;
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            border-color: #3b82f6;
             color: #1e40af;
             display: block;
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.2);
+        }
+
+        .feedback::before {
+            content: '';
+            display: inline-block;
+            margin-right: 8px;
+            font-size: 18px;
+        }
+
+        .feedback.correct::before {
+            content: '✅';
+        }
+
+        .feedback.incorrect::before {
+            content: '❌';
+        }
+
+        .feedback.info::before {
+            content: '⚠️';
+        }
+
+        .correct-answer {
+            margin-top: 12px;
+            padding: 12px;
+            background: rgba(34, 197, 94, 0.1);
+            border-left: 4px solid #22c55e;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #166534;
+        }
+
+        .correct-answer-label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 700;
+        }
+
+        .correct-answer-value {
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
         }
 
         @media (max-width: 768px) {
@@ -353,8 +415,10 @@
 
                     <div class="options-grid" id="quiz1"></div>
 
-                    <button class="check-button" onclick="checkAnswer('q1', 1)">Verificar Respuesta</button>
-                    <div class="feedback" id="feedback1"></div>
+                    <button class="check-button" onclick="checkAnswer(1)">Verificar Respuesta</button>
+                    <div class="feedback-container">
+                        <div class="feedback" id="feedback1"></div>
+                    </div>
                 </div>
             </div>
 
@@ -380,8 +444,10 @@
 
                     <div class="options-grid" id="quiz2"></div>
 
-                    <button class="check-button" onclick="checkAnswer('q2', 2)">Verificar Respuesta</button>
-                    <div class="feedback" id="feedback2"></div>
+                    <button class="check-button" onclick="checkAnswer(2)">Verificar Respuesta</button>
+                    <div class="feedback-container">
+                        <div class="feedback" id="feedback2"></div>
+                    </div>
                 </div>
             </div>
 
@@ -407,8 +473,10 @@
 
                     <div class="options-grid" id="quiz3"></div>
 
-                    <button class="check-button" onclick="checkAnswer('q3', 3)">Verificar Respuesta</button>
-                    <div class="feedback" id="feedback3"></div>
+                    <button class="check-button" onclick="checkAnswer(3)">Verificar Respuesta</button>
+                    <div class="feedback-container">
+                        <div class="feedback" id="feedback3"></div>
+                    </div>
                 </div>
             </div>
 
@@ -434,8 +502,10 @@
 
                     <div class="options-grid" id="quiz4"></div>
 
-                    <button class="check-button" onclick="checkAnswer('q4', 4)">Verificar Respuesta</button>
-                    <div class="feedback" id="feedback4"></div>
+                    <button class="check-button" onclick="checkAnswer(4)">Verificar Respuesta</button>
+                    <div class="feedback-container">
+                        <div class="feedback" id="feedback4"></div>
+                    </div>
                 </div>
             </div>
 
@@ -461,8 +531,10 @@
 
                     <div class="options-grid" id="quiz5"></div>
 
-                    <button class="check-button" onclick="checkAnswer('q5', 5)">Verificar Respuesta</button>
-                    <div class="feedback" id="feedback5"></div>
+                    <button class="check-button" onclick="checkAnswer(5)">Verificar Respuesta</button>
+                    <div class="feedback-container">
+                        <div class="feedback" id="feedback5"></div>
+                    </div>
                 </div>
             </div>
 
@@ -488,8 +560,10 @@
 
                     <div class="options-grid" id="quiz6"></div>
 
-                    <button class="check-button" onclick="checkAnswer('q6', 6)">Verificar Respuesta</button>
-                    <div class="feedback" id="feedback6"></div>
+                    <button class="check-button" onclick="checkAnswer(6)">Verificar Respuesta</button>
+                    <div class="feedback-container">
+                        <div class="feedback" id="feedback6"></div>
+                    </div>
                 </div>
             </div>
 
@@ -515,8 +589,10 @@
 
                     <div class="options-grid" id="quiz7"></div>
 
-                    <button class="check-button" onclick="checkAnswer('q7', 7)">Verificar Respuesta</button>
-                    <div class="feedback" id="feedback7"></div>
+                    <button class="check-button" onclick="checkAnswer(7)">Verificar Respuesta</button>
+                    <div class="feedback-container">
+                        <div class="feedback" id="feedback7"></div>
+                    </div>
                 </div>
             </div>
 
@@ -542,8 +618,10 @@
 
                     <div class="options-grid" id="quiz8"></div>
 
-                    <button class="check-button" onclick="checkAnswer('q8', 8)">Verificar Respuesta</button>
-                    <div class="feedback" id="feedback8"></div>
+                    <button class="check-button" onclick="checkAnswer(8)">Verificar Respuesta</button>
+                    <div class="feedback-container">
+                        <div class="feedback" id="feedback8"></div>
+                    </div>
                 </div>
             </div>
 
@@ -569,8 +647,10 @@
 
                     <div class="options-grid" id="quiz9"></div>
 
-                    <button class="check-button" onclick="checkAnswer('q9', 9)">Verificar Respuesta</button>
-                    <div class="feedback" id="feedback9"></div>
+                    <button class="check-button" onclick="checkAnswer(9)">Verificar Respuesta</button>
+                    <div class="feedback-container">
+                        <div class="feedback" id="feedback9"></div>
+                    </div>
                 </div>
             </div>
 
@@ -596,8 +676,10 @@
 
                     <div class="options-grid" id="quiz10"></div>
 
-                    <button class="check-button" onclick="checkAnswer('q10', 10)">Verificar Respuesta</button>
-                    <div class="feedback" id="feedback10"></div>
+                    <button class="check-button" onclick="checkAnswer(10)">Verificar Respuesta</button>
+                    <div class="feedback-container">
+                        <div class="feedback" id="feedback10"></div>
+                    </div>
                 </div>
             </div>
 
@@ -623,8 +705,10 @@
 
                     <div class="options-grid" id="quiz11"></div>
 
-                    <button class="check-button" onclick="checkAnswer('q11', 11)">Verificar Respuesta</button>
-                    <div class="feedback" id="feedback11"></div>
+                    <button class="check-button" onclick="checkAnswer(11)">Verificar Respuesta</button>
+                    <div class="feedback-container">
+                        <div class="feedback" id="feedback11"></div>
+                    </div>
                 </div>
             </div>
 
@@ -650,8 +734,10 @@
 
                     <div class="options-grid" id="quiz12"></div>
 
-                    <button class="check-button" onclick="checkAnswer('q12', 12)">Verificar Respuesta</button>
-                    <div class="feedback" id="feedback12"></div>
+                    <button class="check-button" onclick="checkAnswer(12)">Verificar Respuesta</button>
+                    <div class="feedback-container">
+                        <div class="feedback" id="feedback12"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -662,51 +748,63 @@
         const questions = {
             1: {
                 correct: "15x^2",
-                options: ["15x^2", "15x^4", "5x^2"]
+                options: ["15x^2", "15x^4", "5x^2"],
+                displayCorrect: "$$15x^2$$"
             },
             2: {
                 correct: "3e^x",
-                options: ["3e^x", "e^x", "3"]
+                options: ["3e^x", "e^x", "3"],
+                displayCorrect: "$$3e^x$$"
             },
             3: {
                 correct: "2/x",
-                options: ["2/x", "1/x", "2"]
+                options: ["2/x", "1/x", "2"],
+                displayCorrect: "$$\\frac{2}{x}$$"
             },
             4: {
                 correct: "4cos(x)",
-                options: ["4cos(x)", "cos(x)", "-4sin(x)"]
+                options: ["4cos(x)", "cos(x)", "-4sin(x)"],
+                displayCorrect: "$$4\\cos(x)$$"
             },
             5: {
                 correct: "-2sin(x)",
-                options: ["-2sin(x)", "2sin(x)", "-sin(x)"]
+                options: ["-2sin(x)", "2sin(x)", "-sin(x)"],
+                displayCorrect: "$$-2\\sin(x)$$"
             },
             6: {
                 correct: "2*3^x*ln(3)",
-                options: ["2*3^x*ln(3)", "3^x*ln(3)", "2*ln(3)"]
+                options: ["2*3^x*ln(3)", "3^x*ln(3)", "2*ln(3)"],
+                displayCorrect: "$$2 \\cdot 3^x \\cdot \\ln(3)$$"
             },
             7: {
                 correct: "3/(2√x)",
-                options: ["3/(2√x)", "3/(√x)", "3√x"]
+                options: ["3/(2√x)", "3/(√x)", "3√x"],
+                displayCorrect: "$$\\frac{3}{2\\sqrt{x}}$$"
             },
             8: {
                 correct: "5sec²(x)",
-                options: ["5sec²(x)", "5cos²(x)", "5tan(x)"]
+                options: ["5sec²(x)", "5cos²(x)", "5tan(x)"],
+                displayCorrect: "$$5\\sec^2(x)$$"
             },
             9: {
                 correct: "(2x+x²)e^x",
-                options: ["(2x+x²)e^x", "2xe^x", "x²e^x"]
+                options: ["(2x+x²)e^x", "2xe^x", "x²e^x"],
+                displayCorrect: "$$(2x+x^2)e^x$$"
             },
             10: {
                 correct: "-8x^(-3)",
-                options: ["-8x^(-3)", "8x^(-3)", "-8x^(-2)"]
+                options: ["-8x^(-3)", "8x^(-3)", "-8x^(-2)"],
+                displayCorrect: "$$-8x^{-3}$$"
             },
             11: {
                 correct: "2/√(1-x²)",
-                options: ["2/√(1-x²)", "1/√(1-x²)", "2√(1-x²)"]
+                options: ["2/√(1-x²)", "1/√(1-x²)", "2√(1-x²)"],
+                displayCorrect: "$$\\frac{2}{\\sqrt{1-x^2}}$$"
             },
             12: {
                 correct: "3/(x·ln(2))",
-                options: ["3/(x·ln(2))", "3/(x·ln(3))", "3·ln(2)"]
+                options: ["3/(x·ln(2))", "3/(x·ln(3))", "3·ln(2)"],
+                displayCorrect: "$$\\frac{3}{x \\cdot \\ln(2)}$$"
             }
         };
 
@@ -736,23 +834,27 @@
         }
 
         // Verificar respuesta
-        function checkAnswer(questionName, questionNumber) {
-            const selected = document.querySelector(`input[name="${questionName}"]:checked`);
+        function checkAnswer(questionNumber) {
+            const selected = document.querySelector(`input[name="q${questionNumber}"]:checked`);
             const feedback = document.getElementById(`feedback${questionNumber}`);
             const question = questions[questionNumber];
 
             if (!selected) {
-                feedback.textContent = '⚠️ Por favor, selecciona una opción';
+                feedback.textContent = 'Por favor, selecciona una opción';
                 feedback.className = 'feedback info';
                 return;
             }
 
-            if (selected.value === question.correct) {
-                feedback.textContent = '✨ ¡Correcto! Excelente trabajo.';
+            const selectedValue = selected.value.trim();
+            const correctValue = question.correct.trim();
+
+            if (selectedValue === correctValue) {
+                feedback.innerHTML = `¡Correcto! Excelente trabajo.`;
                 feedback.className = 'feedback correct';
             } else {
-                feedback.textContent = `✗ Incorrecto. La respuesta correcta es: ${question.correct}`;
+                feedback.innerHTML = `Incorrecto. La respuesta correcta es: ${question.displayCorrect}`;
                 feedback.className = 'feedback incorrect';
+                MathJax.typesetPromise().catch(err => console.log(err));
             }
         }
 
