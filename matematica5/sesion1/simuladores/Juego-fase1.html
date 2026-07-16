@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Fase 1: El Filtro Lógico - Con Reporte</title>
+    <style>
+        body { margin: 0; padding: 20px; background: #1e1e2e; color: #cdd6f4; font-family: 'Segoe UI', Tahoma, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 90vh; }
+        h1 { color: #89b4fa; margin-bottom: 5px; }
+        #canvas-container { box-shadow: 0 10px 30px rgba(0,0,0,0.6); border-radius: 12px; overflow: hidden; border: 2px solid #45475a; }
+        canvas { display: block; background: #181825; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>🟢 Fase 1: El Filtro Lógico</h1>
+    <div id="canvas-container"><canvas id="gameCanvas" width="800" height="520"></canvas></div>
+<script>
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+let gameState = 'START', lives = 3, score = 0, currentIdx = 0, timer = 7, timerInterval = null;
+let feedbackMsg = '', feedbackColor = '#a6e3a1', feedbackTimer = 0;
+let activeQuestions = [], buttons = [], mistakes = [], reportIdx = 0;
+
+const dbPhase1 = [
+    { t: "¡Qué día tan maravilloso!", a: "Enunciado", f: "Es exclamativa; carece de valor de verdad." },
+    { t: "x + 8 = 20", a: "Enunciado Abierto", f: "Contiene una variable (x)." },
+    { t: "Lima es la capital de Perú.", a: "Proposición", f: "Es una afirmación declarativa verdadera." },
+    { t: "¿Cuál es tu nombre?", a: "Enunciado", f: "Es interrogativa; no afirma ni niega." },
+    { t: "2 + 5 = 9", a: "Proposición", f: "Es una afirmación matemática falsa." },
+    { t: "Por favor, cierra la puerta.", a: "Enunciado", f: "Es una orden o petición." },
+    { t: "3x - 5 > 10", a: "Enunciado Abierto", f: "Es una inecuación con variable." },
+    { t: "El número 2 es primo y par.", a: "Proposición", f: "Afirmación categórica verdadera." },
+    { t: "Él escribió 'Cien años de soledad'.", a: "Enunciado Abierto", f: "El pronombre 'Él' actúa como variable." },
+    { t: "Ojalá apruebe matemáticas.", a: "Enunciado", f: "Expresa un deseo (desiderativa)." },
+    { t: "El sol gira alrededor de la Tierra.", a: "Proposición", f: "Es una proposición con valor Falso." },
+    { t: "y^2 = 25", a: "Enunciado Abierto", f: "El valor de verdad depende de y." },
+    { t: "Prohibido estacionar.", a: "Enunciado", f: "Es una norma; carece de valor de verdad." },
+    { t: "El oxígeno es un gas vital.", a: "Proposición", f: "Enunciado declarativo verificable." },
+    { t: "¡Auxilio, llamen a los bomberos!", a: "Enunciado", f: "Exclamación de emergencia." },
+    { t: "Ella fue la primera mujer en el espacio.", a: "Enunciado Abierto", f: "'Ella' no especifica a la persona." },
+    { t: "5 * 4 = 20", a: "Proposición", f: "Enunciado matemático cerrado verdadero." },
+    { t: "¿Dónde queda la biblioteca?", a: "Enunciado", f: "Es una pregunta directa." },
+    { t: "2a + 3b = 15", a: "Enunciado Abierto", f: "Contiene variables proposicionales." },
+    { t: "El agua se congela a los 100 °C.", a: "Proposición", f: "Tiene valor de verdad (Falso)." },
+    { t: "El perro es un animal vertebrado.", a: "Proposición", f: "Afirmación declarativa." },
+    { t: "z - 4 = 0", a: "Enunciado Abierto", f: "Ecuación dependiente de la variable z." },
+    { t: "¡Buenas tardes a todos!", a: "Enunciado", f: "Fórmula de saludo." },
+    { t: "Simón Bolívar nació en Caracas.", a: "Proposición", f: "Hecho histórico verificable." },
+    { t: "Aquél fue un gran científico.", a: "Enunciado Abierto", f: "'Aquél' es un pronombre indeterminado." },
+    { t: "El triángulo tiene cuatro lados.", a: "Proposición", f: "Afirmación con valor Falso." },
+    { t: "¿Qué hora es?", a: "Enunciado", f: "Pregunta sin valor de verdad." },
+    { t: "x + y = z", a: "Enunciado Abierto", f: "Contiene tres variables matemáticas." },
+    { t: "París es la capital de Italia.", a: "Proposición", f: "Afirmación geográfica falsa." },
+    { t: "Silencio en la sala, por favor.", a: "Enunciado", f: "Es una directiva o imperativo." },
+    { t: "10 es divisible por 3.", a: "Proposición", f: "Enunciado matemático cerrado falso." },
+    { t: "Este planeta tiene dos lunas.", a: "Enunciado Abierto", f: "El sujeto 'Este planeta' es ambiguo." },
+    { t: "La semana tiene siete días.", a: "Proposición", f: "Enunciado declarativo verdadero." },
+    { t: "¡Feliz cumpleaños!", a: "Enunciado", f: "Expresión emotiva o de felicitación." },
+    { t: "n / 2 = 10", a: "Enunciado Abierto", f: "Requiere conocer el valor de n." },
+    { t: "El hielo es agua en estado sólido.", a: "Proposición", f: "Hecho físico verdadero." },
+    { t: "Abre tu libro en la página 10.", a: "Enunciado", f: "Es una orden." },
+    { t: "La ballena es un pez.", a: "Proposición", f: "Afirmación biológica falsa." },
+    { t: "Ese río es el más largo del mundo.", a: "Enunciado Abierto", f: "'Ese río' funciona como variable." },
+    { t: "8 + 8 = 16", a: "Proposición", f: "Operación matemática verdadera." },
+    { t: "¿Quién descubrió la penicilina?", a: "Enunciado", f: "Pregunta sin valor de verdad." },
+    { t: "La luna es un satélite natural.", a: "Proposición", f: "Enunciado astronómico verdadero." },
+    { t: "2x + 1 < 9", a: "Enunciado Abierto", f: "Inecuación que depende del valor de x." },
+    { t: "El oro es un metal precioso.", a: "Proposición", f: "Es una proposición verdadera." },
+    { t: "¡No pises el césped!", a: "Enunciado", f: "Oración imperativa." },
+    { t: "Ellos ganaron el torneo mundial.", a: "Enunciado Abierto", f: "'Ellos' es un sujeto indeterminado." },
+    { t: "El número 1 es un número primo.", a: "Proposición", f: "Enunciado matemático falso." },
+    { t: "¡Cuánto lo siento!", a: "Enunciado", f: "Expresión de emoción." },
+    { t: "La velocidad de la luz es constante.", a: "Proposición", f: "Principio de la física verdadero." },
+    { t: "w * 0 = 0", a: "Enunciado Abierto", f: "Aunque siempre se cumpla, formalmente tiene variable w." }
+];
+
+function createBtn(text, x, y, w, h, action, color="#313244") { buttons.push({text, x, y, w, h, action, color}); }
+
+function startRound() {
+    activeQuestions = [...dbPhase1].sort(() => 0.5 - Math.random()).slice(0, 10);
+    currentIdx = 0; lives = 3; score = 0; mistakes = []; reportIdx = 0; gameState = 'GAME';
+    resetTimer();
+}
+
+function resetTimer() {
+    clearInterval(timerInterval);
+    timer = 7;
+    timerInterval = setInterval(() => {
+        if (gameState === 'GAME' && feedbackTimer <= 0) {
+            timer--;
+            if (timer <= 0) handleError("⏱️ Tiempo agotado", true);
+        }
+    }, 1000);
+}
+
+function render() {
+    ctx.fillStyle = "#181825"; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    buttons = [];
+
+    if (gameState === 'START') {
+        ctx.fillStyle = "#89b4fa"; ctx.font = "bold 32px 'Segoe UI'"; ctx.textAlign = "center";
+        ctx.fillText("Fase 1: El Filtro Lógico", canvas.width/2, 160);
+        ctx.fillStyle = "#cdd6f4"; ctx.font = "18px 'Segoe UI'";
+        ctx.fillText("Clasifica 10 expresiones en 7 segundos cada una.", canvas.width/2, 210);
+        createBtn("▶ INICIAR JUEGO", canvas.width/2 - 120, 280, 240, 50, startRound, "#89b4fa");
+    } else if (gameState === 'GAME') {
+        let q = activeQuestions[currentIdx];
+        ctx.fillStyle = "#a6adc8"; ctx.font = "16px 'Segoe UI'"; ctx.textAlign = "left";
+        ctx.fillText(`Ptos: ${score} | Reto: ${currentIdx + 1}/10`, 20, 30);
+        ctx.textAlign = "center"; ctx.fillStyle = timer <= 3 ? "#f38ba8" : "#f9e2af";
+        ctx.font = "bold 18px 'Segoe UI'"; ctx.fillText(`⏱️ Tiempo: ${timer}s`, canvas.width/2, 30);
+        ctx.textAlign = "right"; ctx.fillText(`Vidas: ${"❤️".repeat(lives)}`, canvas.width - 20, 30);
+        
+        ctx.fillStyle = "#27283d"; ctx.beginPath(); ctx.roundRect(80, 80, 640, 130, 15); ctx.fill();
+        ctx.strokeStyle = "#89b4fa"; ctx.lineWidth = 2; ctx.stroke();
+        ctx.fillStyle = "#ffffff"; ctx.font = "bold 22px 'Segoe UI'"; ctx.textAlign = "center";
+        ctx.fillText(q.t, canvas.width/2, 150);
+
+        ctx.fillStyle = "#a6adc8"; ctx.font = "18px 'Segoe UI'";
+        ctx.fillText("¿A qué categoría pertenece?", canvas.width/2, 260);
+
+        createBtn("Enunciado", 80, 310, 190, 55, () => check(q.a, "Enunciado", q.f));
+        createBtn("Enunciado Abierto", 305, 310, 190, 55, () => check(q.a, "Enunciado Abierto", q.f));
+        createBtn("Proposición", 530, 310, 190, 55, () => check(q.a, "Proposición", q.f));
+    } else if (gameState === 'END') {
+        clearInterval(timerInterval);
+        let aciertos = activeQuestions.length - mistakes.length;
+        ctx.fillStyle = lives > 0 ? "#a6e3a1" : "#f38ba8"; ctx.font = "bold 34px 'Segoe UI'"; ctx.textAlign = "center";
+        ctx.fillText(lives > 0 ? "🎉 ¡FASE 1 COMPLETADA! 🎉" : "¡Juego Terminado!", canvas.width/2, 130);
+        
+        ctx.fillStyle = "#ffffff"; ctx.font = "bold 22px 'Segoe UI'";
+        ctx.fillText(`Puntuación: ${score} / 1000 pts (Base esperada)`, canvas.width/2, 185);
+        ctx.fillStyle = "#cdd6f4"; ctx.font = "18px 'Segoe UI'";
+        ctx.fillText(`Aciertos: ${aciertos} de ${activeQuestions.length} retos correctos`, canvas.width/2, 220);
+
+        if (mistakes.length === 0) {
+            ctx.fillStyle = "#a6e3a1"; ctx.font = "bold 18px 'Segoe UI'";
+            ctx.fillText("🌟 ¡Excelente! Has superado la fase sin cometer ningún error.", canvas.width/2, 270);
+        } else {
+            createBtn(`🔍 VER RETROALIMENTACIÓN DE ERRORES (${mistakes.length})`, canvas.width/2 - 190, 270, 380, 50, () => {
+                reportIdx = 0; gameState = 'REPORT';
+            }, "#f38ba8");
+        }
+        createBtn("↻ JUGAR DE NUEVO", canvas.width/2 - 120, 360, 240, 50, startRound, "#89b4fa");
+    } else if (gameState === 'REPORT') {
+        let m = mistakes[reportIdx];
+        ctx.fillStyle = "#f38ba8"; ctx.font = "bold 24px 'Segoe UI'"; ctx.textAlign = "center";
+        ctx.fillText(`Análisis de Error (${reportIdx + 1} de ${mistakes.length})`, canvas.width/2, 60);
+
+        ctx.fillStyle = "#27283d"; ctx.beginPath(); ctx.roundRect(60, 90, 680, 300, 15); ctx.fill();
+        ctx.strokeStyle = "#f38ba8"; ctx.lineWidth = 2; ctx.stroke();
+
+        ctx.fillStyle = "#ffffff"; ctx.font = "bold 20px 'Segoe UI'";
+        ctx.fillText(m.q, canvas.width/2, 140);
+
+        ctx.fillStyle = "#f38ba8"; ctx.font = "18px 'Segoe UI'";
+        ctx.fillText(`❌ Tu respuesta: ${m.user}`, canvas.width/2, 190);
+        ctx.fillStyle = "#a6e3a1"; ctx.font = "bold 18px 'Segoe UI'";
+        ctx.fillText(`✔ Respuesta correcta: ${m.correct}`, canvas.width/2, 230);
+
+        ctx.fillStyle = "#cdd6f4"; ctx.font = "16px 'Segoe UI'";
+        ctx.fillText(`💡 Explicación: ${m.feedback}`, canvas.width/2, 280);
+
+        if (reportIdx > 0) createBtn("⬅ ANTERIOR", 100, 420, 160, 45, () => reportIdx--, "#313244");
+        if (reportIdx < mistakes.length - 1) createBtn("SIGUIENTE ➡", 540, 420, 160, 45, () => reportIdx++, "#313244");
+        createBtn("↻ VOLVER AL RESUMEN", 280, 420, 240, 45, () => gameState = 'END', "#89b4fa");
+    }
+
+    buttons.forEach(b => {
+        ctx.fillStyle = b.color; ctx.beginPath(); ctx.roundRect(b.x, b.y, b.w, b.h, 10); ctx.fill();
+        ctx.strokeStyle = "#a6adc8"; ctx.stroke(); ctx.fillStyle = "#ffffff"; ctx.font = "bold 15px 'Segoe UI'";
+        ctx.textAlign = "center"; ctx.fillText(b.text, b.x + b.w/2, b.y + b.h/2 + 6);
+    });
+
+    if (feedbackTimer > 0) {
+        ctx.fillStyle = "rgba(24,24,37,0.95)"; ctx.fillRect(50, 190, canvas.width-100, 80);
+        ctx.strokeStyle = feedbackColor; ctx.lineWidth = 3; ctx.strokeRect(50, 190, canvas.width-100, 80);
+        ctx.fillStyle = "#ffffff"; ctx.font = "18px 'Segoe UI'"; ctx.textAlign = "center";
+        ctx.fillText(feedbackMsg, canvas.width/2, 235);
+        feedbackTimer--;
+    }
+    requestAnimationFrame(render);
+}
+
+function check(correct, sel, f) {
+    if (feedbackTimer > 0) return;
+    if (sel === correct) {
+        score += 100 + (timer * 10);
+        feedbackColor = '#a6e3a1'; feedbackMsg = "¡CORRECTO! " + f; feedbackTimer = 80;
+        setTimeout(nextQuestion, 1200);
+    } else {
+        handleError(`Incorrecto (${sel})`, false, sel);
+    }
+}
+
+function handleError(msg, isTimeout, userSel = "Opción incorrecta") {
+    let q = activeQuestions[currentIdx];
+    mistakes.push({ q: q.t, user: isTimeout ? "⏱️ Tiempo agotado" : userSel, correct: q.a, feedback: q.f });
+    lives--; feedbackColor = '#f38ba8'; feedbackMsg = "💔 " + msg; feedbackTimer = 80;
+    if (lives <= 0) setTimeout(() => gameState = 'END', 1200);
+    else setTimeout(nextQuestion, 1200);
+}
+
+function nextQuestion() {
+    currentIdx++;
+    if (currentIdx >= activeQuestions.length) gameState = 'END';
+    else resetTimer();
+}
+
+canvas.addEventListener('click', e => {
+    const r = canvas.getBoundingClientRect();
+    const x = e.clientX - r.left, y = e.clientY - r.top;
+    buttons.forEach(b => { if (x >= b.x && x <= b.x+b.w && y >= b.y && y <= b.y+b.h) b.action(); });
+});
+
+render();
+</script>
+</body>
+</html>

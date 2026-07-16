@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Fase 3: Descomposición Lógica - Con Reporte</title>
+    <style>
+        body { margin: 0; padding: 20px; background: #1e1e2e; color: #cdd6f4; font-family: 'Segoe UI', Tahoma, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 90vh; }
+        h1 { color: #f38ba8; margin-bottom: 5px; }
+        #canvas-container { box-shadow: 0 10px 30px rgba(0,0,0,0.6); border-radius: 12px; overflow: hidden; border: 2px solid #45475a; }
+        canvas { display: block; background: #181825; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>🔴 Fase 3: Descomposición y Conectores</h1>
+    <div id="canvas-container"><canvas id="gameCanvas" width="800" height="520"></canvas></div>
+<script>
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+let gameState = 'START', lives = 3, score = 0, currentIdx = 0, timer = 12, timerInterval = null;
+let feedbackMsg = '', feedbackColor = '#a6e3a1', feedbackTimer = 0;
+let activeQuestions = [], buttons = [], mistakes = [], reportIdx = 0;
+
+const dbPhase3 = [
+    { t: "Si hace frío y llueve, entonces nos quedaremos en casa.", p: ["p: Hace frío.", "q: Llueve.", "r: Quedaremos en casa."], c: "Conjunción (y) + Condicional (Si... entonces)", opts: ["Conjunción (y) + Condicional (Si... entonces)", "Disyunción (o) + Negación (no)"], f: "Correcto: p y q conducen a r." },
+    { t: "Aprobarás el curso si y solo si entregas tareas y apruebas el examen.", p: ["p: Aprobarás el curso.", "q: Entregas tareas.", "r: Apruebas el examen."], c: "Bicondicional (si y solo si) + Conjunción (y)", opts: ["Bicondicional (si y solo si) + Conjunción (y)", "Condicional + Disyunción"], f: "Estructura bicondicional con conjunción." },
+    { t: "El partido jugará el sábado o el domingo, pero no se cancelará.", p: ["p: Juega sábado.", "q: Juega domingo.", "r: Se cancela."], c: "Disyunción (o) + Conjunción (pero) + Negación (no)", opts: ["Disyunción (o) + Conjunción (pero) + Negación (no)", "Condicional + Conjunción"], f: "'Pero' equivale a conjunción." },
+    { t: "No es el caso que sea verano y haga frío simultáneamente.", p: ["p: Es verano.", "q: Hace frío."], c: "Negación externa + Conjunción (y)", opts: ["Negación externa + Conjunción (y)", "Disyunción + Bicondicional"], f: "La negación afecta a toda la conjunción." },
+    { t: "Si estudias programación y practicas, serás ingeniero o investigador.", p: ["p: Estudias prog.", "q: Practicas.", "r: Ingeniero.", "s: Investigador."], c: "Conjunción (y) + Condicional + Disyunción (o)", opts: ["Conjunción (y) + Condicional + Disyunción (o)", "Bicondicional + Negación"], f: "Excelente análisis de 4 variables." },
+    { t: "O vas al cine o estudias física, pero no ambos.", p: ["p: Vas al cine.", "q: Estudias física."], c: "Disyunción fuerte (O... o) + Conjunción + Negación", opts: ["Disyunción fuerte (O... o) + Conjunción + Negación", "Condicional + Disyunción débil"], f: "Disyunción fuerte excluyente." },
+    { t: "La alarma sonará si y solo si detecta humo y la batería no está vacía.", p: ["p: Alarma sonará.", "q: Detecta humo.", "r: Batería vacía."], c: "Bicondicional + Conjunción (y) + Negación (no)", opts: ["Bicondicional + Conjunción (y) + Negación (no)", "Condicional + Disyunción"], f: "Bicondicional con negación interna." },
+    { t: "Si no prestas atención, no comprenderás y desaprobarás.", p: ["p: Prestas atención.", "q: Comprenderás.", "r: Desaprobarás."], c: "Negación (no) + Condicional + Conjunción (y)", opts: ["Negación (no) + Condicional + Conjunción (y)", "Disyunción fuerte + Bicondicional"], f: "Negación en antecedente y consecuente." },
+    { t: "El agua hervirá si y solo si alcanza los 100 °C y la presión es normal.", p: ["p: Agua hervirá.", "q: Alcanza 100 °C.", "r: Presión normal."], c: "Bicondicional + Conjunción (y)", opts: ["Bicondicional + Conjunción (y)", "Condicional + Negación"], f: "Equivalencia lógica compuesta." },
+    { t: "Iremos al parque o al museo, pero no nos quedaremos aburridos.", p: ["p: Iremos parque.", "q: Iremos museo.", "r: Quedaremos aburridos."], c: "Disyunción (o) + Conjunción (pero) + Negación", opts: ["Disyunción (o) + Conjunción (pero) + Negación", "Bicondicional + Disyunción"], f: "Disyunción unida a una negación por conjunción." },
+    { t: "Si el dólar baja, los precios disminuyen y la economía crece.", p: ["p: Dólar baja.", "q: Precios disminuyen.", "r: Economía crece."], c: "Condicional (Si...) + Conjunción (y)", opts: ["Condicional (Si...) + Conjunción (y)", "Disyunción + Bicondicional"], f: "Un antecedente y dos consecuentes." },
+    { t: "No es cierto que Juan sea abogado o ingeniero.", p: ["p: Juan abogado.", "q: Juan ingeniero."], c: "Negación externa + Disyunción (o)", opts: ["Negación externa + Disyunción (o)", "Conjunción + Condicional"], f: "Leyes de De Morgan aplicables." },
+    { t: "O tomamos el autobús o caminamos rápido, si queremos llegar a tiempo.", p: ["p: Tomamos autobús.", "q: Caminamos rápido.", "r: Queremos llegar."], c: "Disyunción fuerte (O... o) + Condicional (si)", opts: ["Disyunción fuerte (O... o) + Condicional (si)", "Conjunción + Negación"], f: "El condicional está invertido en la frase." },
+    { t: "La planta crecerá si tiene luz solar y se la riega a diario.", p: ["p: Planta crecerá.", "q: Tiene luz solar.", "r: Riega a diario."], c: "Condicional (si) + Conjunción (y)", opts: ["Condicional (si) + Conjunción (y)", "Bicondicional + Disyunción"], f: "Condicional con conjunción en la condición." },
+    { t: "Si el servidor falla o no hay internet, no podremos enviar la tarea.", p: ["p: Servidor falla.", "q: Hay internet.", "r: Podremos enviar tarea."], c: "Condicional + Disyunción (o) + Negación (no)", opts: ["Condicional + Disyunción (o) + Negación (no)", "Conjunción + Bicondicional"], f: "Disyunción con negación en el antecedente." },
+    { t: "Eres estudiante universitario si y solo si culminaste la secundaria y te matriculaste.", p: ["p: Eres universitario.", "q: Culminaste sec.", "r: Te matriculaste."], c: "Bicondicional + Conjunción (y)", opts: ["Bicondicional + Conjunción (y)", "Disyunción + Condicional"], f: "Bicondicional de doble condición." },
+    { t: "No iré a la fiesta si llueve y no tengo transporte.", p: ["p: Iré a la fiesta.", "q: Llueve.", "r: Tengo transporte."], c: "Negación + Condicional (si) + Conjunción (y)", opts: ["Negación + Condicional (si) + Conjunción (y)", "Disyunción fuerte + Bicondicional"], f: "Negaciones vinculadas a un condicional." },
+    { t: "El código compilará si y solo si no hay errores de sintaxis ni de lógica.", p: ["p: Código compilará.", "q: Errores sintaxis.", "r: Errores lógica."], c: "Bicondicional + Conjunción negada (ni... ni)", opts: ["Bicondicional + Conjunción negada (ni... ni)", "Condicional + Disyunción"], f: "'Ni... ni' equivale a una conjunción de negaciones." },
+    { t: "Si compras el boleto y ganas el sorteo, viajarás a París o Roma.", p: ["p: Compras boleto.", "q: Ganas sorteo.", "r: Viajas París.", "s: Viajas Roma."], c: "Condicional + Conjunción (y) + Disyunción (o)", opts: ["Condicional + Conjunción (y) + Disyunción (o)", "Bicondicional + Negación"], f: "4 variables bien identificadas." },
+    { t: "El sol brilla y hace calor, pero no iremos a la piscina.", p: ["p: Sol brilla.", "q: Hace calor.", "r: Iremos piscina."], c: "Conjunción (y / pero) + Negación (no)", opts: ["Conjunción (y / pero) + Negación (no)", "Disyunción + Condicional"], f: "Dos conjunciones en la misma oración." },
+    { t: "O estudias para el examen o repruebas y tendrás que repetir el curso.", p: ["p: Estudias.", "q: Repruebas.", "r: Repites curso."], c: "Disyunción fuerte (O... o) + Conjunción (y)", opts: ["Disyunción fuerte (O... o) + Conjunción (y)", "Condicional + Negación"], f: "Disyunción unida a una consecuencia conjunta." },
+    { t: "Si la batería está cargada y el motor funciona, el auto arrancará.", p: ["p: Batería cargada.", "q: Motor funciona.", "r: Auto arrancará."], c: "Conjunción (y) + Condicional", opts: ["Conjunción (y) + Condicional", "Disyunción + Bicondicional"], f: "Estructura estándar de condicional." },
+    { t: "No es verdad que haga frío o esté lloviendo hoy.", p: ["p: Hace frío.", "q: Está lloviendo."], c: "Negación externa + Disyunción (o)", opts: ["Negación externa + Disyunción (o)", "Conjunción + Condicional"], f: "Negación de una disyunción." },
+    { t: "El número es par si y solo si termina en 0, 2, 4, 6 u 8.", p: ["p: Número es par.", "q: Termina cifra par."], c: "Bicondicional (si y solo si)", opts: ["Bicondicional (si y solo si)", "Condicional + Negación"], f: "Definición matemática clara." },
+    { t: "Si escuchas música y lees el libro, te relajarás o te dormirás.", p: ["p: Escuchas música.", "q: Lees libro.", "r: Relajarás.", "s: Dormirás."], c: "Conjunción (y) + Condicional + Disyunción (o)", opts: ["Conjunción (y) + Condicional + Disyunción (o)", "Negación + Bicondicional"], f: "Dos condiciones y dos posibles efectos." },
+    { t: "El perro ladra y el gato maúlla, pero el pájaro canta.", p: ["p: Perro ladra.", "q: Gato maúlla.", "r: Pájaro canta."], c: "Conjunción múltiple (y / pero)", opts: ["Conjunción múltiple (y / pero)", "Disyunción + Condicional"], f: "Tres proposiciones en conjunción." },
+    { t: "Si no haces el ejercicio, no aprenderás y fallarás la prueba.", p: ["p: Haces ejercicio.", "q: Aprenderás.", "r: Fallarás."], c: "Negación (no) + Condicional + Conjunción (y)", opts: ["Negación (no) + Condicional + Conjunción (y)", "Disyunción fuerte + Bicondicional"], f: "Manejo correcto de negaciones en condicional." },
+    { t: "Iremos de vacaciones en julio o en agosto, si ahorramos suficiente.", p: ["p: Vacaciones julio.", "q: Vacaciones agosto.", "r: Ahorramos."], c: "Disyunción (o) + Condicional (si)", opts: ["Disyunción (o) + Condicional (si)", "Conjunción + Negación"], f: "Condicional invertido con disyunción." },
+    { t: "La luz se encenderá si y solo si pulsas el interruptor y hay electricidad.", p: ["p: Luz encenderá.", "q: Pulsas interruptor.", "r: Hay electricidad."], c: "Bicondicional + Conjunción (y)", opts: ["Bicondicional + Conjunción (y)", "Condicional + Disyunción"], f: "Doble condición necesaria y suficiente." },
+    { t: "No es el caso que sea lunes y tengamos clase de física.", p: ["p: Es lunes.", "q: Tenemos física."], c: "Negación externa + Conjunción (y)", opts: ["Negación externa + Conjunción (y)", "Disyunción + Condicional"], f: "Negación agrupando dos ideas." },
+    { t: "O vienes a mi casa o voy a la tuya, pero debemos estudiar hoy.", p: ["p: Vienes mi casa.", "q: Voy a la tuya.", "r: Debemos estudiar."], c: "Disyunción fuerte (O... o) + Conjunción (pero)", opts: ["Disyunción fuerte (O... o) + Conjunción (pero)", "Condicional + Negación"], f: "Exclusión seguida de obligación conjunta." },
+    { t: "Si la película es buena, la recomendaré a mis amigos y la veré de nuevo.", p: ["p: Película buena.", "q: Recomendaré.", "r: Veré de nuevo."], c: "Condicional (Si...) + Conjunción (y)", opts: ["Condicional (Si...) + Conjunción (y)", "Disyunción + Bicondicional"], f: "Una causa y dos acciones." },
+    { t: "Aprobarás el examen si y solo si respondes todo correctamente o el profesor baja la escala.", p: ["p: Aprobarás examen.", "q: Respondes correcto.", "r: Baja escala."], c: "Bicondicional + Disyunción (o)", opts: ["Bicondicional + Disyunción (o)", "Condicional + Conjunción"], f: "Bicondicional con opción disyuntiva." },
+    { t: "Si no llueve el domingo, iremos a la montaña y acamparemos.", p: ["p: Llueve domingo.", "q: Iremos montaña.", "r: Acamparemos."], c: "Negación (no) + Condicional + Conjunción (y)", opts: ["Negación (no) + Condicional + Conjunción (y)", "Disyunción + Bicondicional"], f: "Condición negativa con efecto doble." },
+    { t: "El tigre y el león son felinos, pero el oso no lo es.", p: ["p: Tigre felino.", "q: León felino.", "r: Oso felino."], c: "Conjunción (y / pero) + Negación (no)", opts: ["Conjunción (y / pero) + Negación (no)", "Disyunción + Condicional"], f: "Conjunción adversativa con negación final." },
+    { t: "Si estudias lógica, pensarás mejor y resolverás problemas complejos.", p: ["p: Estudias lógica.", "q: Pensarás mejor.", "r: Resolverás problemas."], c: "Condicional (Si...) + Conjunción (y)", opts: ["Condicional (Si...) + Conjunción (y)", "Disyunción + Negación"], f: "Condicional con conjunción." },
+    { t: "O el número es positivo o es negativo, si no es igual a cero.", p: ["p: Número positivo.", "q: Número negativo.", "r: Igual a cero."], c: "Disyunción fuerte (O... o) + Condicional + Negación", opts: ["Disyunción fuerte (O... o) + Condicional + Negación", "Conjunción + Bicondicional"], f: "Clasificación numérica condicional." },
+    { t: "No es verdad que Luis sepa cantar y bailar al mismo tiempo.", p: ["p: Luis sabe cantar.", "q: Luis sabe bailar."], c: "Negación externa + Conjunción (y)", opts: ["Negación externa + Conjunción (y)", "Disyunción + Condicional"], f: "Negación de habilidades simultáneas." },
+    { t: "El proyecto triunfará si y solo si hay presupuesto y el equipo trabaja unido.", p: ["p: Proyecto triunfará.", "q: Hay presupuesto.", "r: Equipo trabaja."], c: "Bicondicional + Conjunción (y)", opts: ["Bicondicional + Conjunción (y)", "Condicional + Disyunción"], f: "Equivalencia con conjunción." },
+    { t: "Si sales sin abrigo, tendrás frío o te resfriarás.", p: ["p: Sales sin abrigo.", "q: Tendrás frío.", "r: Resfriarás."], c: "Condicional (Si...) + Disyunción (o)", opts: ["Condicional (Si...) + Disyunción (o)", "Conjunción + Bicondicional"], f: "Una causa y dos posibles efectos disyuntivos." },
+    { t: "La reunión será el martes o el miércoles, pero no empezará tarde.", p: ["p: Reunión martes.", "q: Reunión miércoles.", "r: Empezará tarde."], c: "Disyunción (o) + Conjunción (pero) + Negación (no)", opts: ["Disyunción (o) + Conjunción (pero) + Negación (no)", "Condicional + Conjunción"], f: "'Pero' es conjunción en lógica formal." },
+    { t: "Si el vaso se cae y es de vidrio, entonces se romperá.", p: ["p: Vaso se cae.", "q: Es de vidrio.", "r: Se romperá."], c: "Conjunción (y) + Condicional (entonces)", opts: ["Conjunción (y) + Condicional (entonces)", "Disyunción + Negación"], f: "Dos condiciones necesarias para la ruptura." },
+    { t: "Eres ciudadano mayor de edad si y solo si tienes 18 años y tu documento.", p: ["p: Eres mayor edad.", "q: Tienes 18 años.", "r: Tienes documento."], c: "Bicondicional + Conjunción (y)", opts: ["Bicondicional + Conjunción (y)", "Condicional + Disyunción"], f: "Definición legal expresada en lógica." },
+    { t: "No es el caso que apruebes sin estudiar o sin entregar tareas.", p: ["p: Apruebas.", "q: Estudias.", "r: Entregas tareas."], c: "Negación externa + Disyunción (o)", opts: ["Negación externa + Disyunción (o)", "Conjunción + Bicondicional"], f: "Negación que envuelve una disyunción." },
+    { t: "O jugamos ajedrez o jugamos dominó, pero no usemos el teléfono.", p: ["p: Jugamos ajedrez.", "q: Jugamos dominó.", "r: Usamos teléfono."], c: "Disyunción fuerte (O... o) + Conjunción + Negación", opts: ["Disyunción fuerte (O... o) + Conjunción + Negación", "Condicional + Disyunción débil"], f: "Elección excluyente con restricción." },
+    { t: "Si la temperatura sube, el hielo se funde y el nivel del agua aumenta.", p: ["p: Temp. sube.", "q: Hielo funde.", "r: Nivel agua aumenta."], c: "Condicional (Si...) + Conjunción (y)", opts: ["Condicional (Si...) + Conjunción (y)", "Disyunción + Bicondicional"], f: "Cadena de efectos encadenados por conjunción." },
+    { t: "El pastel estará listo si y solo si lo horneas 40 minutos y no abres el horno.", p: ["p: Pastel listo.", "q: Horneas 40 min.", "r: Abres horno."], c: "Bicondicional + Conjunción (y) + Negación (no)", opts: ["Bicondicional + Conjunción (y) + Negación (no)", "Condicional + Disyunción"], f: "Bicondicional que incluye una acción negada." },
+    { t: "No iremos al teatro si las entradas están agotadas o son muy caras.", p: ["p: Iremos teatro.", "q: Entradas agotadas.", "r: Son muy caras."], c: "Negación (No) + Condicional (si) + Disyunción (o)", opts: ["Negación (No) + Condicional (si) + Disyunción (o)", "Conjunción + Bicondicional"], f: "Condicional dependiente de una disyunción." },
+    { t: "Si practicas deporte y comes sano, tendrás energía y vivirás mejor.", p: ["p: Practicas deporte.", "q: Comes sano.", "r: Tendrás energía.", "s: Vivirás mejor."], c: "Conjunción (y) + Condicional + Conjunción (y)", opts: ["Conjunción (y) + Condicional + Conjunción (y)", "Disyunción + Negación"], f: "Doble conjunción conectada por un condicional." },
+    { t: "O el bus llega a tiempo o tomaremos un taxi, pero llegaremos al examen.", p: ["p: Bus llega tiempo.", "q: Tomamos taxi.", "r: Llegaremos examen."], c: "Disyunción fuerte (O... o) + Conjunción (pero)", opts: ["Disyunción fuerte (O... o) + Conjunción (pero)", "Condicional + Negación"], f: "Disyunción fuerte resolutiva con conclusión cierta." }
+];
+
+function createBtn(text, x, y, w, h, action, color="#313244") { buttons.push({text, x, y, w, h, action, color}); }
+
+function startRound() {
+    activeQuestions = [...dbPhase3].sort(() => 0.5 - Math.random()).slice(0, 7);
+    currentIdx = 0; lives = 3; score = 0; mistakes = []; reportIdx = 0; gameState = 'GAME';
+    resetTimer();
+}
+
+function resetTimer() {
+    clearInterval(timerInterval);
+    timer = 12;
+    timerInterval = setInterval(() => {
+        if (gameState === 'GAME' && feedbackTimer <= 0) {
+            timer--;
+            if (timer <= 0) handleError("⏱️ Tiempo agotado", true, "Ninguna (Tiempo agotado)");
+        }
+    }, 1000);
+}
+
+function render() {
+    ctx.fillStyle = "#181825"; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    buttons = [];
+
+    if (gameState === 'START') {
+        ctx.fillStyle = "#f38ba8"; ctx.font = "bold 32px 'Segoe UI'"; ctx.textAlign = "center";
+        ctx.fillText("Fase 3: Descomposición Lógica", canvas.width/2, 160);
+        ctx.fillStyle = "#cdd6f4"; ctx.font = "18px 'Segoe UI'";
+        ctx.fillText("Analiza variables y conectores (12 segundos por reto).", canvas.width/2, 210);
+        createBtn("▶ INICIAR FASE 3", canvas.width/2 - 120, 280, 240, 50, startRound, "#f38ba8");
+    } else if (gameState === 'GAME') {
+        let q = activeQuestions[currentIdx];
+        ctx.fillStyle = "#a6adc8"; ctx.font = "16px 'Segoe UI'"; ctx.textAlign = "left";
+        ctx.fillText(`Ptos: ${score} | Reto: ${currentIdx + 1}/7`, 20, 30);
+        ctx.textAlign = "center"; ctx.fillStyle = timer <= 3 ? "#f38ba8" : "#f38ba8";
+        ctx.font = "bold 18px 'Segoe UI'"; ctx.fillText(`⏱️ Tiempo: ${timer}s`, canvas.width/2, 30);
+        ctx.textAlign = "right"; ctx.fillText(`Vidas: ${"❤️".repeat(lives)}`, canvas.width - 20, 30);
+        
+        ctx.fillStyle = "#27283d"; ctx.beginPath(); ctx.roundRect(60, 60, 680, 110, 15); ctx.fill();
+        ctx.strokeStyle = "#f38ba8"; ctx.lineWidth = 2; ctx.stroke();
+        ctx.fillStyle = "#ffffff"; ctx.font = "bold 18px 'Segoe UI'"; ctx.textAlign = "center";
+        
+        if (q.t.length > 60) {
+            let split = q.t.indexOf(' ', Math.floor(q.t.length/2));
+            ctx.fillText(q.t.substring(0, split), canvas.width/2, 105);
+            ctx.fillText(q.t.substring(split + 1), canvas.width/2, 135);
+        } else { ctx.fillText(q.t, canvas.width/2, 120); }
+
+        ctx.fillStyle = "#a6adc8"; ctx.font = "15px 'Segoe UI'"; ctx.textAlign = "left";
+        ctx.fillText("Proposiciones simples detectadas:", 80, 200);
+        ctx.fillStyle = "#89b4fa"; ctx.font = "15px 'Segoe UI'";
+        q.p.forEach((prop, i) => {
+            let col = i % 2 === 0 ? 80 : 420; let row = 225 + (Math.floor(i/2) * 22);
+            ctx.fillText("✔ " + prop, col, row);
+        });
+
+        ctx.textAlign = "center"; ctx.fillStyle = "#cdd6f4"; ctx.font = "17px 'Segoe UI'";
+        ctx.fillText("Selecciona los conectores lógicos correctos:", canvas.width/2, 330);
+
+        createBtn(q.opts[0], 50, 360, 335, 65, () => check(q.c, q.opts[0], q.f));
+        createBtn(q.opts[1], 415, 360, 335, 65, () => check(q.c, q.opts[1], q.f));
+    } else if (gameState === 'END') {
+        clearInterval(timerInterval);
+        let aciertos = activeQuestions.length - mistakes.length;
+        ctx.fillStyle = lives > 0 ? "#a6e3a1" : "#f38ba8"; ctx.font = "bold 34px 'Segoe UI'"; ctx.textAlign = "center";
+        ctx.fillText(lives > 0 ? "🏆 ¡VICTORIA TOTAL! 🏆" : "¡Juego Terminado!", canvas.width/2, 130);
+        
+        ctx.fillStyle = "#ffffff"; ctx.font = "bold 22px 'Segoe UI'";
+        ctx.fillText(`Puntuación: ${score} / 1400 pts (Base esperada)`, canvas.width/2, 185);
+        ctx.fillStyle = "#cdd6f4"; ctx.font = "18px 'Segoe UI'";
+        ctx.fillText(`Aciertos: ${aciertos} de ${activeQuestions.length} retos correctos`, canvas.width/2, 220);
+
+        if (mistakes.length === 0) {
+            ctx.fillStyle = "#a6e3a1"; ctx.font = "bold 18px 'Segoe UI'";
+            ctx.fillText("🌟 ¡Maestro Lógico! Has obtenido la insignia 'Arquitecto Proposicional'.", canvas.width/2, 270);
+        } else {
+            createBtn(`🔍 VER RETROALIMENTACIÓN DE ERRORES (${mistakes.length})`, canvas.width/2 - 190, 270, 380, 50, () => {
+                reportIdx = 0; gameState = 'REPORT';
+            }, "#f38ba8");
+        }
+        createBtn("↻ JUGAR DE NUEVO", canvas.width/2 - 120, 360, 240, 50, startRound, "#f38ba8");
+    } else if (gameState === 'REPORT') {
+        let m = mistakes[reportIdx];
+        ctx.fillStyle = "#f38ba8"; ctx.font = "bold 24px 'Segoe UI'"; ctx.textAlign = "center";
+        ctx.fillText(`Análisis de Error (${reportIdx + 1} de ${mistakes.length})`, canvas.width/2, 60);
+
+        ctx.fillStyle = "#27283d"; ctx.beginPath(); ctx.roundRect(50, 90, 700, 300, 15); ctx.fill();
+        ctx.strokeStyle = "#f38ba8"; ctx.lineWidth = 2; ctx.stroke();
+
+        ctx.fillStyle = "#ffffff"; ctx.font = "bold 16px 'Segoe UI'";
+        if (m.q.length > 65) {
+            let s = m.q.indexOf(' ', Math.floor(m.q.length/2));
+            ctx.fillText(m.q.substring(0, s), canvas.width/2, 130);
+            ctx.fillText(m.q.substring(s + 1), canvas.width/2, 155);
+        } else { ctx.fillText(m.q, canvas.width/2, 140); }
+
+        ctx.fillStyle = "#f38ba8"; ctx.font = "16px 'Segoe UI'";
+        ctx.fillText(`❌ Tu error: ${m.user}`, canvas.width/2, 195);
+        ctx.fillStyle = "#a6e3a1"; ctx.font = "bold 16px 'Segoe UI'";
+        ctx.fillText(`✔ Conectores correctos: ${m.correct}`, canvas.width/2, 235);
+
+        ctx.fillStyle = "#cdd6f4"; ctx.font = "15px 'Segoe UI'";
+        ctx.fillText(`💡 Explicación: ${m.feedback}`, canvas.width/2, 280);
+
+        if (reportIdx > 0) createBtn("⬅ ANTERIOR", 100, 420, 160, 45, () => reportIdx--, "#313244");
+        if (reportIdx < mistakes.length - 1) createBtn("SIGUIENTE ➡", 540, 420, 160, 45, () => reportIdx++, "#313244");
+        createBtn("↻ VOLVER AL RESUMEN", 280, 420, 240, 45, () => gameState = 'END', "#f38ba8");
+    }
+
+    buttons.forEach(b => {
+        ctx.fillStyle = b.color; ctx.beginPath(); ctx.roundRect(b.x, b.y, b.w, b.h, 10); ctx.fill();
+        ctx.strokeStyle = "#a6adc8"; ctx.stroke(); ctx.fillStyle = "#ffffff"; ctx.font = "bold 14px 'Segoe UI'";
+        ctx.textAlign = "center";
+        if (b.text.length > 35 && gameState !== 'REPORT') {
+            let s = b.text.indexOf('+', Math.floor(b.text.length/2));
+            if (s === -1) s = b.text.indexOf(' ', Math.floor(b.text.length/2));
+            ctx.fillText(b.text.substring(0, s), b.x + b.w/2, b.y + b.h/2 - 4);
+            ctx.fillText(b.text.substring(s + 1), b.x + b.w/2, b.y + b.h/2 + 16);
+        } else { ctx.fillText(b.text, b.x + b.w/2, b.y + b.h/2 + 6); }
+    });
+
+    if (feedbackTimer > 0) {
+        ctx.fillStyle = "rgba(24,24,37,0.95)"; ctx.fillRect(40, 180, canvas.width-80, 90);
+        ctx.strokeStyle = feedbackColor; ctx.lineWidth = 3; ctx.strokeRect(40, 180, canvas.width-80, 90);
+        ctx.fillStyle = "#ffffff"; ctx.font = "18px 'Segoe UI'"; ctx.textAlign = "center";
+        ctx.fillText(feedbackMsg, canvas.width/2, 230);
+        feedbackTimer--;
+    }
+    requestAnimationFrame(render);
+}
+
+function check(correct, sel, f) {
+    if (feedbackTimer > 0) return;
+    if (sel === correct) {
+        score += 200 + (timer * 15);
+        feedbackColor = '#a6e3a1'; feedbackMsg = "¡CORRECTO! " + f; feedbackTimer = 80;
+        setTimeout(nextQuestion, 1200);
+    } else {
+        handleError(`Estructura incorrecta`, false, sel);
+    }
+}
+
+function handleError(msg, isTimeout, userSel) {
+    let q = activeQuestions[currentIdx];
+    mistakes.push({ q: q.t, user: userSel, correct: q.c, feedback: q.f });
+    lives--; feedbackColor = '#f38ba8'; feedbackMsg = "💔 " + msg; feedbackTimer = 80;
+    if (lives <= 0) setTimeout(() => gameState = 'END', 1200);
+    else setTimeout(nextQuestion, 1200);
+}
+
+function nextQuestion() {
+    currentIdx++;
+    if (currentIdx >= activeQuestions.length) gameState = 'END';
+    else resetTimer();
+}
+
+canvas.addEventListener('click', e => {
+    const r = canvas.getBoundingClientRect();
+    const x = e.clientX - r.left, y = e.clientY - r.top;
+    buttons.forEach(b => { if (x >= b.x && x <= b.x+b.w && y >= b.y && y <= b.y+b.h) b.action(); });
+});
+
+render();
+</script>
+</body>
+</html>

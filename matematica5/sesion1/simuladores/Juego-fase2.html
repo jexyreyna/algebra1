@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Fase 2: Simples y Compuestas - Con Reporte</title>
+    <style>
+        body { margin: 0; padding: 20px; background: #1e1e2e; color: #cdd6f4; font-family: 'Segoe UI', Tahoma, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 90vh; }
+        h1 { color: #f9e2af; margin-bottom: 5px; }
+        #canvas-container { box-shadow: 0 10px 30px rgba(0,0,0,0.6); border-radius: 12px; overflow: hidden; border: 2px solid #45475a; }
+        canvas { display: block; background: #181825; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>🟡 Fase 2: Simples vs. Compuestas y Conectores</h1>
+    <div id="canvas-container"><canvas id="gameCanvas" width="800" height="520"></canvas></div>
+<script>
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+let gameState = 'START', lives = 3, score = 0, currentIdx = 0, timer = 7, timerInterval = null;
+let feedbackMsg = '', feedbackColor = '#a6e3a1', feedbackTimer = 0;
+let activeQuestions = [], buttons = [], mistakes = [], reportIdx = 0;
+
+const dbPhase2 = [
+    { t: "La biología es una ciencia natural.", type: "Simple", c: "Ninguno (Es simple)", opts: [], f: "Una sola idea, sin conectores ni negación." },
+    { t: "Si estudias para el examen, entonces aprobarás.", type: "Compuesta", c: "Si... entonces", opts: ["Si... entonces", "y", "o"], f: "Es una condicional." },
+    { t: "Mario nació en Arequipa y ganó el Premio Nobel.", type: "Compuesta", c: "y", opts: ["o", "y", "si y solo si"], f: "Es una conjunción." },
+    { t: "No es cierto que la Tierra sea plana.", type: "Compuesta", c: "No es cierto que", opts: ["No es cierto que", "o", "y"], f: "La negación la vuelve compuesta." },
+    { t: "El triángulo tiene tres lados.", type: "Simple", c: "Ninguno (Es simple)", opts: [], f: "Es una idea simple y directa." },
+    { t: "Iremos a acampar o veremos películas en casa.", type: "Compuesta", c: "o", opts: ["y", "o", "Si... entonces"], f: "Disyunción débil." },
+    { t: "Un número es par si y solo si es divisible por 2.", type: "Compuesta", c: "si y solo si", opts: ["si y solo si", "y", "o"], f: "Es un bicondicional." },
+    { t: "O viajas en tren o viajas en autobús.", type: "Compuesta", c: "O... o", opts: ["O... o", "y", "No es cierto que"], f: "Disyunción fuerte." },
+    { t: "El mercurio es un metal líquido.", type: "Simple", c: "Ninguno (Es simple)", opts: [], f: "No contiene operadores lógicos." },
+    { t: "Carlos juega fútbol pero no entrena los martes.", type: "Compuesta", c: "pero", opts: ["pero", "O... o", "si y solo si"], f: "'Pero' funciona como conjunción." },
+    { t: "El cuadrado tiene cuatro ángulos rectos.", type: "Simple", c: "Ninguno (Es simple)", opts: [], f: "Proposición simple y categórica." },
+    { t: "Si llueve hoy, la calle estará mojada.", type: "Compuesta", c: "Si... entonces", opts: ["Si... entonces", "o", "y"], f: "Condicional implícita con coma." },
+    { t: "Pedro no asistió a la conferencia.", type: "Compuesta", c: "no", opts: ["no", "y", "o"], f: "El adverbio 'no' genera una proposición negativa." },
+    { t: "El león es un mamífero carnívoro.", type: "Simple", c: "Ninguno (Es simple)", opts: [], f: "Un sujeto y un predicado." },
+    { t: "Aprobarás si y solo si entregas el proyecto.", type: "Compuesta", c: "si y solo si", opts: ["si y solo si", "Si... entonces", "o"], f: "Bicondicional." },
+    { t: "El sol es una estrella enana amarilla.", type: "Simple", c: "Ninguno (Es simple)", opts: [], f: "Afirmación unitaria." },
+    { t: "Ni comió la pizza ni tomó el refresco.", type: "Compuesta", c: "Ni... ni", opts: ["Ni... ni", "o", "Si... entonces"], f: "Conjunción con doble negación." },
+    { t: "La guitarra es un instrumento de cuerda.", type: "Simple", c: "Ninguno (Es simple)", opts: [], f: "Sin conectores." },
+    { t: "Si calientas hielo, entonces se derretirá.", type: "Compuesta", c: "Si... entonces", opts: ["Si... entonces", "y", "o"], f: "Relación causa-efecto (Condicional)." },
+    { t: "El número 7 es primo y el 8 es par.", type: "Compuesta", c: "y", opts: ["o", "y", "no"], f: "Conjunción de dos ideas." },
+    { t: "La luna gira en torno a la Tierra.", type: "Simple", c: "Ninguno (Es simple)", opts: [], f: "Proposición simple." },
+    { t: "O estudias ingeniería o estudias medicina.", type: "Compuesta", c: "O... o", opts: ["O... o", "y", "si y solo si"], f: "Disyunción fuerte excluyente." },
+    { t: "La química estudia la materia.", type: "Simple", c: "Ninguno (Es simple)", opts: [], f: "Una sola oración afirmativa." },
+    { t: "El delfín no es un pez.", type: "Compuesta", c: "no", opts: ["no", "o", "y"], f: "La negación es un operador proposicional." },
+    { t: "Iremos a la playa si el clima es favorable.", type: "Compuesta", c: "si", opts: ["si", "y", "o"], f: "El condicional está en medio de la oración." },
+    { t: "El acero es una aleación de hierro y carbono.", type: "Simple", c: "Ninguno (Es simple)", opts: [], f: "El 'y' une términos, no proposiciones completas." },
+    { t: "Juan canta muy bien y toca el piano.", type: "Compuesta", c: "y", opts: ["y", "o", "si y solo si"], f: "Dos verbos y dos ideas." },
+    { t: "El oxígeno es necesario para la combustión.", type: "Simple", c: "Ninguno (Es simple)", opts: [], f: "Idea completa simple." },
+    { t: "Llegaremos a tiempo si y solo si tomamos el taxi.", type: "Compuesta", c: "si y solo si", opts: ["si y solo si", "y", "o"], f: "Equivalencia lógica." },
+    { t: "El oro conduce la electricidad.", type: "Simple", c: "Ninguno (Es simple)", opts: [], f: "Sin conectores." },
+    { t: "No es verdad que 2 + 2 sea 5.", type: "Compuesta", c: "No es verdad que", opts: ["No es verdad que", "o", "y"], f: "Negación externa." },
+    { t: "El Amazonas es un río caudaloso.", type: "Simple", c: "Ninguno (Es simple)", opts: [], f: "Simple." },
+    { t: "El cielo está nublado o va a llover pronto.", type: "Compuesta", c: "o", opts: ["y", "o", "si y solo si"], f: "Disyunción." },
+    { t: "La física elemental es fácil de comprender.", type: "Simple", c: "Ninguno (Es simple)", opts: [], f: "Idea simple." },
+    { t: "Si corres rápido, llegarás temprano.", type: "Compuesta", c: "Si... entonces", opts: ["Si... entonces", "o", "y"], f: "Condicional." },
+    { t: "Ana es médica y trabaja en el hospital.", type: "Compuesta", c: "y", opts: ["o", "y", "no"], f: "Conjunción." },
+    { t: "El diamante es el mineral más duro.", type: "Simple", c: "Ninguno (Es simple)", opts: [], f: "Proposición simple." },
+    { t: "Es falso que el hielo sea caliente.", type: "Compuesta", c: "Es falso que", opts: ["Es falso que", "y", "o"], f: "Negación." },
+    { t: "El pingüino es una ave marina.", type: "Simple", c: "Ninguno (Es simple)", opts: [], f: "Simple." },
+    { t: "Compraré el libro si y solo si está en oferta.", type: "Compuesta", c: "si y solo si", opts: ["si y solo si", "o", "y"], f: "Bicondicional." },
+    { t: "La Tierra es el tercer planeta del sistema solar.", type: "Simple", c: "Ninguno (Es simple)", opts: [], f: "Simple." },
+    { t: "Tomamos té o tomamos café por la mañana.", type: "Compuesta", c: "o", opts: ["o", "y", "no"], f: "Disyunción." },
+    { t: "La informática es una disciplina tecnológica.", type: "Simple", c: "Ninguno (Es simple)", opts: [], f: "Simple." },
+    { t: "Si no estudias, no aprobarás el examen.", type: "Compuesta", c: "Si... entonces / no", opts: ["Si... entonces / no", "y", "o"], f: "Condicional con negaciones." },
+    { t: "El Everest es la montaña más alta del mundo.", type: "Simple", c: "Ninguno (Es simple)", opts: [], f: "Simple." },
+    { t: "O nos vamos ahora o perderemos el vuelo.", type: "Compuesta", c: "O... o", opts: ["O... o", "y", "si y solo si"], f: "Disyunción fuerte." },
+    { t: "La lectura enriquece el vocabulario.", type: "Simple", c: "Ninguno (Es simple)", opts: [], f: "Simple." },
+    { t: "El partido comenzó tarde pero fue emocionante.", type: "Compuesta", c: "pero", opts: ["pero", "o", "si y solo si"], f: "Conjunción adversativa." },
+    { t: "El invierno comienza en junio en el sur.", type: "Simple", c: "Ninguno (Es simple)", opts: [], f: "Simple." },
+    { t: "Un ángulo es recto si y solo si mide 90 grados.", type: "Compuesta", c: "si y solo si", opts: ["si y solo si", "y", "o"], f: "Bicondicional." }
+];
+
+function createBtn(text, x, y, w, h, action, color="#313244") { buttons.push({text, x, y, w, h, action, color}); }
+
+function startRound() {
+    activeQuestions = [...dbPhase2].sort(() => 0.5 - Math.random()).slice(0, 10);
+    currentIdx = 0; lives = 3; score = 0; mistakes = []; reportIdx = 0; gameState = 'GAME';
+    resetTimer();
+}
+
+function resetTimer() {
+    clearInterval(timerInterval);
+    timer = 7;
+    timerInterval = setInterval(() => {
+        if ((gameState === 'GAME' || gameState === 'CONN') && feedbackTimer <= 0) {
+            timer--;
+            if (timer <= 0) handleError("⏱️ Tiempo agotado", true, "Ninguna (Tiempo agotado)");
+        }
+    }, 1000);
+}
+
+function render() {
+    ctx.fillStyle = "#181825"; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    buttons = [];
+
+    if (gameState === 'START') {
+        ctx.fillStyle = "#f9e2af"; ctx.font = "bold 32px 'Segoe UI'"; ctx.textAlign = "center";
+        ctx.fillText("Fase 2: Simples vs. Compuestas", canvas.width/2, 160);
+        ctx.fillStyle = "#cdd6f4"; ctx.font = "18px 'Segoe UI'";
+        ctx.fillText("Identifica el tipo y el conector lógico (7 segundos por reto).", canvas.width/2, 210);
+        createBtn("▶ INICIAR FASE 2", canvas.width/2 - 120, 280, 240, 50, startRound, "#f9e2af");
+    } else if (gameState === 'GAME' || gameState === 'CONN') {
+        let q = activeQuestions[currentIdx];
+        ctx.fillStyle = "#a6adc8"; ctx.font = "16px 'Segoe UI'"; ctx.textAlign = "left";
+        ctx.fillText(`Ptos: ${score} | Reto: ${currentIdx + 1}/10`, 20, 30);
+        ctx.textAlign = "center"; ctx.fillStyle = timer <= 3 ? "#f38ba8" : "#89b4fa";
+        ctx.font = "bold 18px 'Segoe UI'"; ctx.fillText(`⏱️ Tiempo: ${timer}s`, canvas.width/2, 30);
+        ctx.textAlign = "right"; ctx.fillText(`Vidas: ${"❤️".repeat(lives)}`, canvas.width - 20, 30);
+        
+        ctx.fillStyle = "#27283d"; ctx.beginPath(); ctx.roundRect(80, 70, 640, 130, 15); ctx.fill();
+        ctx.strokeStyle = "#f9e2af"; ctx.lineWidth = 2; ctx.stroke();
+        ctx.fillStyle = "#ffffff"; ctx.font = "bold 20px 'Segoe UI'"; ctx.textAlign = "center";
+        
+        if (q.t.length > 55) {
+            let split = q.t.indexOf(' ', Math.floor(q.t.length/2));
+            ctx.fillText(q.t.substring(0, split), canvas.width/2, 125);
+            ctx.fillText(q.t.substring(split + 1), canvas.width/2, 155);
+        } else { ctx.fillText(q.t, canvas.width/2, 140); }
+
+        if (gameState === 'GAME') {
+            ctx.fillStyle = "#a6adc8"; ctx.font = "18px 'Segoe UI'";
+            ctx.fillText("¿Esta proposición es simple o compuesta?", canvas.width/2, 250);
+            createBtn("Simple", 200, 300, 180, 55, () => {
+                if (q.type === "Simple") checkSuccess(q.f);
+                else handleError("Incorrecto (Elegiste Simple)", false, "Elegiste: Simple");
+            });
+            createBtn("Compuesta", 420, 300, 180, 55, () => {
+                if (q.type === "Compuesta") { gameState = 'CONN'; resetTimer(); }
+                else handleError("Incorrecto (Elegiste Compuesta)", false, "Elegiste: Compuesta");
+            });
+        } else if (gameState === 'CONN') {
+            ctx.fillStyle = "#f9e2af"; ctx.font = "18px 'Segoe UI'";
+            ctx.fillText("¡Bien! Ahora, ¿cuál es el conector principal?", canvas.width/2, 250);
+            q.opts.forEach((o, i) => {
+                createBtn(o, 100 + (i * 210), 300, 180, 55, () => {
+                    if (o === q.c) checkSuccess(q.f);
+                    else handleError(`Conector incorrecto (${o})`, false, `Conector elegido: ${o}`);
+                });
+            });
+        }
+    } else if (gameState === 'END') {
+        clearInterval(timerInterval);
+        let aciertos = activeQuestions.length - mistakes.length;
+        ctx.fillStyle = lives > 0 ? "#a6e3a1" : "#f38ba8"; ctx.font = "bold 34px 'Segoe UI'"; ctx.textAlign = "center";
+        ctx.fillText(lives > 0 ? "🎉 ¡FASE 2 COMPLETADA! 🎉" : "¡Juego Terminado!", canvas.width/2, 130);
+        
+        ctx.fillStyle = "#ffffff"; ctx.font = "bold 22px 'Segoe UI'";
+        ctx.fillText(`Puntuación: ${score} / 1500 pts (Base esperada)`, canvas.width/2, 185);
+        ctx.fillStyle = "#cdd6f4"; ctx.font = "18px 'Segoe UI'";
+        ctx.fillText(`Aciertos: ${aciertos} de ${activeQuestions.length} retos correctos`, canvas.width/2, 220);
+
+        if (mistakes.length === 0) {
+            ctx.fillStyle = "#a6e3a1"; ctx.font = "bold 18px 'Segoe UI'";
+            ctx.fillText("🌟 ¡Impresionante! Discriminaste todas las estructuras a la perfección.", canvas.width/2, 270);
+        } else {
+            createBtn(`🔍 VER RETROALIMENTACIÓN DE ERRORES (${mistakes.length})`, canvas.width/2 - 190, 270, 380, 50, () => {
+                reportIdx = 0; gameState = 'REPORT';
+            }, "#f38ba8");
+        }
+        createBtn("↻ JUGAR DE NUEVO", canvas.width/2 - 120, 360, 240, 50, startRound, "#f9e2af");
+    } else if (gameState === 'REPORT') {
+        let m = mistakes[reportIdx];
+        ctx.fillStyle = "#f38ba8"; ctx.font = "bold 24px 'Segoe UI'"; ctx.textAlign = "center";
+        ctx.fillText(`Análisis de Error (${reportIdx + 1} de ${mistakes.length})`, canvas.width/2, 60);
+
+        ctx.fillStyle = "#27283d"; ctx.beginPath(); ctx.roundRect(60, 90, 680, 300, 15); ctx.fill();
+        ctx.strokeStyle = "#f38ba8"; ctx.lineWidth = 2; ctx.stroke();
+
+        ctx.fillStyle = "#ffffff"; ctx.font = "bold 18px 'Segoe UI'";
+        ctx.fillText(m.q, canvas.width/2, 135);
+
+        ctx.fillStyle = "#f38ba8"; ctx.font = "17px 'Segoe UI'";
+        ctx.fillText(`❌ Tu error: ${m.user}`, canvas.width/2, 185);
+        ctx.fillStyle = "#a6e3a1"; ctx.font = "bold 17px 'Segoe UI'";
+        ctx.fillText(`✔ Respuesta correcta: Tipo ${m.type} | Conector: ${m.correct}`, canvas.width/2, 225);
+
+        ctx.fillStyle = "#cdd6f4"; ctx.font = "16px 'Segoe UI'";
+        ctx.fillText(`💡 Explicación: ${m.feedback}`, canvas.width/2, 275);
+
+        if (reportIdx > 0) createBtn("⬅ ANTERIOR", 100, 420, 160, 45, () => reportIdx--, "#313244");
+        if (reportIdx < mistakes.length - 1) createBtn("SIGUIENTE ➡", 540, 420, 160, 45, () => reportIdx++, "#313244");
+        createBtn("↻ VOLVER AL RESUMEN", 280, 420, 240, 45, () => gameState = 'END', "#f9e2af");
+    }
+
+    buttons.forEach(b => {
+        ctx.fillStyle = b.color; ctx.beginPath(); ctx.roundRect(b.x, b.y, b.w, b.h, 10); ctx.fill();
+        ctx.strokeStyle = "#a6adc8"; ctx.stroke(); ctx.fillStyle = "#ffffff"; ctx.font = "bold 15px 'Segoe UI'";
+        ctx.textAlign = "center"; ctx.fillText(b.text, b.x + b.w/2, b.y + b.h/2 + 6);
+    });
+
+    if (feedbackTimer > 0) {
+        ctx.fillStyle = "rgba(24,24,37,0.95)"; ctx.fillRect(50, 180, canvas.width-100, 80);
+        ctx.strokeStyle = feedbackColor; ctx.lineWidth = 3; ctx.strokeRect(50, 180, canvas.width-100, 80);
+        ctx.fillStyle = "#ffffff"; ctx.font = "18px 'Segoe UI'"; ctx.textAlign = "center";
+        ctx.fillText(feedbackMsg, canvas.width/2, 225);
+        feedbackTimer--;
+    }
+    requestAnimationFrame(render);
+}
+
+function checkSuccess(f) {
+    if (feedbackTimer > 0) return;
+    score += 150 + (timer * 10);
+    feedbackColor = '#a6e3a1'; feedbackMsg = "¡CORRECTO! " + f; feedbackTimer = 80;
+    setTimeout(nextQuestion, 1200);
+}
+
+function handleError(msg, isTimeout, userSel) {
+    let q = activeQuestions[currentIdx];
+    mistakes.push({ q: q.t, user: userSel, type: q.type, correct: q.c, feedback: q.f });
+    lives--; feedbackColor = '#f38ba8'; feedbackMsg = "💔 " + msg; feedbackTimer = 80;
+    if (lives <= 0) setTimeout(() => gameState = 'END', 1200);
+    else setTimeout(() => { if(gameState === 'CONN') gameState = 'GAME'; nextQuestion(); }, 1200);
+}
+
+function nextQuestion() {
+    currentIdx++;
+    if (currentIdx >= activeQuestions.length) gameState = 'END';
+    else { gameState = 'GAME'; resetTimer(); }
+}
+
+canvas.addEventListener('click', e => {
+    const r = canvas.getBoundingClientRect();
+    const x = e.clientX - r.left, y = e.clientY - r.top;
+    buttons.forEach(b => { if (x >= b.x && x <= b.x+b.w && y >= b.y && y <= b.y+b.h) b.action(); });
+});
+
+render();
+</script>
+</body>
+</html>
