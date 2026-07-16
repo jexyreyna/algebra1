@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego: El Oráculo del Tiempo 3.0 - Cadenas de Markov</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --secondary: #0f172a;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #0284c7;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            max-width: 1000px;
+            width: 100%;
+            padding: 30px;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        p.subtitle {
+            text-align: center;
+            color: #64748b;
+            margin-bottom: 25px;
+            font-size: 0.95rem;
+        }
+
+        .controls-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .level-selector {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .btn-level {
+            border: 2px solid #e2e8f0;
+            background: white;
+            color: var(--text);
+        }
+
+        .btn-level.active {
+            border-color: var(--primary);
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-new-game {
+            background-color: var(--secondary);
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-new-game:hover {
+            background-color: #334155;
+            transform: scale(1.02);
+        }
+
+        .story-box {
+            background: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%);
+            padding: 22px;
+            border-radius: 12px;
+            border-left: 6px solid var(--primary);
+            margin-bottom: 20px;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            color: #1e1b4b;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+
+        .precision-alert {
+            background-color: #e0f2fe;
+            border: 1px solid #7dd3fc;
+            color: #0369a1;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+        }
+
+        .story-box strong {
+            color: var(--primary-hover);
+        }
+
+        .modeling-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 18px;
+        }
+
+        .card h3 {
+            font-size: 1.05rem;
+            color: var(--secondary);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+            font-size: 0.9rem;
+        }
+
+        th {
+            background-color: #f1f5f9;
+            font-weight: 600;
+        }
+
+        .input-cell {
+            width: 80px;
+            padding: 6px;
+            text-align: center;
+            border: 2px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            outline: none;
+            background-color: #fef08a;
+            transition: all 0.2s;
+        }
+
+        .input-cell:focus {
+            border-color: var(--primary);
+            background-color: white;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+        }
+
+        .input-k {
+            width: 100px;
+            font-size: 1.2rem;
+            padding: 8px;
+        }
+
+        .tank-wrapper {
+            margin-top: 8px;
+            padding: 8px;
+            background: white;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .tank-label {
+            font-size: 0.75rem;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background-color: #e2e8f0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s, background-color 0.3s;
+        }
+
+        .status-text {
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-top: 4px;
+            text-align: right;
+        }
+
+        .btn-check {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.15rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.3);
+        }
+
+        .btn-check:hover {
+            background-color: var(--primary-hover);
+        }
+
+        /* Panel de Retroalimentación Detallada */
+        .feedback-panel {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 12px;
+            display: none;
+            line-height: 1.6;
+        }
+
+        .feedback-panel h4 {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .feedback-list {
+            list-style-type: none;
+            margin-top: 10px;
+        }
+
+        .feedback-list li {
+            padding: 8px 12px;
+            margin-bottom: 6px;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            border-left: 4px solid transparent;
+        }
+
+        .item-error {
+            background-color: #fef2f2;
+            border-left-color: var(--danger);
+            color: #991b1b;
+        }
+
+        .item-warning {
+            background-color: #fffbeb;
+            border-left-color: var(--warning);
+            color: #92400e;
+        }
+
+        .item-success {
+            background-color: #ecfdf5;
+            border-left-color: var(--success);
+            color: #065f46;
+        }
+
+        .color-success { color: var(--success); }
+        .color-warning { color: var(--warning); }
+        .color-danger { color: var(--danger); }
+        .bg-success { background-color: var(--success); }
+        .bg-warning { background-color: var(--warning); }
+        .bg-danger { background-color: var(--danger); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>El Oráculo del Tiempo 3.0: Diagnóstico Completo</h1>
+    <p class="subtitle">Construye el modelo probabilístico en decimales y proyecta el estado futuro. ¡Con retroalimentación inteligente en tiempo real!</p>
+
+    <div class="controls-row">
+        <div class="level-selector">
+            <button class="btn btn-level active" onclick="changeLevel(0)">Nivel 1: Estudio (2 Estados)</button>
+            <button class="btn btn-level" onclick="changeLevel(1)">Nivel 2: Transporte (3 Estados)</button>
+        </div>
+        <button class="btn btn-new-game" onclick="startNewGame()">🔄 Nueva Lectura</button>
+    </div>
+
+    <div class="story-box" id="story-text">Cargando relato...</div>
+
+    <div class="precision-alert">
+        <span>⚙️ <strong>Tolerancia Dinámica Activa:</strong> Si tu resultado final supera los 3 decimales, aproxima a <strong>2 o 3 decimales</strong>. El sistema tolera mínimas variaciones de arrastre decimal. No aproximes en pasos intermedios.</span>
+    </div>
+
+    <div class="modeling-grid">
+        <div class="card" style="grid-column: span 2;">
+            <h3>1. Matriz de Transición (M) - Suma por columnas = 1</h3>
+            <div id="matrix-container"></div>
+            <div id="matrix-tanks" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px;"></div>
+        </div>
+
+        <div class="card">
+            <h3>2. Vector Inicial (v₀)</h3>
+            <div id="v0-container"></div>
+            <div class="tank-wrapper">
+                <div class="tank-label"><span>Suma v₀:</span> <span id="val-v0">0.00</span></div>
+                <div class="progress-bar"><div class="progress-fill" id="bar-v0"></div></div>
+                <div class="status-text" id="status-v0">-</div>
+            </div>
+        </div>
+
+        <div class="card" style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+            <h3>3. Período (k)</h3>
+            <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 15px; text-align: center;">¿Cuántos períodos temporales (k) exige el relato?</p>
+            <input type="number" id="input-k" class="input-cell input-k" placeholder="k = ?" min="1" max="3" step="1">
+        </div>
+
+        <div class="card" style="grid-column: span 2;">
+            <h3>4. Vector en el Período k (vₖ = M<sup style="font-size:0.8em">k</sup> · v₀)</h3>
+            <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 10px;">Ingresa las probabilidades resultantes para el k-ésimo período:</p>
+            <div id="vk-container"></div>
+        </div>
+    </div>
+
+    <button class="btn btn-check" onclick="checkWinCondition()">✨ Verificar Predicción y Diagnosticar</button>
+    
+    <div class="feedback-panel" id="feedback-panel"></div>
+</div>
+
+<script>
+    const levelsConfig = [
+        {
+            title: "2 Estados: Hábitos de Estudio",
+            states: ["Estudiar (E)", "Descansar (D)"],
+            generateStory: (M, v0, k) => {
+                let pE0 = Math.round(v0[0] * 100);
+                let pD0 = Math.round(v0[1] * 100);
+                let pEE = Math.round(M[0][0] * 100);
+                let pDE = Math.round(M[1][0] * 100);
+                let pED = Math.round(M[0][1] * 100);
+                let pDD = Math.round(M[1][1] * 100);
+                
+                let v0Text = "";
+                if (pE0 === 100 || pD0 === 100) {
+                    let activeState = pE0 === 100 ? "Estudiando (E)" : "Descansando (D)";
+                    let zeroState = pE0 === 100 ? "Descansar (D)" : "Estudiar (E)";
+                    v0Text = `El día de hoy (período inicial 0), se presenta un <strong>estado inicial determinístico puro</strong>: exactamente el <strong>100%</strong> de los alumnos se encuentra <strong>${activeState}</strong> y un <strong>0%</strong> en ${zeroState}.`;
+                } else {
+                    v0Text = `El día de hoy (período inicial 0), una encuesta revela que el <strong>${pE0}%</strong> de los estudiantes se encuentra estudiando, mientras que el <strong>${pD0}%</strong> restante está descansando.`;
+                }
+
+                return `En una universidad escolar, los alumnos alternan diariamente entre dos estados: <strong>Estudiar (E)</strong> y <strong>Descansar (D)</strong>. ${v0Text}<br><br>
+                Los registros históricos demuestran el siguiente comportamiento para el día siguiente:
+                <ul>
+                    <li>De aquellos que están <strong>Estudiando</strong> hoy, el <strong>${pEE}%</strong> seguirá estudiando mañana y el <strong>${pDE}%</strong> pasará a descansar.</li>
+                    <li>De aquellos que están <strong>Descansando</strong> hoy, el <strong>${pED}%</strong> encontrará motivación para estudiar mañana, mientras que el <strong>${pDD}%</strong> continuará descansando.</li>
+                </ul><br>
+                Como analista de datos, tu misión es modelar esta cadena de Markov y predecir exactamente cómo estará distribuido el alumnado al cabo de <strong>${k} ${k === 1 ? 'día' : 'días'}</strong> (período de observación k).`;
+            }
+        },
+        {
+            title: "3 Estados: Movilidad Urbana",
+            states: ["Metro (M)", "Autobús (A)", "Bici (B)"],
+            generateStory: (M, v0, k) => {
+                let pM0 = Math.round(v0[0] * 100);
+                let pA0 = Math.round(v0[1] * 100);
+                let pB0 = Math.round(v0[2] * 100);
+                
+                let v0Text = "";
+                if (pM0 === 100 || pA0 === 100 || pB0 === 100) {
+                    let activeState = pM0 === 100 ? "Metro (M)" : (pA0 === 100 ? "Autobús (A)" : "Bicicleta (B)");
+                    v0Text = `El censo de movilidad del mes 0 parte de un <strong>estado certero puro</strong>: el <strong>100%</strong> de los ciudadanos se desplaza en <strong>${activeState}</strong>, dejando en <strong>0%</strong> a los otros dos medios.`;
+                } else {
+                    v0Text = `El censo actual (mes 0) indica que el <strong>${pM0}%</strong> de los ciudadanos se desplaza en Metro, el <strong>${pA0}%</strong> en Autobús y el <strong>${pB0}%</strong> en Bicicleta.`;
+                }
+
+                return `Una metrópolis busca revolucionar su transporte público, dividido en tres medios: <strong>Metro (M)</strong>, <strong>Autobús (A)</strong> y <strong>Bicicleta (B)</strong>. ${v0Text}<br><br>
+                Tras inaugurar ciclovías y carriles exclusivos, las transiciones mensuales se comportan así:
+                <ul>
+                    <li><strong>Usuarios de Metro:</strong> El <strong>${Math.round(M[0][0]*100)}%</strong> se mantiene en Metro, el <strong>${Math.round(M[1][0]*100)}%</strong> cambia a Autobús y el <strong>${Math.round(M[2][0]*100)}%</strong> pasa a Bicicleta.</li>
+                    <li><strong>Usuarios de Autobús:</strong> El <strong>${Math.round(M[0][1]*100)}%</strong> migra al Metro, el <strong>${Math.round(M[1][1]*100)}%</strong> sigue en Autobús y el <strong>${Math.round(M[2][1]*100)}%</strong> cambia a Bicicleta.</li>
+                    <li><strong>Usuarios de Bicicleta:</strong> El <strong>${Math.round(M[0][2]*100)}%</strong> pasa a Metro, el <strong>${Math.round(M[1][2]*100)}%</strong> a Autobús y un fiel <strong>${Math.round(M[2][2]*100)}%</strong> continúa en Bicicleta.</li>
+                </ul><br>
+                Construye el modelo probabilístico y determina la distribución del transporte público al transcurrir exactamente <strong>${k} ${k === 1 ? 'mes' : 'meses'}</strong> (período k).`;
+            }
+        }
+    ];
+
+    let currentLevel = 0;
+    let solM = [], solV0 = [], solK = 1, solVk = [];
+
+    function changeLevel(idx) {
+        currentLevel = idx;
+        document.querySelectorAll('.btn-level').forEach((btn, i) => {
+            btn.classList.toggle('active', i === idx);
+        });
+        startNewGame();
+    }
+
+    function startNewGame() {
+        const config = levelsConfig[currentLevel];
+        const n = config.states.length;
+
+        solM = [];
+        for (let r = 0; r < n; r++) solM.push(new Array(n).fill(0));
+        
+        for (let c = 0; c < n; c++) {
+            let rem = 100, step = 10, colVals = [];
+            for (let r = 0; r < n - 1; r++) {
+                let maxSteps = Math.floor((rem - step * (n - 1 - r)) / step);
+                let chosen = 1 + Math.floor(Math.random() * (maxSteps - 1));
+                let val = chosen * step;
+                colVals.push(val / 100);
+                rem -= val;
+            }
+            colVals.push(Math.round(rem) / 100);
+            colVals.sort(() => Math.random() - 0.5);
+            for (let r = 0; r < n; r++) solM[r][c] = colVals[r];
+        }
+
+        solV0 = [];
+        let isDeterministic = Math.random() < 0.40;
+        if (isDeterministic) {
+            let activeIdx = Math.floor(Math.random() * n);
+            for (let i = 0; i < n; i++) solV0.push(i === activeIdx ? 1.0 : 0.0);
+        } else {
+            let remV = 100;
+            for (let i = 0; i < n - 1; i++) {
+                let maxS = Math.floor((remV - 10 * (n - 1 - i)) / 10);
+                let ch = 1 + Math.floor(Math.random() * (maxS - 1));
+                solV0.push((ch * 10) / 100);
+                remV -= ch * 10;
+            }
+            solV0.push(Math.round(remV) / 100);
+            solV0.sort(() => Math.random() - 0.5);
+        }
+
+        solK = 1 + Math.floor(Math.random() * 3);
+
+        let currentV = [...solV0];
+        for (let step = 0; step < solK; step++) {
+            let nextV = new Array(n).fill(0);
+            for (let r = 0; r < n; r++) {
+                for (let c = 0; c < n; c++) {
+                    nextV[r] += solM[r][c] * currentV[c];
+                }
+            }
+            currentV = nextV;
+        }
+        solVk = currentV;
+
+        document.getElementById('story-text').innerHTML = config.generateStory(solM, solV0, solK);
+        document.getElementById('feedback-panel').style.display = 'none';
+        document.getElementById('input-k').value = "";
+        
+        renderMatrixUI(config.states);
+        renderVectorsUI(config.states);
+        updateTanks();
+    }
+
+    function renderMatrixUI(states) {
+        const n = states.length;
+        let html = '<table><thead><tr><th>Destino \\ Origen</th>';
+        states.forEach(s => html += `<th>${s}</th>`);
+        html += '</tr></thead><tbody>';
+
+        for (let r = 0; r < n; r++) {
+            html += `<tr><th>${states[r]}</th>`;
+            for (let c = 0; c < n; c++) {
+                html += `<td><input type="number" step="any" class="input-cell" id="m-${r}-${c}" placeholder="0.0" oninput="updateTanks()"></td>`;
+            }
+            html += '</tr>';
+        }
+        html += '</tbody></table>';
+        document.getElementById('matrix-container').innerHTML = html;
+
+        let tanksHtml = '';
+        for (let c = 0; c < n; c++) {
+            tanksHtml += `
+                <div class="tank-wrapper">
+                    <div class="tank-label"><span>Col: ${states[c].split(' ')[0]}</span><span id="val-col-${c}">0.00</span></div>
+                    <div class="progress-bar"><div class="progress-fill" id="bar-col-${c}"></div></div>
+                    <div class="status-text" id="status-col-${c}">-</div>
+                </div>
+            `;
+        }
+        document.getElementById('matrix-tanks').innerHTML = tanksHtml;
+    }
+
+    function renderVectorsUI(states) {
+        const n = states.length;
+        let htmlV0 = '<table><thead><tr><th>Estado</th><th>Prob. Inicial</th></tr></thead><tbody>';
+        states.forEach((s, i) => {
+            htmlV0 += `<tr><th>${s}</th><td><input type="number" step="any" class="input-cell" id="v0-${i}" placeholder="0.0" oninput="updateTanks()"></td></tr>`;
+        });
+        htmlV0 += '</tbody></table>';
+        document.getElementById('v0-container').innerHTML = htmlV0;
+
+        let htmlVk = '<table><thead><tr>';
+        states.forEach(s => htmlVk += `<th>${s}</th>`);
+        htmlVk += '</tr></thead><tbody><tr>';
+        states.forEach((s, i) => {
+            htmlVk += `<td><input type="number" step="any" class="input-cell" id="vk-${i}" placeholder="0.0" style="width: 85px;"></td>`;
+        });
+        htmlVk += '</tr></tbody></table>';
+        document.getElementById('vk-container').innerHTML = htmlVk;
+    }
+
+    function updateTanks() {
+        const n = levelsConfig[currentLevel].states.length;
+        for (let c = 0; c < n; c++) {
+            let sum = 0;
+            for (let r = 0; r < n; r++) {
+                sum += parseFloat(document.getElementById(`m-${r}-${c}`).value) || 0;
+            }
+            sum = Math.round(sum * 1000) / 1000;
+            updateSingleBar(`col-${c}`, sum, '100%');
+        }
+
+        let sumV0 = 0;
+        for (let i = 0; i < n; i++) {
+            sumV0 += parseFloat(document.getElementById(`v0-${i}`).value) || 0;
+        }
+        sumV0 = Math.round(sumV0 * 1000) / 1000;
+        updateSingleBar('v0', sumV0, 'Equilibrado');
+    }
+
+    function updateSingleBar(idSuffix, sum, okText) {
+        const bar = document.getElementById(`bar-${idSuffix}`);
+        const label = document.getElementById(`val-${idSuffix}`);
+        const status = document.getElementById(`status-${idSuffix}`);
+
+        label.innerText = `${sum}`;
+        let pct = Math.min(sum * 100, 100);
+        bar.style.width = `${pct}%`;
+
+        if (sum === 1) {
+            bar.className = 'progress-fill bg-success';
+            if(status) { status.innerText = okText; status.className = 'status-text color-success'; }
+        } else if (sum > 1) {
+            bar.className = 'progress-fill bg-danger';
+            if(status) { status.innerText = '¡Exceso!'; status.className = 'status-text color-danger'; }
+        } else {
+            bar.className = 'progress-fill bg-warning';
+            if(status) { status.innerText = 'Falta'; status.className = 'status-text color-warning'; }
+        }
+    }
+
+    // MOTOR DE RETROALIMENTACIÓN DETALLADA
+    function checkWinCondition() {
+        const config = levelsConfig[currentLevel];
+        const n = config.states.length;
+        let feedbackList = [];
+        let allCorrect = true;
+
+        // 1. Auditoría de la Matriz M
+        let matrixSwapped = false;
+        let matrixError = false;
+        for (let c = 0; c < n; c++) {
+            let colSum = 0;
+            for (let r = 0; r < n; r++) {
+                let val = parseFloat(document.getElementById(`m-${r}-${c}`).value) || 0;
+                colSum += val;
+                if (Math.abs(val - solM[r][c]) > 0.008) {
+                    matrixError = true;
+                    // Detectar si el alumno transpuso filas por columnas
+                    if (Math.abs(val - solM[c][r]) <= 0.008 && r !== c) matrixSwapped = true;
+                }
+            }
+            if (Math.abs(colSum - 1.0) > 0.01) {
+                feedbackList.push(`<li class="item-warning">⚠️ <strong>Matriz M (Columna "${config.states[c].split(' ')[0]}"):</strong> La suma actual es ${colSum.toFixed(2)}, pero toda columna estocástica debe sumar exactamente 1.00.</li>`);
+                allCorrect = false;
+            }
+        }
+        if (matrixError && Math.abs(feedbackList.length) === 0) {
+            allCorrect = false;
+            if (matrixSwapped) {
+                feedbackList.push(`<li class="item-error">🔄 <strong>Error de Orientación en Matriz M:</strong> ¡Atención! Has colocado las probabilidades por <em>filas</em> en lugar de <em>columnas</em>. Recuerda que el estado de ORIGEN siempre dicta la columna.</li>`);
+            } else {
+                feedbackList.push(`<li class="item-error">❌ <strong>Valores Incorrectos en Matriz M:</strong> Algunos decimales de transición no coinciden con las tasas descritas en la historia. Verifícalos.</li>`);
+            }
+        } else if (!matrixError) {
+            feedbackList.push(`<li class="item-success">✔️ <strong>Matriz de Transición M:</strong> Perfectamente construida y estocástica por columnas.</li>`);
+        }
+
+        // 2. Auditoría del Vector v0
+        let v0Error = false;
+        let v0Sum = 0;
+        for (let i = 0; i < n; i++) {
+            let val = parseFloat(document.getElementById(`v0-${i}`).value) || 0;
+            v0Sum += val;
+            if (Math.abs(val - solV0[i]) > 0.008) v0Error = true;
+        }
+        if (Math.abs(v0Sum - 1.0) > 0.01) {
+            feedbackList.push(`<li class="item-warning">⚠️ <strong>Vector Inicial (v₀):</strong> La suma de sus elementos es ${v0Sum.toFixed(2)}. Debe sumar 1.00 (el 100% de la población).</li>`);
+            allCorrect = false;
+        } else if (v0Error) {
+            feedbackList.push(`<li class="item-error">❌ <strong>Vector Inicial (v₀):</strong> Los datos no coinciden con la encuesta o censo inicial del relato. Recuerda pasar los porcentajes a decimales (ej: 100% = 1.00).</li>`);
+            allCorrect = false;
+        } else {
+            feedbackList.push(`<li class="item-success">✔️ <strong>Vector Inicial (v₀):</strong> Correctamente interpretado.</li>`);
+        }
+
+        // 3. Auditoría del Período k
+        let valK = parseInt(document.getElementById('input-k').value) || 0;
+        if (valK !== solK) {
+            feedbackList.push(`<li class="item-error">⏱️ <strong>Período de Observación (k):</strong> Has indicado k=${valK}, pero la pregunta final del relato solicita proyectar al período k=${solK}.</li>`);
+            allCorrect = false;
+        } else {
+            feedbackList.push(`<li class="item-success">✔️ <strong>Período de Observación (k):</strong> Identificado correctamente (k=${solK}).</li>`);
+        }
+
+        // 4. Auditoría del Vector Proyectado vk (Con Tolerancia Ampliada ±0.015)
+        let vkError = false;
+        let vkDetails = [];
+        for (let i = 0; i < n; i++) {
+            let val = parseFloat(document.getElementById(`vk-${i}`).value);
+            if (isNaN(val)) {
+                vkError = true;
+                continue;
+            }
+            let exact = solVk[i];
+            let round2 = Number(exact.toFixed(2));
+            let round3 = Number(exact.toFixed(3));
+
+            // Acepta el valor si coincide con el exacto, o con el redondeo a 2 o 3 decimales
+            if (Math.abs(val - exact) > 0.015 && Math.abs(val - round2) > 0.015 && Math.abs(val - round3) > 0.015) {
+                vkError = true;
+                vkDetails.push(`${config.states[i].split(' ')[0]} (Esperado: ~${round2} o ${round3} | Ingresado: ${val})`);
+            }
+        }
+
+        if (vkError) {
+            allCorrect = false;
+            if (valK !== solK || matrixError || v0Error) {
+                feedbackList.push(`<li class="item-warning">📈 <strong>Vector Proyectado (vₖ):</strong> Al tener errores en la Matriz M, en v₀ o en el período k, tu cálculo de proyección final inevitablemente difiere del esperado.</li>`);
+            } else {
+                feedbackList.push(`<li class="item-error">🧮 <strong>Vector Proyectado (vₖ):</strong> El cálculo de v_${solK} = M<sup style="font-size:0.8em">${solK}</sup> · v₀ no es correcto. Asegúrate de multiplicar paso a paso sin redondear decimales intermedios. Discrepancias: ${vkDetails.join(', ')}.</li>`);
+            }
+        } else if (!vkError && !matrixError && !v0Error && valK === solK) {
+            feedbackList.push(`<li class="item-success">✔️ <strong>Vector Proyectado (vₖ):</strong> ¡Proyección estocástica impecable!</li>`);
+        }
+
+        // Mostrar Panel
+        const panel = document.getElementById('feedback-panel');
+        panel.style.display = 'block';
+        if (allCorrect) {
+            panel.style.backgroundColor = '#ecfdf5';
+            panel.style.border = '2px solid var(--success)';
+            panel.style.color = '#065f46';
+            panel.innerHTML = `<h4>🏆 ¡Resolución Perfecta! Has dominado el Oráculo del Tiempo.</h4>
+                               <p>Tus multiplicaciones matriciales y tu interpretación lectora son exactas. El sistema conserva su energía probabilística al 100%.</p>`;
+        } else {
+            panel.style.backgroundColor = '#f8fafc';
+            panel.style.border = '2px solid #cbd5e1';
+            panel.style.color = 'var(--text)';
+            panel.innerHTML = `<h4 style="color: var(--danger);">🔍 Diagnóstico de la Predicción:</h4>
+                               <ul class="feedback-list">${feedbackList.join('')}</ul>`;
+        }
+    }
+
+    window.onload = () => startNewGame();
+</script>
+
+</body>
+</html>

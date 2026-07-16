@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego: El Detective de Nudos - Cadenas de Markov</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --secondary: #0f172a;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            max-width: 950px;
+            width: 100%;
+            padding: 30px;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        p.subtitle {
+            text-align: center;
+            color: #64748b;
+            margin-bottom: 25px;
+            font-size: 0.95rem;
+        }
+
+        .controls-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .level-selector {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .btn-level {
+            border: 2px solid #e2e8f0;
+            background: white;
+            color: var(--text);
+        }
+
+        .btn-level.active {
+            border-color: var(--primary);
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-new-game {
+            background-color: var(--secondary);
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-new-game:hover {
+            background-color: #334155;
+            transform: scale(1.02);
+        }
+
+        .game-area {
+            background-color: #f1f5f9;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .context-box {
+            width: 100%;
+            margin-bottom: 20px;
+            padding: 12px;
+            background-color: #e0e7ff;
+            border-left: 4px solid var(--primary);
+            border-radius: 4px;
+            line-height: 1.5;
+        }
+
+        /* Contenedor Gráfico Interactivo Más Amplio */
+        .graph-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 750px;
+            height: 480px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            border: 1px solid #cbd5e1;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .node-circle {
+            fill: #3b82f6;
+            stroke: #1d4ed8;
+            stroke-width: 4px;
+            transition: fill 0.3s, stroke 0.3s;
+        }
+
+        .node-text {
+            fill: white;
+            font-weight: bold;
+            font-size: 13px;
+            text-anchor: middle;
+            pointer-events: none;
+        }
+
+        .node-text-large {
+            font-size: 16px;
+        }
+
+        .arrow-path {
+            fill: none;
+            stroke: #64748b;
+            stroke-width: 2.5px;
+            marker-end: url(#arrowhead);
+        }
+
+        .loop-path {
+            fill: none;
+            stroke: #8b5cf6;
+            stroke-width: 2.5px;
+            stroke-dasharray: 5, 4;
+            marker-end: url(#arrowhead-loop);
+        }
+
+        /* Elementos HTML superpuestos al SVG */
+        .overlay-box {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 3px 8px;
+            border-radius: 6px;
+            border: 1px solid #94a3b8;
+            font-weight: bold;
+            font-size: 0.95rem;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+            z-index: 10;
+        }
+
+        .input-cell {
+            width: 75px;
+            padding: 5px;
+            text-align: center;
+            border: 2px solid var(--primary);
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: bold;
+            outline: none;
+            background-color: #fef08a;
+            color: #000;
+        }
+
+        .input-cell:focus {
+            background-color: #ffffff;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
+        }
+
+        /* Tanques de Energía por Nudo */
+        .tanks-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            width: 100%;
+        }
+
+        .tank-card {
+            background: white;
+            padding: 14px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .tank-label {
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-bottom: 6px;
+            color: #334155;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .progress-bar {
+            height: 12px;
+            background-color: #e2e8f0;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 6px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s, background-color 0.3s;
+        }
+
+        .status-text {
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .btn-check {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-check:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .feedback-message {
+            margin-top: 15px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+            min-height: 27px;
+        }
+
+        .color-success { color: var(--success); }
+        .color-warning { color: var(--warning); }
+        .color-danger { color: var(--danger); }
+        .bg-success { background-color: var(--success); }
+        .bg-warning { background-color: var(--warning); }
+        .bg-danger { background-color: var(--danger); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>El Detective de Nudos y Ramas</h1>
+    <p class="subtitle">Completa los valores faltantes en el grafo. ¡La suma de las probabilidades de todas las flechas que SALEN de un nudo debe ser exactamente 1!</p>
+
+    <div class="controls-row">
+        <div class="level-selector">
+            <button class="btn btn-level active" onclick="changeLevel(0)">Nivel 1: Clima (2 Estados)</button>
+            <button class="btn btn-level" onclick="changeLevel(1)">Nivel 2: Marcas (3 Estados)</button>
+        </div>
+        <button class="btn btn-new-game" onclick="startNewGame()">🔄 Nueva Partida</button>
+    </div>
+
+    <div class="game-area">
+        <div class="context-box" id="context-text"></div>
+        
+        <div class="graph-wrapper" id="graph-wrapper">
+            <svg id="graph-svg">
+                <defs>
+                    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="30" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#64748b" />
+                    </marker>
+                    <marker id="arrowhead-loop" markerWidth="10" markerHeight="7" refX="26" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#8b5cf6" />
+                    </marker>
+                </defs>
+            </svg>
+            <div id="html-overlays"></div>
+        </div>
+
+        <div class="tanks-container" id="tanks-container"></div>
+    </div>
+
+    <button class="btn btn-check" onclick="checkWinCondition()">Auditar Nudos y Ramas</button>
+    <div class="feedback-message" id="feedback-msg"></div>
+</div>
+
+<script>
+    const levelsConfig = [
+        {
+            title: "Nivel 1: El Clima del Planeta",
+            context: "En este diagrama, las ramas están ampliamente separadas para facilitar su lectura. Los nudos son **Sol (S)** y **Lluvia (L)**. Las ramas moradas punteadas son bucles (fidelidad o permanencia en el estado) y las grises indican el cambio al otro estado. ¡Completa las incógnitas para que cada nudo sume 1!",
+            states: ["Sol (S)", "Lluvia (L)"],
+            nodes: [
+                { id: 0, label: "Sol (S)", x: 220, y: 240 },
+                { id: 1, label: "Lluvia (L)", x: 530, y: 240 }
+            ]
+        },
+        {
+            title: "Nivel 2: Comportamiento del Consumidor",
+            context: "Las tres marcas de telefonía (**Marca A**, **Marca B** y **Marca C**) están claramente diferenciadas en los nudos. Cada flecha que SALE de una marca representa la retención de clientes (bucle morado) o la migración hacia un competidor (rama gris). ¡Encuentra los valores perdidos!",
+            states: ["Marca A", "Marca B", "Marca C"],
+            nodes: [
+                { id: 0, label: "Marca A", x: 375, y: 110 },
+                { id: 1, label: "Marca B", x: 150, y: 370 },
+                { id: 2, label: "Marca C", x: 600, y: 370 }
+            ]
+        }
+    ];
+
+    let currentLevel = 0;
+    let currentData = [];
+    let currentSolutions = [];
+
+    function generateLevelData(levelIndex) {
+        const numStates = levelsConfig[levelIndex].states.length;
+        currentData = [];
+        currentSolutions = [];
+
+        for (let r = 0; r < numStates; r++) {
+            currentData.push(new Array(numStates).fill(0));
+            currentSolutions.push(new Array(numStates).fill(0));
+        }
+
+        for (let origin = 0; origin < numStates; origin++) {
+            let colVals = [];
+            let remaining = 100;
+            let step = (levelIndex === 0) ? 10 : 5; 
+            
+            for (let dest = 0; dest < numStates - 1; dest++) {
+                let maxSteps = Math.floor((remaining - step * (numStates - 1 - dest)) / step);
+                let minSteps = 1; 
+                let chosenSteps = minSteps + Math.floor(Math.random() * (maxSteps - minSteps + 1));
+                let val = chosenSteps * step;
+                colVals.push(val / 100);
+                remaining -= val;
+            }
+            colVals.push(Math.round(remaining) / 100);
+            colVals.sort(() => Math.random() - 0.5);
+
+            let hiddenDest = Math.floor(Math.random() * numStates);
+
+            for (let dest = 0; dest < numStates; dest++) {
+                currentSolutions[dest][origin] = colVals[dest];
+                if (dest === hiddenDest) {
+                    currentData[dest][origin] = "input";
+                } else {
+                    currentData[dest][origin] = colVals[dest];
+                }
+            }
+        }
+    }
+
+    function changeLevel(index) {
+        currentLevel = index;
+        document.querySelectorAll('.btn-level').forEach((btn, idx) => {
+            btn.classList.toggle('active', idx === index);
+        });
+        startNewGame();
+    }
+
+    function startNewGame() {
+        generateLevelData(currentLevel);
+        renderGame();
+    }
+
+    function renderGame() {
+        const config = levelsConfig[currentLevel];
+        document.getElementById('context-text').innerHTML = config.context;
+        document.getElementById('feedback-msg').innerText = "";
+
+        const svg = document.getElementById('graph-svg');
+        const overlays = document.getElementById('html-overlays');
+        
+        svg.innerHTML = `
+            <defs>
+                <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="30" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="#64748b" />
+                </marker>
+                <marker id="arrowhead-loop" markerWidth="10" markerHeight="7" refX="26" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="#8b5cf6" />
+                </marker>
+            </defs>
+        `;
+        overlays.innerHTML = "";
+
+        const nodes = config.nodes;
+        const numStates = nodes.length;
+
+        // 1. DIBUJAR RAMAS CON MAYOR CURVATURA Y SEPARACIÓN
+        for (let origin = 0; origin < numStates; origin++) {
+            for (let dest = 0; dest < numStates; dest++) {
+                let val = currentData[dest][origin];
+                let n1 = nodes[origin];
+                let n2 = nodes[dest];
+                let midX, midY;
+
+                if (origin === dest) {
+                    // Dibujar Bucles muy separados
+                    let path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                    path.setAttribute("class", "loop-path");
+                    
+                    if (n1.y < 200) {
+                        // Bucle superior (Marca A o Sol en Nivel 1)
+                        path.setAttribute("d", `M ${n1.x - 20} ${n1.y - 35} C ${n1.x - 75} ${n1.y - 120}, ${n1.x + 75} ${n1.y - 120}, ${n1.x + 20} ${n1.y - 35}`);
+                        midX = n1.x; midY = n1.y - 90;
+                    } else if (n1.x < 300 && numStates === 3) {
+                        // Bucle inferior izquierdo (Marca B) apuntando hacia abajo
+                        path.setAttribute("d", `M ${n1.x - 20} ${n1.y + 35} C ${n1.x - 75} ${n1.y + 120}, ${n1.x + 75} ${n1.y + 120}, ${n1.x + 20} ${n1.y + 35}`);
+                        midX = n1.x; midY = n1.y + 90;
+                    } else if (n1.x > 400 && numStates === 3) {
+                        // Bucle inferior derecho (Marca C) apuntando hacia abajo
+                        path.setAttribute("d", `M ${n1.x - 20} ${n1.y + 35} C ${n1.x - 75} ${n1.y + 120}, ${n1.x + 75} ${n1.y + 120}, ${n1.x + 20} ${n1.y + 35}`);
+                        midX = n1.x; midY = n1.y + 90;
+                    } else {
+                        // Bucle estándar en Nivel 1 (Lluvia)
+                        path.setAttribute("d", `M ${n1.x - 20} ${n1.y - 35} C ${n1.x - 75} ${n1.y - 120}, ${n1.x + 75} ${n1.y - 120}, ${n1.x + 20} ${n1.y - 35}`);
+                        midX = n1.x; midY = n1.y - 90;
+                    }
+                    svg.appendChild(path);
+                } else {
+                    // Ramas entre nudos con curvatura muy amplia (50 a 60) para separar ida y vuelta
+                    let path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                    path.setAttribute("class", "arrow-path");
+                    
+                    let dx = n2.x - n1.x;
+                    let dy = n2.y - n1.y;
+                    let dist = Math.sqrt(dx*dx + dy*dy);
+                    
+                    // Aumentar curvatura drásticamente para evitar superposiciones
+                    let curvature = (numStates === 2) ? 60 : 50;
+                    let nx = -dy / dist * curvature;
+                    let ny = dx / dist * curvature;
+                    
+                    let cx = (n1.x + n2.x)/2 + nx;
+                    let cy = (n1.y + n2.y)/2 + ny;
+
+                    path.setAttribute("d", `M ${n1.x} ${n1.y} Q ${cx} ${cy} ${n2.x} ${n2.y}`);
+                    svg.appendChild(path);
+
+                    midX = (n1.x * 0.25 + cx * 0.5 + n2.x * 0.25);
+                    midY = (n1.y * 0.25 + cy * 0.5 + n2.y * 0.25);
+                }
+
+                let box = document.createElement("div");
+                box.className = "overlay-box";
+                box.style.left = `${midX}px`;
+                box.style.top = `${midY}px`;
+
+                if (val === "input") {
+                    box.style.background = "transparent";
+                    box.style.border = "none";
+                    box.style.boxShadow = "none";
+                    box.innerHTML = `<input type="number" step="any" class="input-cell" data-origin="${origin}" data-dest="${dest}" placeholder="?" oninput="updateTanks()">`;
+                } else {
+                    box.style.color = (origin === dest) ? "#6d28d9" : "#1e293b";
+                    box.innerText = val.toFixed(2).replace(/\.00$/, '');
+                }
+                overlays.appendChild(box);
+            }
+        }
+
+        // 2. DIBUJAR NUDOS MÁS GRANDES Y ETIQUETAS EN 2 LÍNEAS
+        nodes.forEach((n, idx) => {
+            let circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            circle.setAttribute("cx", n.x);
+            circle.setAttribute("cy", n.y);
+            circle.setAttribute("r", 45); // Radio ampliado para que quepa el texto
+            circle.setAttribute("class", "node-circle");
+            circle.setAttribute("id", `node-circle-${idx}`);
+            svg.appendChild(circle);
+
+            let text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            text.setAttribute("class", "node-text");
+            
+            let words = n.label.split(" ");
+            if (words.length > 1) {
+                // Línea superior (Ej: "Marca" o "Sol")
+                let tspan1 = document.createElementNS("http://www.w3.org/2000/svg", "tspan");
+                tspan1.setAttribute("x", n.x);
+                tspan1.setAttribute("y", n.y - 6);
+                tspan1.textContent = words[0];
+                text.appendChild(tspan1);
+
+                // Línea inferior destacada (Ej: "A", "B", "C" o "(S)")
+                let tspan2 = document.createElementNS("http://www.w3.org/2000/svg", "tspan");
+                tspan2.setAttribute("x", n.x);
+                tspan2.setAttribute("y", n.y + 14);
+                tspan2.setAttribute("class", "node-text-large");
+                tspan2.textContent = words[1];
+                text.appendChild(tspan2);
+            } else {
+                text.setAttribute("x", n.x);
+                text.setAttribute("y", n.y + 5);
+                text.textContent = n.label;
+            }
+            svg.appendChild(text);
+        });
+
+        // 3. CREAR TANQUES DE ENERGÍA POR NUDO
+        let tanksHtml = "";
+        config.states.forEach((state, idx) => {
+            tanksHtml += `
+                <div class="tank-card" id="tank-card-${idx}">
+                    <div class="tank-label">
+                        <span>Salida: <strong>${state}</strong></span>
+                        <span id="label-val-${idx}">0.00</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="bar-fill-${idx}"></div>
+                    </div>
+                    <div class="status-text" id="status-text-${idx}">Calculando...</div>
+                </div>
+            `;
+        });
+        document.getElementById('tanks-container').innerHTML = tanksHtml;
+
+        updateTanks();
+    }
+
+    function updateTanks() {
+        const numStates = levelsConfig[currentLevel].states.length;
+
+        for (let origin = 0; origin < numStates; origin++) {
+            let sum = 0;
+            for (let dest = 0; dest < numStates; dest++) {
+                let val = currentData[dest][origin];
+                if (val === "input") {
+                    const inputEl = document.querySelector(`input[data-origin="${origin}"][data-dest="${dest}"]`);
+                    val = inputEl && inputEl.value !== "" ? parseFloat(inputEl.value) : 0;
+                }
+                sum += val;
+            }
+
+            sum = Math.round(sum * 1000) / 1000;
+
+            const bar = document.getElementById(`bar-fill-${origin}`);
+            const labelVal = document.getElementById(`label-val-${origin}`);
+            const status = document.getElementById(`status-text-${origin}`);
+            const nodeCircle = document.getElementById(`node-circle-${origin}`);
+
+            labelVal.innerText = `${sum}`;
+            let percentage = Math.min(sum * 100, 100);
+            bar.style.width = `${percentage}%`;
+
+            if (sum === 1) {
+                bar.className = 'progress-fill bg-success';
+                status.innerText = '¡Nudo equilibrado (100%)!';
+                status.className = 'status-text color-success';
+                nodeCircle.style.fill = '#10b981';
+                nodeCircle.style.stroke = '#047857';
+            } else if (sum > 1) {
+                bar.className = 'progress-fill bg-danger';
+                status.innerText = '¡Exceso de probabilidad!';
+                status.className = 'status-text color-danger';
+                nodeCircle.style.fill = '#ef4444';
+                nodeCircle.style.stroke = '#b91c1c';
+            } else {
+                bar.className = 'progress-fill bg-warning';
+                status.innerText = 'Falta probabilidad';
+                status.className = 'status-text color-warning';
+                nodeCircle.style.fill = '#3b82f6';
+                nodeCircle.style.stroke = '#1d4ed8';
+            }
+        }
+    }
+
+    function checkWinCondition() {
+        const numStates = levelsConfig[currentLevel].states.length;
+        let allCorrect = true;
+
+        for (let origin = 0; origin < numStates; origin++) {
+            for (let dest = 0; dest < numStates; dest++) {
+                if (currentData[dest][origin] === "input") {
+                    const inputEl = document.querySelector(`input[data-origin="${origin}"][data-dest="${dest}"]`);
+                    const val = inputEl && inputEl.value !== "" ? parseFloat(inputEl.value) : -1;
+                    if (Math.abs(val - currentSolutions[dest][origin]) > 0.001) {
+                        allCorrect = false;
+                    }
+                }
+            }
+        }
+
+        const msgEl = document.getElementById('feedback-msg');
+        if (allCorrect) {
+            msgEl.innerText = "¡Excelente trabajo! Todos los nudos conservan la probabilidad perfectamente. 🎯";
+            msgEl.className = "feedback-message color-success";
+        } else {
+            msgEl.innerText = "Hay nudos desequilibrados o con valores incorrectos. ¡Revisa la suma de las flechas salientes!";
+            msgEl.className = "feedback-message color-danger";
+        }
+    }
+
+    window.onload = () => startNewGame();
+</script>
+
+</body>
+</html>
