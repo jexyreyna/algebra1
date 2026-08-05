@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>¿Cuántas selecciones participaron? — Ecuación cuadrática</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0F2A66;
+    --navy-deep:#081B47;
+    --navy-soft:#E7ECF7;
+    --bg:#F3F5FA;
+    --panel:#FFFFFF;
+    --line:#E1E6F0;
+    --ink:#1B2540;
+    --ink-soft:#5D6580;
+    --gold:#C99A3C;
+    --gold-soft:#F7EED9;
+    --green:#1F8A5F;
+    --green-soft:#E4F3EC;
+    --red:#C0392B;
+    --red-soft:#FBE7E4;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter', sans-serif;
+    min-height:100vh;
+  }
+  .band{
+    background:linear-gradient(120deg, var(--navy-deep), var(--navy) 70%);
+    padding:20px 22px;
+    display:flex; align-items:center; gap:16px;
+  }
+  .band img{ width:52px; height:52px; border-radius:10px; flex-shrink:0; }
+  .band .word{ color:#fff; }
+  .band .word .inst{
+    font-family:'JetBrains Mono', monospace; font-size:11.5px; letter-spacing:.16em;
+    text-transform:uppercase; color:var(--gold); font-weight:700; margin-bottom:3px;
+  }
+  .band .word .name{
+    font-family:'Fraunces', serif; font-weight:600; font-size:19px; letter-spacing:.01em;
+  }
+
+  .wrap{max-width:1160px; margin:0 auto; padding:26px 20px 60px;}
+
+  header{margin-bottom:20px;}
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--navy); font-weight:700; margin-bottom:10px;
+  }
+  h1{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:clamp(26px, 4vw, 38px);
+    margin:0 0 8px;
+    line-height:1.15;
+    letter-spacing:-.01em;
+    color:var(--navy-deep);
+  }
+  .sub{color:var(--ink-soft); font-size:14.5px; max-width:700px; line-height:1.55;}
+
+  .statement{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-left:4px solid var(--gold);
+    border-radius:10px;
+    padding:20px 24px;
+    margin:22px 0 26px;
+    font-size:14.5px;
+    line-height:1.7;
+    color:var(--ink);
+  }
+  .statement .tag{
+    font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:.12em;
+    text-transform:uppercase; color:var(--gold); font-weight:700; margin-bottom:10px;
+  }
+  .statement p{margin:0 0 10px;}
+  .statement .question{
+    font-family:'Fraunces', serif; font-weight:600; font-size:19px;
+    color:var(--navy-deep); text-align:center; margin-top:12px;
+  }
+  .statement .knowns{
+    display:flex; gap:24px; flex-wrap:wrap; margin-top:14px;
+    padding-top:14px; border-top:1px dashed var(--line);
+  }
+  .statement .knowns .item{font-size:13px; color:var(--ink-soft);}
+  .statement .knowns .item b{color:var(--navy); font-family:'JetBrains Mono', monospace;}
+
+  .layout{display:grid; grid-template-columns:280px 1fr; gap:20px; align-items:start;}
+  @media (max-width:900px){ .layout{grid-template-columns:1fr;} }
+
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:20px;
+  }
+  .panel h2{
+    font-family:'Fraunces', serif;
+    font-size:16.5px; font-weight:600;
+    margin:0 0 4px; color:var(--navy-deep);
+  }
+  .panel .h2-sub{font-size:12px; color:var(--ink-soft); margin-bottom:16px;}
+
+  .field{margin-bottom:16px;}
+  .field label{
+    display:flex; justify-content:space-between; align-items:baseline;
+    font-size:13px; color:var(--ink-soft); margin-bottom:6px;
+  }
+  .field label .val{
+    font-family:'JetBrains Mono', monospace; font-weight:700; color:var(--navy); font-size:14px;
+  }
+  .field input[type=range]{ width:100%; accent-color:var(--navy); height:4px; cursor:pointer; }
+
+  .reset-btn{
+    width:100%; margin-top:6px; padding:11px 12px; border-radius:9px;
+    border:1px solid var(--line); background:var(--navy-soft); color:var(--navy-deep);
+    font-weight:600; font-size:13px; cursor:pointer; font-family:'Inter',sans-serif;
+    transition:background .15s;
+  }
+  .reset-btn:hover{background:#DBE3F4;}
+  .reset-btn:focus-visible{outline:2px solid var(--navy); outline-offset:2px;}
+
+  .answer-card{
+    margin-top:6px;
+    background:linear-gradient(135deg, var(--gold-soft), var(--panel));
+    border:1px solid var(--gold);
+    border-radius:12px;
+    padding:16px 18px;
+    text-align:center;
+  }
+  .answer-card .lbl{
+    font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:.1em;
+    text-transform:uppercase; color:#8A6A1E; font-weight:700; margin-bottom:6px;
+  }
+  .answer-card .num{
+    font-family:'Fraunces', serif; font-weight:700; font-size:38px; color:var(--navy-deep); line-height:1;
+  }
+  .answer-card .cap{font-size:12px; color:var(--ink-soft); margin-top:4px;}
+
+  .steps{display:grid; gap:12px; margin-top:4px;}
+  .step{
+    background:var(--panel); border:1px solid var(--line); border-radius:14px;
+    padding:16px 18px; display:grid; grid-template-columns:32px 1fr; gap:14px; align-items:start;
+  }
+  .step .num{
+    font-family:'Fraunces', serif; font-weight:700; font-size:15px;
+    color:#fff; background:var(--navy); width:28px; height:28px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  }
+  .step.discard .num{background:var(--red);}
+  .step .title{font-weight:600; font-size:14px; color:var(--navy-deep); margin-bottom:6px;}
+  .step .desc{font-size:13px; color:var(--ink-soft); line-height:1.55; margin-bottom:8px;}
+  .step .formula{font-size:15px; overflow-x:auto; padding:2px 0;}
+
+  .verdict{
+    margin-top:18px;
+    border-radius:14px;
+    padding:22px 24px;
+    border:1px solid var(--green);
+    background:linear-gradient(135deg, var(--green-soft), var(--panel));
+  }
+  .verdict .title{
+    font-family:'JetBrains Mono', monospace; font-size:11.5px; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--green); font-weight:700; margin-bottom:10px;
+  }
+  .verdict .big{
+    font-family:'Fraunces', serif; font-weight:600; font-size:clamp(19px,3vw,25px);
+    color:var(--navy-deep); line-height:1.3;
+  }
+  .verdict .note{font-size:13px; color:var(--ink-soft); margin-top:8px; line-height:1.55;}
+
+  footer{text-align:center; color:var(--ink-soft); font-size:12px; margin-top:30px;}
+</style>
+</head>
+<body>
+
+<div class="band">
+  <div class="word">
+    <div class="name">Laboratorio de Ecuaciones Cuadráticas</div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">El mundial de fútbol &middot; el problema al revés</div>
+    <h1>¿Cuántas selecciones participaron?</h1>
+    <div class="sub">Esta vez el dato conocido es la recaudación final. El número de equipos es la incógnita: hay que plantear y resolver una ecuación cuadrática para encontrarlo.</div>
+  </header>
+
+  <div class="statement">
+    <div class="tag">Enunciado</div>
+    <p>En un torneo <em>todos contra todos</em> con partidos de <em>ida y vuelta</em>, cada partido genera <strong>4 millones de dólares</strong> de utilidad. Al finalizar el torneo se obtuvieron <strong>360 millones de dólares</strong>.</p>
+    <div class="question">¿Cuántas selecciones participaron?</div>
+    <div class="knowns">
+      <div class="item">Utilidad por partido: <b id="kw-rev">US$ 4M</b></div>
+      <div class="item">Recaudación total: <b id="kw-R">US$ 360M</b></div>
+      <div class="item">Incógnita: <b>x = número de equipos</b></div>
+    </div>
+  </div>
+
+  <div class="layout">
+
+    <div>
+      <div class="panel">
+        <h2>Datos conocidos</h2>
+        <div class="h2-sub">la recaudación solo toma valores alcanzables con un número entero de equipos</div>
+
+        <div class="field">
+          <label>Utilidad por partido <span class="val" id="val-rev">US$ 4M</span></label>
+          <input type="range" id="rev" min="1" max="10" step="0.5" value="4">
+        </div>
+        <div class="field">
+          <label>Recaudación total <span class="val" id="val-R">US$ 360M</span></label>
+          <input type="range" id="xSel" min="2" max="30" step="1" value="10">
+        </div>
+
+        <button class="reset-btn" id="resetBtn">Restaurar enunciado original</button>
+      </div>
+    </div>
+
+    <div>
+      <div class="steps" id="steps"></div>
+
+      <div class="verdict" id="verdict"></div>
+    </div>
+  </div>
+
+  <footer>La cantidad de equipos siempre debe ser un entero positivo: por eso se descarta la raíz negativa.</footer>
+</div>
+
+<script>
+function fmt(x, d=3){
+  if (Object.is(x,-0)) x = 0;
+  const r = Math.round(x*1000)/1000;
+  if (Math.abs(r-Math.round(r)) < 1e-6) return String(Math.round(r));
+  return r.toFixed(d).replace(/0+$/,'').replace(/\.$/,'');
+}
+function K(el, tex, display=true){
+  try{ katex.render(tex, el, {throwOnError:false, displayMode:display}); }
+  catch(e){ el.textContent = tex; }
+}
+function niceStep(range){
+  const rough = range/9;
+  const mag = Math.pow(10, Math.floor(Math.log10(rough)));
+  const norm = rough/mag;
+  let step;
+  if (norm < 1.5) step = 1; else if (norm < 3) step = 2; else if (norm < 7) step = 5; else step = 10;
+  return step*mag;
+}
+
+const revEl = document.getElementById('rev');
+const xSelEl = document.getElementById('xSel');
+
+function render(){
+  const rev = parseFloat(revEl.value);
+  const x = parseInt(xSelEl.value);          // equipos reales, siempre entero por diseño del slider
+  const R = rev * x * (x - 1);               // recaudación derivada: solo toma valores "enteros" alcanzables
+
+  document.getElementById('val-rev').textContent = 'US$ ' + fmt(rev) + 'M';
+  document.getElementById('val-R').textContent = 'US$ ' + fmt(R) + 'M';
+  document.getElementById('kw-rev').textContent = 'US$ ' + fmt(rev) + 'M';
+  document.getElementById('kw-R').textContent = 'US$ ' + fmt(R) + 'M';
+
+  // rev * x(x-1) = R  ->  x^2 - x - R/rev = 0
+  const k = R/rev; // = x(x-1), exacto por construcción
+  const a = 1, b = -1, c = -k;
+  const D = b*b - 4*a*c;
+  const hasReal = D >= 0;
+  let posRoot=null, negRoot=null;
+  if (hasReal){
+    const sqrtD = Math.sqrt(D);
+    const root1 = (-b+sqrtD)/(2*a);
+    const root2 = (-b-sqrtD)/(2*a);
+    posRoot = Math.max(root1, root2);
+    negRoot = Math.min(root1, root2);
+  }
+  const isIntegerAnswer = true; // garantizado por el slider indexado en equipos enteros
+
+  renderSteps(rev, R, k, a, b, c, D, hasReal, posRoot, negRoot, isIntegerAnswer);
+  renderVerdict(rev, R, posRoot, negRoot, isIntegerAnswer, hasReal);
+}
+
+function renderSteps(rev, R, k, a, b, c, D, hasReal, posRoot, negRoot, isIntegerAnswer){
+  const box = document.getElementById('steps');
+  box.innerHTML = '';
+
+  addStep(1, false, 'Plantear la ecuación',
+    `Sea x el número de equipos. Cada equipo enfrenta a los otros x−1 rivales, dos veces (ida y vuelta), así que hay x(x−1) partidos. La recaudación es la utilidad por partido multiplicada por esos partidos:`,
+    `${fmt(rev)}\\,x(x-1) = ${fmt(R)}`);
+
+  addStep(2, false, 'Despejar el producto x(x−1)',
+    `Dividimos ambos lados entre la utilidad por partido:`,
+    `x(x-1) = \\dfrac{${fmt(R)}}{${fmt(rev)}} = ${fmt(k)}`);
+
+  addStep(3, false, 'Ordenar como ecuación cuadrática',
+    `Distribuimos y pasamos todo a un lado, igualando a cero:`,
+    `x^2 - x - ${fmt(k)} = 0`);
+
+  addStep(4, false, 'Resolver con la fórmula general',
+    `Con a = ${fmt(a)}, b = ${fmt(b)}, c = ${fmt(c)}: discriminante D = b² − 4ac = ${fmt(D)}.`,
+    hasReal
+      ? `x = \\dfrac{${fmt(-b)} \\pm \\sqrt{${fmt(D)}}}{${fmt(2*a)}} = ${fmt(posRoot)} \\ \\text{ó} \\ ${fmt(negRoot)}`
+      : `D = ${fmt(D)} < 0 \\ \\Rightarrow \\text{ no hay raíces reales}`);
+
+  if (hasReal){
+    const div = document.createElement('div');
+    div.className = 'step discard';
+    div.innerHTML = `<div class="num">5</div><div><div class="title">Descartar la raíz que no tiene sentido</div><div class="desc">Un número de equipos no puede ser negativo, así que se descarta x = ${fmt(negRoot)}. ${isIntegerAnswer ? `Queda la solución válida:` : 'La raíz positiva que queda no es un entero, así que estos datos no corresponden a un torneo real de equipos completos.'}</div><div class="formula" id="step-f-5"></div></div>`;
+    box.appendChild(div);
+    K(document.getElementById('step-f-5'), isIntegerAnswer ? `x = ${fmt(posRoot)}\\ \\text{equipos}` : `x \\approx ${fmt(posRoot)}`);
+  }
+
+  function addStep(num, isDiscard, title, desc, tex){
+    const div = document.createElement('div');
+    div.className = 'step' + (isDiscard ? ' discard' : '');
+    div.innerHTML = `<div class="num">${num}</div><div><div class="title">${title}</div><div class="desc">${desc}</div><div class="formula" id="step-f-${num}"></div></div>`;
+    box.appendChild(div);
+    K(document.getElementById(`step-f-${num}`), tex);
+  }
+}
+
+function renderVerdict(rev, R, posRoot, negRoot, isIntegerAnswer, hasReal){
+  const v = document.getElementById('verdict');
+  if (isIntegerAnswer){
+    v.innerHTML = `
+      <div class="title">Respuesta</div>
+      <div class="big">Con una utilidad de US$${fmt(rev)}M por partido y una recaudación de US$${fmt(R)}M, participaron <strong>${fmt(posRoot)} selecciones</strong>.</div>
+      <div class="note">Se comprueba: ${fmt(posRoot)} equipos generan ${fmt(posRoot)}×${fmt(posRoot-1)} = ${fmt(posRoot*(posRoot-1))} partidos, y ${fmt(posRoot*(posRoot-1))}×US$${fmt(rev)}M = US$${fmt(posRoot*(posRoot-1)*rev)}M. ✓</div>`;
+  } else if (hasReal){
+    v.innerHTML = `
+      <div class="title">Estos datos no dan un torneo "completo"</div>
+      <div class="big">La ecuación da x ≈ ${fmt(posRoot)}, que no es un número entero de equipos.</div>
+      <div class="note">Prueba otros valores de recaudación o utilidad por partido: para que la respuesta tenga sentido, x debe salir un entero mayor o igual a 2.</div>`;
+  } else {
+    v.innerHTML = `
+      <div class="title">Sin solución real</div>
+      <div class="big">Con estos valores, la ecuación cuadrática no tiene raíces reales.</div>
+      <div class="note">Aumenta la recaudación o reduce la utilidad por partido para que el discriminante sea positivo.</div>`;
+  }
+}
+[revEl, xSelEl].forEach(el => el.addEventListener('input', render));
+
+document.getElementById('resetBtn').addEventListener('click', ()=>{
+  revEl.value = 4; xSelEl.value = 10;
+  render();
+});
+
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Práctica de identidades trigonométricas</title>
+<style>
+:root{
+  --bg1:#07111f;--bg2:#121a34;--card:rgba(255,255,255,.085);
+  --line:rgba(255,255,255,.14);--text:#f8fafc;--muted:#cbd5e1;
+  --cyan:#22d3ee;--violet:#8b5cf6;--green:#34d399;--red:#fb7185;
+  --yellow:#fbbf24;--input:rgba(7,17,31,.78);--shadow:0 25px 70px rgba(0,0,0,.38)
+}
+*{box-sizing:border-box}
+body{
+  margin:0;min-height:100vh;color:var(--text);
+  font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+  background:
+    radial-gradient(circle at 12% 18%,rgba(34,211,238,.18),transparent 28%),
+    radial-gradient(circle at 86% 10%,rgba(139,92,246,.22),transparent 30%),
+    linear-gradient(135deg,var(--bg1),var(--bg2));
+  padding:30px 16px
+}
+.app{width:min(1200px,100%);margin:auto}
+header{text-align:center;margin-bottom:26px}
+.badge{
+  display:inline-flex;padding:8px 14px;border-radius:999px;
+  border:1px solid rgba(34,211,238,.28);background:rgba(34,211,238,.09);
+  color:#a5f3fc;font-size:.85rem;font-weight:800
+}
+h1{margin:15px 0 8px;font-size:clamp(2rem,5vw,3.55rem);letter-spacing:-.045em;line-height:1.05}
+.subtitle{max-width:850px;margin:auto;color:var(--muted);line-height:1.65}
+.layout{display:grid;grid-template-columns:minmax(350px,.9fr) minmax(430px,1.1fr);gap:22px;align-items:start}
+.card{
+  border:1px solid var(--line);background:var(--card);backdrop-filter:blur(18px);
+  box-shadow:var(--shadow);border-radius:24px;overflow:hidden
+}
+.content{padding:24px}
+.title{display:flex;align-items:center;gap:12px;margin:0 0 20px;font-size:1.12rem}
+.icon{
+  width:40px;height:40px;display:grid;place-items:center;border-radius:13px;
+  background:linear-gradient(135deg,var(--cyan),var(--violet));font-weight:900
+}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.field label{display:block;margin-bottom:7px;color:var(--muted);font-size:.85rem;font-weight:750}
+select{
+  width:100%;min-height:50px;padding:10px 12px;border-radius:13px;
+  border:1px solid rgba(255,255,255,.14);outline:none;background:var(--input);
+  color:var(--text);font-size:.96rem
+}
+select:focus{border-color:var(--cyan);box-shadow:0 0 0 4px rgba(34,211,238,.12)}
+.identity-card{
+  margin-top:18px;padding:18px;border-radius:18px;background:rgba(7,17,31,.5);
+  border:1px solid rgba(255,255,255,.09);text-align:center
+}
+.identity-label{color:var(--muted);font-size:.8rem;font-weight:850;text-transform:uppercase;letter-spacing:.08em}
+.identity{
+  margin-top:9px;font-family:"Cambria Math","Times New Roman",serif;
+  font-size:clamp(1.3rem,4vw,1.9rem);line-height:1.6
+}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:17px}
+button{
+  min-height:49px;border:0;border-radius:13px;cursor:pointer;color:white;
+  font-size:.94rem;font-weight:850;transition:.18s
+}
+button:hover{transform:translateY(-2px);filter:brightness(1.08)}
+.primary{background:linear-gradient(135deg,var(--cyan),var(--violet))}
+.secondary{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.12)}
+.reference{margin-top:18px}
+.reference h3{margin:0 0 10px}
+.identity-list{display:grid;gap:9px}
+.ref-item{
+  padding:12px;border-radius:13px;background:rgba(255,255,255,.055);
+  border:1px solid rgba(255,255,255,.08);
+  font-family:"Cambria Math","Times New Roman",serif;cursor:pointer;transition:.18s
+}
+.ref-item:hover{transform:translateX(3px);border-color:rgba(34,211,238,.3)}
+.practice{
+  min-height:250px;padding:20px;border-radius:19px;background:rgba(7,17,31,.42);
+  border:1px solid rgba(255,255,255,.09)
+}
+.type-badge{
+  display:inline-flex;padding:7px 11px;border-radius:999px;color:#a5f3fc;
+  background:rgba(34,211,238,.1);border:1px solid rgba(34,211,238,.2);
+  font-size:.8rem;font-weight:850
+}
+.question{
+  margin:18px 0;padding:18px;border-radius:16px;background:rgba(255,255,255,.06);
+  font-family:"Cambria Math","Times New Roman",serif;font-size:clamp(1.25rem,4vw,1.75rem);
+  text-align:center;line-height:1.6
+}
+.options{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.option{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.12)}
+.feedback{display:none;margin-top:13px;padding:13px;border-radius:13px;line-height:1.5}
+.feedback.ok{display:block;color:#a7f3d0;background:rgba(16,185,129,.12);border:1px solid rgba(52,211,153,.24)}
+.feedback.bad{display:block;color:#fecdd3;background:rgba(244,63,94,.12);border:1px solid rgba(251,113,133,.25)}
+.hint{
+  display:none;margin-top:12px;padding:13px;border-radius:13px;color:#fde68a;
+  background:rgba(251,191,36,.09);border:1px solid rgba(251,191,36,.22);line-height:1.5
+}
+.solution{
+  display:none;margin-top:13px;padding:15px;border-radius:14px;
+  background:rgba(139,92,246,.1);border:1px solid rgba(167,139,250,.22)
+}
+.solution.show{display:block}
+.solution h4{margin:0 0 8px;color:#ddd6fe}
+.step{
+  padding:10px 0;border-bottom:1px solid rgba(255,255,255,.08);
+  font-family:"Cambria Math","Times New Roman",serif;line-height:1.55
+}
+.step:last-child{border-bottom:0}
+.score{margin-top:14px;text-align:center;color:var(--muted);font-size:.88rem}
+.progress{height:9px;margin-top:10px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}
+.progress-bar{height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--violet));transition:.3s}
+.note{margin-top:17px;text-align:center;color:#94a3b8;font-size:.8rem;line-height:1.5}
+@media(max-width:900px){.layout{grid-template-columns:1fr}}
+@media(max-width:580px){
+  body{padding:18px 10px}.content{padding:18px}.controls,.options,.actions{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<main class="app">
+<header>
+  <div class="badge">Identidades fundamentales</div>
+  <h1>Práctica de identidades trigonométricas</h1>
+  <p class="subtitle">
+    Practica identidades pitagóricas, recíprocas, de cociente y de ángulos
+    complementarios mediante ejercicios interactivos, pistas y demostraciones.
+  </p>
+</header>
+
+<section class="layout">
+<article class="card">
+<div class="content">
+  <h2 class="title"><span class="icon">≡</span> Banco de identidades</h2>
+
+  <div class="controls">
+    <div class="field">
+      <label for="family">Familia</label>
+      <select id="family">
+        <option value="all">Todas</option>
+        <option value="pythagorean">Pitagóricas</option>
+        <option value="quotient">De cociente</option>
+        <option value="reciprocal">Recíprocas</option>
+        <option value="cofunction">Complementarias</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="difficulty">Dificultad</label>
+      <select id="difficulty">
+        <option value="basic">Básica</option>
+        <option value="medium">Intermedia</option>
+        <option value="mixed">Mixta</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="identity-card">
+    <div class="identity-label">Identidad destacada</div>
+    <div class="identity" id="featured">1 + tan²(x) = sec²(x)</div>
+  </div>
+
+  <div class="actions">
+    <button class="primary" id="newBtn">Nuevo ejercicio</button>
+    <button class="secondary" id="randomIdentityBtn">Otra identidad</button>
+  </div>
+
+  <section class="reference">
+    <h3>Referencia rápida</h3>
+    <div class="identity-list" id="identityList"></div>
+  </section>
+</div>
+</article>
+
+<article class="card">
+<div class="content">
+  <h2 class="title"><span class="icon">✓</span> Zona de práctica</h2>
+
+  <section class="practice">
+    <span class="type-badge" id="typeBadge">Completar identidad</span>
+    <div class="question" id="question">1 + tan²(x) = ?</div>
+    <div class="options" id="options"></div>
+
+    <div class="actions">
+      <button class="secondary" id="hintBtn">Mostrar pista</button>
+      <button class="secondary" id="solutionBtn">Ver demostración</button>
+    </div>
+
+    <div class="hint" id="hint"></div>
+    <div class="feedback" id="feedback"></div>
+    <div class="solution" id="solution"></div>
+
+    <div class="score" id="score">Aciertos: 0 · Intentos: 0</div>
+    <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+  </section>
+</div>
+</article>
+</section>
+
+<p class="note">
+  Las identidades son válidas en los puntos donde todas las expresiones involucradas están definidas.
+</p>
+</main>
+
+<script>
+const identities=[
+  {
+    family:"pythagorean",
+    name:"Pitagórica fundamental",
+    left:"sen²(x) + cos²(x)",
+    right:"1",
+    full:"sen²(x) + cos²(x) = 1",
+    hint:"Proviene del teorema de Pitágoras aplicado a la circunferencia unitaria.",
+    proof:[
+      "En la circunferencia unitaria: x² + y² = 1.",
+      "Como x = cos(x) e y = sen(x), resulta:",
+      "cos²(x) + sen²(x) = 1."
+    ]
+  },
+  {
+    family:"pythagorean",
+    name:"Pitagórica con tangente",
+    left:"1 + tan²(x)",
+    right:"sec²(x)",
+    full:"1 + tan²(x) = sec²(x)",
+    hint:"Divide sen²(x) + cos²(x) = 1 entre cos²(x).",
+    proof:[
+      "sen²(x) + cos²(x) = 1.",
+      "Dividiendo entre cos²(x):",
+      "sen²(x)/cos²(x) + 1 = 1/cos²(x).",
+      "tan²(x) + 1 = sec²(x)."
+    ]
+  },
+  {
+    family:"pythagorean",
+    name:"Pitagórica con cotangente",
+    left:"1 + cot²(x)",
+    right:"csc²(x)",
+    full:"1 + cot²(x) = csc²(x)",
+    hint:"Divide sen²(x) + cos²(x) = 1 entre sen²(x).",
+    proof:[
+      "sen²(x) + cos²(x) = 1.",
+      "Dividiendo entre sen²(x):",
+      "1 + cos²(x)/sen²(x) = 1/sen²(x).",
+      "1 + cot²(x) = csc²(x)."
+    ]
+  },
+  {
+    family:"quotient",
+    name:"Cociente de seno y coseno",
+    left:"tan(x)",
+    right:"sen(x)/cos(x)",
+    full:"tan(x) = sen(x)/cos(x)",
+    hint:"Tangente es cateto opuesto dividido entre cateto adyacente.",
+    proof:[
+      "sen(x) = opuesto/hipotenusa.",
+      "cos(x) = adyacente/hipotenusa.",
+      "sen(x)/cos(x) = opuesto/adyacente = tan(x)."
+    ]
+  },
+  {
+    family:"quotient",
+    name:"Cociente de coseno y seno",
+    left:"cot(x)",
+    right:"cos(x)/sen(x)",
+    full:"cot(x) = cos(x)/sen(x)",
+    hint:"La cotangente es la recíproca de la tangente.",
+    proof:[
+      "cot(x) = 1/tan(x).",
+      "tan(x) = sen(x)/cos(x).",
+      "Por tanto, cot(x) = cos(x)/sen(x)."
+    ]
+  },
+  {
+    family:"reciprocal",
+    name:"Recíproca del coseno",
+    left:"sec(x)",
+    right:"1/cos(x)",
+    full:"sec(x) = 1/cos(x)",
+    hint:"La secante es la función recíproca del coseno.",
+    proof:["Por definición de función recíproca:","sec(x)·cos(x)=1.","Así, sec(x)=1/cos(x)."]
+  },
+  {
+    family:"reciprocal",
+    name:"Recíproca del seno",
+    left:"csc(x)",
+    right:"1/sen(x)",
+    full:"csc(x) = 1/sen(x)",
+    hint:"La cosecante es la función recíproca del seno.",
+    proof:["Por definición:","csc(x)·sen(x)=1.","Así, csc(x)=1/sen(x)."]
+  },
+  {
+    family:"reciprocal",
+    name:"Recíproca de la tangente",
+    left:"cot(x)",
+    right:"1/tan(x)",
+    full:"cot(x) = 1/tan(x)",
+    hint:"Tangente y cotangente son recíprocas.",
+    proof:["tan(x)=opuesto/adyacente.","cot(x)=adyacente/opuesto.","Por ello, cot(x)=1/tan(x)."]
+  },
+  {
+    family:"cofunction",
+    name:"Cofunción seno-coseno",
+    left:"sen(90° − x)",
+    right:"cos(x)",
+    full:"sen(90° − x) = cos(x)",
+    hint:"En un triángulo rectángulo, los ángulos agudos son complementarios.",
+    proof:[
+      "Si los ángulos agudos son x y 90°−x,",
+      "el cateto opuesto a 90°−x es adyacente a x.",
+      "Por tanto, sen(90°−x)=cos(x)."
+    ]
+  },
+  {
+    family:"cofunction",
+    name:"Cofunción tangente-cotangente",
+    left:"tan(90° − x)",
+    right:"cot(x)",
+    full:"tan(90° − x) = cot(x)",
+    hint:"Al pasar al ángulo complementario, opuesto y adyacente se intercambian.",
+    proof:[
+      "tan(90°−x)=adyacente a x/opuesto a x.",
+      "Ese cociente es cot(x).",
+      "Luego tan(90°−x)=cot(x)."
+    ]
+  }
+];
+
+let current=null;
+let attempts=0;
+let correct=0;
+
+const familySelect=document.getElementById("family");
+const difficultySelect=document.getElementById("difficulty");
+const featured=document.getElementById("featured");
+
+function filtered(){
+  const family=familySelect.value;
+  return identities.filter(i=>family==="all"||i.family===family);
+}
+
+function renderReference(){
+  const list=document.getElementById("identityList");
+  list.innerHTML="";
+  filtered().forEach(identity=>{
+    const div=document.createElement("div");
+    div.className="ref-item";
+    div.textContent=identity.full;
+    div.onclick=()=>{
+      featured.textContent=identity.full;
+      current=identity;
+      createExercise(identity);
+    };
+    list.appendChild(div);
+  });
+}
+
+function randomItem(array){
+  return array[Math.floor(Math.random()*array.length)];
+}
+
+function createExercise(identity=randomItem(filtered())){
+  current=identity;
+  const difficulty=difficultySelect.value;
+  const types=difficulty==="basic"
+    ?["complete","truefalse"]
+    :difficulty==="medium"
+      ?["equivalent","reverse"]
+      :["complete","truefalse","equivalent","reverse"];
+
+  const type=randomItem(types);
+  const badge=document.getElementById("typeBadge");
+  const question=document.getElementById("question");
+  const options=document.getElementById("options");
+  const feedback=document.getElementById("feedback");
+  const hint=document.getElementById("hint");
+  const solution=document.getElementById("solution");
+
+  feedback.className="feedback";
+  feedback.textContent="";
+  hint.style.display="none";
+  solution.className="solution";
+  options.innerHTML="";
+
+  let correctAnswer;
+  let optionValues=[];
+
+  if(type==="complete"){
+    badge.textContent="Completar identidad";
+    question.textContent=`${identity.left} = ?`;
+    correctAnswer=identity.right;
+    optionValues=[identity.right,...distractors(identity.right,3)];
+  }else if(type==="reverse"){
+    badge.textContent="Completar en sentido inverso";
+    question.textContent=`? = ${identity.right}`;
+    correctAnswer=identity.left;
+    optionValues=[identity.left,...distractors(identity.left,3)];
+  }else if(type==="truefalse"){
+    badge.textContent="Verdadero o falso";
+    const isTrue=Math.random()>.5;
+    const right=isTrue?identity.right:randomItem(distractors(identity.right,1));
+    question.textContent=`${identity.left} = ${right}`;
+    correctAnswer=isTrue?"Verdadero":"Falso";
+    optionValues=["Verdadero","Falso"];
+  }else{
+    badge.textContent="Expresión equivalente";
+    question.textContent=`¿Qué expresión es equivalente a ${identity.left}?`;
+    correctAnswer=identity.right;
+    optionValues=[identity.right,...distractors(identity.right,3)];
+  }
+
+  [...new Set(optionValues)].sort(()=>Math.random()-.5).forEach(value=>{
+    const btn=document.createElement("button");
+    btn.className="option";
+    btn.textContent=value;
+    btn.onclick=()=>check(value,correctAnswer);
+    options.appendChild(btn);
+  });
+
+  hint.textContent=identity.hint;
+  solution.innerHTML=
+    `<h4>Demostración</h4>`+
+    identity.proof.map((s,i)=>`<div class="step">${i+1}. ${s}</div>`).join("");
+}
+
+function distractors(correctValue,count){
+  const pool=[
+    "1","sen²(x)","cos²(x)","tan²(x)","sec²(x)","csc²(x)",
+    "sen(x)/cos(x)","cos(x)/sen(x)","1/sen(x)","1/cos(x)",
+    "tan(x)","cot(x)","sen(x)","cos(x)","sec(x)","csc(x)",
+    "1 − tan²(x)","1 + sen²(x)","1 − cos²(x)"
+  ].filter(x=>x!==correctValue);
+
+  return pool.sort(()=>Math.random()-.5).slice(0,count);
+}
+
+function check(value,correctAnswer){
+  attempts++;
+  const feedback=document.getElementById("feedback");
+
+  if(value===correctAnswer){
+    correct++;
+    feedback.className="feedback ok";
+    feedback.textContent="Correcto. La identidad ha sido reconocida adecuadamente.";
+  }else{
+    feedback.className="feedback bad";
+    feedback.textContent=`Incorrecto. La respuesta correcta es: ${correctAnswer}.`;
+  }
+
+  document.getElementById("score").textContent=`Aciertos: ${correct} · Intentos: ${attempts}`;
+  document.getElementById("progressBar").style.width=
+    `${attempts===0?0:(100*correct/attempts)}%`;
+}
+
+document.getElementById("newBtn").onclick=()=>createExercise();
+document.getElementById("randomIdentityBtn").onclick=()=>{
+  const identity=randomItem(filtered());
+  featured.textContent=identity.full;
+};
+document.getElementById("hintBtn").onclick=()=>{
+  document.getElementById("hint").style.display="block";
+};
+document.getElementById("solutionBtn").onclick=()=>{
+  document.getElementById("solution").classList.toggle("show");
+};
+familySelect.onchange=()=>{
+  renderReference();
+  const list=filtered();
+  if(list.length){
+    featured.textContent=list[0].full;
+    createExercise(list[0]);
+  }
+};
+difficultySelect.onchange=()=>createExercise();
+
+renderReference();
+featured.textContent="1 + tan²(x) = sec²(x)";
+createExercise(identities[1]);
+</script>
+</body>
+</html>

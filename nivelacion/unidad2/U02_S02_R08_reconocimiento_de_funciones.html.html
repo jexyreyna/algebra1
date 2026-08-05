@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>¿Un conjunto de pares ordenados es una función?</title>
+
+<style>
+:root{
+  --bg1:#07111f;
+  --bg2:#121a34;
+  --card:rgba(255,255,255,.085);
+  --line:rgba(255,255,255,.14);
+  --text:#f8fafc;
+  --muted:#cbd5e1;
+  --cyan:#22d3ee;
+  --violet:#8b5cf6;
+  --green:#34d399;
+  --red:#fb7185;
+  --yellow:#fbbf24;
+  --input:rgba(7,17,31,.78);
+  --shadow:0 25px 70px rgba(0,0,0,.38);
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  min-height:100vh;
+  color:var(--text);
+  font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+  background:
+    radial-gradient(circle at 12% 18%,rgba(34,211,238,.18),transparent 28%),
+    radial-gradient(circle at 86% 10%,rgba(139,92,246,.22),transparent 30%),
+    linear-gradient(135deg,var(--bg1),var(--bg2));
+  padding:30px 16px;
+}
+
+.app{width:min(1200px,100%);margin:auto}
+
+header{text-align:center;margin-bottom:26px}
+
+.badge{
+  display:inline-flex;
+  padding:8px 14px;
+  border-radius:999px;
+  border:1px solid rgba(34,211,238,.28);
+  background:rgba(34,211,238,.09);
+  color:#a5f3fc;
+  font-size:.85rem;
+  font-weight:800;
+}
+
+h1{
+  margin:15px 0 8px;
+  font-size:clamp(2rem,5vw,3.5rem);
+  letter-spacing:-.045em;
+  line-height:1.05;
+}
+
+.subtitle{
+  max-width:850px;
+  margin:auto;
+  color:var(--muted);
+  line-height:1.65;
+}
+
+.layout{
+  display:grid;
+  grid-template-columns:minmax(360px,.92fr) minmax(430px,1.08fr);
+  gap:22px;
+  align-items:start;
+}
+
+.card{
+  border:1px solid var(--line);
+  background:var(--card);
+  backdrop-filter:blur(18px);
+  box-shadow:var(--shadow);
+  border-radius:24px;
+  overflow:hidden;
+}
+
+.content{padding:24px}
+
+.title{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin:0 0 20px;
+  font-size:1.12rem;
+}
+
+.icon{
+  width:40px;
+  height:40px;
+  display:grid;
+  place-items:center;
+  border-radius:13px;
+  background:linear-gradient(135deg,var(--cyan),var(--violet));
+  font-weight:900;
+}
+
+.relation-preview{
+  margin-bottom:18px;
+  padding:17px 12px;
+  border-radius:17px;
+  border:1px solid rgba(255,255,255,.1);
+  background:rgba(7,17,31,.52);
+  text-align:center;
+  font-family:"Cambria Math","Times New Roman",serif;
+  font-size:clamp(1.1rem,3.5vw,1.5rem);
+  line-height:1.55;
+  overflow-wrap:anywhere;
+}
+
+.pairs{
+  display:grid;
+  gap:10px;
+}
+
+.pair-row{
+  display:grid;
+  grid-template-columns:34px 1fr 1fr 44px;
+  gap:9px;
+  align-items:end;
+  padding:11px;
+  border-radius:15px;
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.08);
+}
+
+.pair-number{
+  width:30px;
+  height:30px;
+  display:grid;
+  place-items:center;
+  border-radius:10px;
+  background:linear-gradient(135deg,var(--cyan),var(--violet));
+  font-size:.8rem;
+  font-weight:900;
+  margin-bottom:9px;
+}
+
+.field label{
+  display:block;
+  margin-bottom:6px;
+  color:var(--muted);
+  font-size:.8rem;
+  font-weight:750;
+}
+
+input{
+  width:100%;
+  min-height:44px;
+  padding:9px 10px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.14);
+  outline:none;
+  background:var(--input);
+  color:var(--text);
+  font-size:1rem;
+  text-align:center;
+}
+
+input:focus{
+  border-color:var(--cyan);
+  box-shadow:0 0 0 4px rgba(34,211,238,.12);
+}
+
+.remove-btn{
+  min-height:44px;
+  width:44px;
+  padding:0;
+  background:rgba(244,63,94,.13);
+  border:1px solid rgba(251,113,133,.2);
+  color:#fecdd3;
+}
+
+.actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:11px;
+  margin-top:16px;
+}
+
+button{
+  min-height:48px;
+  border:0;
+  border-radius:13px;
+  cursor:pointer;
+  color:white;
+  font-size:.93rem;
+  font-weight:850;
+  transition:.18s;
+}
+
+button:hover{
+  transform:translateY(-2px);
+  filter:brightness(1.08);
+}
+
+.primary{background:linear-gradient(135deg,var(--cyan),var(--violet))}
+
+.secondary{
+  background:rgba(255,255,255,.1);
+  border:1px solid rgba(255,255,255,.12);
+}
+
+.examples{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:15px;
+}
+
+.chip{
+  min-height:35px;
+  padding:7px 11px;
+  border-radius:999px;
+  background:rgba(139,92,246,.1);
+  border:1px solid rgba(167,139,250,.2);
+  color:#ddd6fe;
+  font-size:.79rem;
+}
+
+.rule{
+  margin-top:17px;
+  padding:14px;
+  border-radius:14px;
+  color:#fde68a;
+  background:rgba(251,191,36,.08);
+  border:1px solid rgba(251,191,36,.2);
+  line-height:1.55;
+  font-size:.86rem;
+}
+
+.graph{
+  width:100%;
+  aspect-ratio:1.35;
+  min-height:330px;
+  margin-bottom:18px;
+  border-radius:18px;
+  overflow:hidden;
+  background:#f8fafc;
+}
+
+canvas{
+  width:100%;
+  height:100%;
+  display:block;
+}
+
+.message{
+  display:none;
+  margin-bottom:14px;
+  padding:13px;
+  border-radius:13px;
+  line-height:1.5;
+}
+
+.message.error{
+  display:block;
+  color:#fecdd3;
+  background:rgba(244,63,94,.12);
+  border:1px solid rgba(251,113,133,.25);
+}
+
+.status{
+  display:inline-flex;
+  padding:8px 12px;
+  margin-bottom:15px;
+  border-radius:999px;
+  font-size:.84rem;
+  font-weight:850;
+}
+
+.status.yes{
+  color:#a7f3d0;
+  background:rgba(16,185,129,.12);
+  border:1px solid rgba(52,211,153,.24);
+}
+
+.status.no{
+  color:#fecdd3;
+  background:rgba(244,63,94,.12);
+  border:1px solid rgba(251,113,133,.25);
+}
+
+.result-box{
+  padding:20px;
+  border-radius:18px;
+  background:linear-gradient(135deg,rgba(34,211,238,.1),rgba(139,92,246,.1));
+  border:1px solid rgba(125,211,252,.16);
+}
+
+.result-title{
+  margin-bottom:9px;
+  color:var(--muted);
+  font-size:.82rem;
+  font-weight:850;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+}
+
+.answer{
+  padding:15px;
+  border-radius:14px;
+  background:rgba(7,17,31,.52);
+  text-align:center;
+  font-size:clamp(1.15rem,3.5vw,1.55rem);
+  font-weight:850;
+}
+
+.steps{
+  margin-top:18px;
+}
+
+.steps h3{
+  margin:0 0 12px;
+  font-size:1rem;
+}
+
+.step{
+  position:relative;
+  padding:14px 14px 14px 48px;
+  border-radius:15px;
+  background:rgba(7,17,31,.38);
+  border:1px solid rgba(255,255,255,.08);
+}
+
+.step+.step{margin-top:10px}
+
+.step-number{
+  position:absolute;
+  top:13px;
+  left:13px;
+  width:25px;
+  height:25px;
+  display:grid;
+  place-items:center;
+  border-radius:9px;
+  background:linear-gradient(135deg,var(--cyan),var(--violet));
+  font-size:.78rem;
+  font-weight:900;
+}
+
+.step-title{
+  margin-bottom:5px;
+  color:#e0f2fe;
+  font-weight:800;
+}
+
+.math{
+  font-family:"Cambria Math","Times New Roman",serif;
+  line-height:1.65;
+  overflow-wrap:anywhere;
+}
+
+.practice{
+  margin-top:22px;
+  padding:21px;
+  border:1px solid var(--line);
+  border-radius:22px;
+  background:var(--card);
+  box-shadow:var(--shadow);
+}
+
+.practice h2{margin:0 0 8px}
+
+.practice p{
+  color:var(--muted);
+  line-height:1.5;
+}
+
+.practice-relation{
+  margin:14px 0;
+  padding:17px;
+  border-radius:15px;
+  background:rgba(7,17,31,.48);
+  text-align:center;
+  font-family:"Cambria Math","Times New Roman",serif;
+  font-size:1.3rem;
+}
+
+.practice-options{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.option{
+  background:rgba(255,255,255,.09);
+  border:1px solid rgba(255,255,255,.12);
+}
+
+.feedback{
+  display:none;
+  margin-top:12px;
+  padding:12px;
+  border-radius:12px;
+}
+
+.feedback.ok{
+  display:block;
+  color:#a7f3d0;
+  background:rgba(16,185,129,.12);
+  border:1px solid rgba(52,211,153,.24);
+}
+
+.feedback.bad{
+  display:block;
+  color:#fecdd3;
+  background:rgba(244,63,94,.12);
+  border:1px solid rgba(251,113,133,.25);
+}
+
+.score{
+  margin-top:13px;
+  text-align:center;
+  color:var(--muted);
+  font-size:.87rem;
+}
+
+.note{
+  margin-top:17px;
+  text-align:center;
+  color:#94a3b8;
+  font-size:.8rem;
+}
+
+@media(max-width:920px){
+  .layout{grid-template-columns:1fr}
+}
+
+@media(max-width:580px){
+  body{padding:18px 10px}
+  .content{padding:18px}
+  .pair-row{grid-template-columns:30px 1fr 1fr 40px}
+  .actions,.practice-options{grid-template-columns:1fr}
+  .graph{min-height:290px}
+}
+</style>
+</head>
+
+<body>
+<main class="app">
+
+<header>
+  <div class="badge">Relaciones y funciones</div>
+  <h1>¿Es una función?</h1>
+  <p class="subtitle">
+    Ingresa un conjunto de pares ordenados, represéntalo en el plano cartesiano
+    y determina si cada elemento del dominio posee una única imagen.
+  </p>
+</header>
+
+<section class="layout">
+
+<article class="card">
+<div class="content">
+  <h2 class="title"><span class="icon">ƒ</span> Pares ordenados</h2>
+
+  <div class="relation-preview" id="relationPreview">
+    f = {(1,2), (2,3), (3,4)}
+  </div>
+
+  <div class="pairs" id="pairsContainer"></div>
+
+  <div class="actions">
+    <button class="secondary" id="addPairBtn">Agregar par</button>
+    <button class="primary" id="checkBtn">Verificar relación</button>
+  </div>
+
+  <div class="examples">
+    <button class="chip" data-example="function">Ejemplo función</button>
+    <button class="chip" data-example="notFunction">No es función</button>
+    <button class="chip" data-example="sameOutput">Misma imagen</button>
+    <button class="chip" data-example="negative">Coordenadas negativas</button>
+  </div>
+
+  <div class="rule">
+    Una relación es función cuando ningún primer componente \(x\) aparece asociado
+    con dos valores diferentes de \(y\). Varios valores de \(x\) sí pueden tener
+    la misma imagen.
+  </div>
+</div>
+</article>
+
+<article class="card">
+<div class="content">
+  <h2 class="title"><span class="icon">✓</span> Gráfica y clasificación</h2>
+
+  <div class="graph">
+    <canvas id="graph"></canvas>
+  </div>
+
+  <div id="errorMessage" class="message"></div>
+  <div id="resultArea"></div>
+</div>
+</article>
+
+</section>
+
+<section class="practice">
+  <h2>Modo de práctica</h2>
+  <p>Decide si el siguiente conjunto de pares ordenados representa una función.</p>
+
+  <div class="practice-relation" id="practiceRelation"></div>
+
+  <div class="practice-options">
+    <button class="option" data-answer="yes">Sí es función</button>
+    <button class="option" data-answer="no">No es función</button>
+  </div>
+
+  <div id="feedback" class="feedback"></div>
+
+  <button class="primary" id="newPracticeBtn" style="width:100%;margin-top:12px">
+    Nuevo ejercicio
+  </button>
+
+  <div class="score" id="score">Aciertos: 0 · Intentos: 0</div>
+</section>
+
+<p class="note">
+  En la gráfica, la prueba de la recta vertical equivale a verificar que no haya
+  dos puntos con la misma coordenada \(x\) y distintas coordenadas \(y\).
+</p>
+
+</main>
+
+<script>
+const pairsContainer=document.getElementById("pairsContainer");
+const relationPreview=document.getElementById("relationPreview");
+const resultArea=document.getElementById("resultArea");
+const errorMessage=document.getElementById("errorMessage");
+const canvas=document.getElementById("graph");
+const ctx=canvas.getContext("2d");
+
+let pairId=0;
+let currentPractice=null;
+let attempts=0;
+let correct=0;
+
+function addPair(x="",y=""){
+  pairId++;
+  const row=document.createElement("div");
+  row.className="pair-row";
+  row.dataset.id=pairId;
+
+  row.innerHTML=`
+    <div class="pair-number">${pairsContainer.children.length+1}</div>
+
+    <div class="field">
+      <label>Primera componente x</label>
+      <input class="x-input" type="number" step="any" value="${x}">
+    </div>
+
+    <div class="field">
+      <label>Segunda componente y</label>
+      <input class="y-input" type="number" step="any" value="${y}">
+    </div>
+
+    <button class="remove-btn" title="Eliminar par">×</button>
+  `;
+
+  row.querySelectorAll("input").forEach(input=>{
+    input.addEventListener("input",()=>{
+      updatePreview();
+      drawGraph();
+    });
+
+    input.addEventListener("keydown",event=>{
+      if(event.key==="Enter")checkRelation();
+    });
+  });
+
+  row.querySelector(".remove-btn").addEventListener("click",()=>{
+    if(pairsContainer.children.length<=1)return;
+    row.remove();
+    renumberPairs();
+    updatePreview();
+    checkRelation();
+  });
+
+  pairsContainer.appendChild(row);
+  renumberPairs();
+  updatePreview();
+}
+
+function renumberPairs(){
+  [...pairsContainer.children].forEach((row,index)=>{
+    row.querySelector(".pair-number").textContent=index+1;
+  });
+}
+
+function getPairs(){
+  const rows=[...pairsContainer.querySelectorAll(".pair-row")];
+  const pairs=[];
+
+  for(const row of rows){
+    const xText=row.querySelector(".x-input").value.trim();
+    const yText=row.querySelector(".y-input").value.trim();
+
+    if(xText===""||yText===""){
+      throw new Error("Completa las dos coordenadas de cada par ordenado.");
+    }
+
+    const x=Number(xText);
+    const y=Number(yText);
+
+    if(!Number.isFinite(x)||!Number.isFinite(y)){
+      throw new Error("Todas las coordenadas deben ser números reales válidos.");
+    }
+
+    pairs.push([x,y]);
+  }
+
+  if(pairs.length===0){
+    throw new Error("Debes ingresar al menos un par ordenado.");
+  }
+
+  return pairs;
+}
+
+function formatNumber(n){
+  return String(n).replace("-","−");
+}
+
+function relationText(pairs){
+  return `f = {${pairs.map(([x,y])=>`(${formatNumber(x)},${formatNumber(y)})`).join(", ")}}`;
+}
+
+function updatePreview(){
+  try{
+    relationPreview.textContent=relationText(getPairs());
+  }catch{
+    relationPreview.textContent="f = {(x₁,y₁), (x₂,y₂), …}";
+  }
+}
+
+function analyzeFunction(pairs){
+  const map=new Map();
+  const conflicts=[];
+
+  pairs.forEach(([x,y])=>{
+    if(!map.has(x)){
+      map.set(x,new Set());
+    }
+    map.get(x).add(y);
+  });
+
+  for(const [x,ys] of map.entries()){
+    if(ys.size>1){
+      conflicts.push({
+        x,
+        values:[...ys]
+      });
+    }
+  }
+
+  return{
+    isFunction:conflicts.length===0,
+    domain:[...map.keys()],
+    conflicts
+  };
+}
+
+function uniqueValues(values){
+  return [...new Set(values)];
+}
+
+function checkRelation(){
+  errorMessage.className="message";
+  errorMessage.textContent="";
+
+  try{
+    const pairs=getPairs();
+    const analysis=analyzeFunction(pairs);
+    const range=uniqueValues(pairs.map(pair=>pair[1]));
+
+    let conflictText="";
+
+    if(analysis.isFunction){
+      conflictText=
+        "Cada valor de x aparece asociado con una sola imagen. " +
+        "No importa que dos valores distintos de x compartan el mismo valor de y.";
+    }else{
+      conflictText=analysis.conflicts.map(c=>
+        `El valor x=${formatNumber(c.x)} está asociado con ${c.values.map(formatNumber).join(" y ")}.`
+      ).join(" ");
+    }
+
+    resultArea.innerHTML=`
+      <div class="status ${analysis.isFunction?"yes":"no"}">
+        ● ${analysis.isFunction?"Sí es una función":"No es una función"}
+      </div>
+
+      <div class="result-box">
+        <div class="result-title">Clasificación</div>
+        <div class="answer">
+          ${analysis.isFunction
+            ?"La relación asigna una única imagen a cada elemento del dominio."
+            :"Existe al menos un elemento del dominio con dos imágenes diferentes."}
+        </div>
+      </div>
+
+      <div class="steps">
+        <h3>Procedimiento</h3>
+
+        <div class="step">
+          <span class="step-number">1</span>
+          <div class="step-title">Identificar el dominio</div>
+          <div class="math">
+            Dom(f) = {${analysis.domain.map(formatNumber).join(", ")}}
+          </div>
+        </div>
+
+        <div class="step">
+          <span class="step-number">2</span>
+          <div class="step-title">Identificar las imágenes</div>
+          <div class="math">
+            Im(f) = {${range.map(formatNumber).join(", ")}}
+          </div>
+        </div>
+
+        <div class="step">
+          <span class="step-number">3</span>
+          <div class="step-title">Revisar los primeros componentes</div>
+          <div class="math">${conflictText}</div>
+        </div>
+
+        <div class="step">
+          <span class="step-number">4</span>
+          <div class="step-title">Aplicar la definición</div>
+          <div class="math">
+            ${analysis.isFunction
+              ?"Cada x tiene exactamente una imagen y."
+              :"Un mismo x tiene más de una imagen; por tanto, la relación no es función."}
+          </div>
+        </div>
+      </div>
+    `;
+
+    drawGraph();
+  }catch(error){
+    errorMessage.textContent=error.message;
+    errorMessage.className="message error";
+    resultArea.innerHTML="";
+    drawGraph();
+  }
+}
+
+function resizeCanvas(){
+  const rect=canvas.getBoundingClientRect();
+  const dpr=window.devicePixelRatio||1;
+  canvas.width=Math.round(rect.width*dpr);
+  canvas.height=Math.round(rect.height*dpr);
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  drawGraph();
+}
+
+function drawGraph(){
+  const rect=canvas.getBoundingClientRect();
+  const w=rect.width;
+  const h=rect.height;
+
+  ctx.clearRect(0,0,w,h);
+  ctx.fillStyle="#f8fafc";
+  ctx.fillRect(0,0,w,h);
+
+  let pairs;
+
+  try{
+    pairs=getPairs();
+  }catch{
+    pairs=[];
+  }
+
+  const coords=pairs.flat();
+  const maxAbs=Math.max(5,...coords.map(v=>Math.abs(v)));
+  const range=Math.ceil(maxAbs+1);
+  const scale=Math.min(w,h)/(2*range);
+  const ox=w/2;
+  const oy=h/2;
+
+  ctx.strokeStyle="#dbe4ef";
+  ctx.lineWidth=1;
+
+  for(let i=-range;i<=range;i++){
+    const x=ox+i*scale;
+    const y=oy-i*scale;
+
+    ctx.beginPath();
+    ctx.moveTo(x,0);
+    ctx.lineTo(x,h);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(0,y);
+    ctx.lineTo(w,y);
+    ctx.stroke();
+  }
+
+  ctx.strokeStyle="#334155";
+  ctx.lineWidth=1.7;
+
+  ctx.beginPath();
+  ctx.moveTo(0,oy);
+  ctx.lineTo(w,oy);
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.moveTo(ox,0);
+  ctx.lineTo(ox,h);
+  ctx.stroke();
+
+  ctx.fillStyle="#475569";
+  ctx.font="12px Inter, sans-serif";
+
+  for(let i=-range;i<=range;i++){
+    if(i!==0){
+      ctx.textAlign="center";
+      ctx.textBaseline="top";
+      ctx.fillText(i,ox+i*scale,oy+5);
+
+      ctx.textAlign="right";
+      ctx.textBaseline="middle";
+      ctx.fillText(i,ox-6,oy-i*scale);
+    }
+  }
+
+  const analysis=analyzeFunction(pairs);
+  const conflictXs=new Set(analysis.conflicts.map(c=>c.x));
+
+  pairs.forEach(([x,y],index)=>{
+    const px=ox+x*scale;
+    const py=oy-y*scale;
+
+    ctx.fillStyle=conflictXs.has(x)?"#e11d48":"#7c3aed";
+    ctx.beginPath();
+    ctx.arc(px,py,6,0,Math.PI*2);
+    ctx.fill();
+
+    ctx.fillStyle="#0f172a";
+    ctx.font="bold 12px Inter, sans-serif";
+    ctx.textAlign="left";
+    ctx.textBaseline="bottom";
+    ctx.fillText(`(${x}, ${y})`,px+8,py-7);
+  });
+
+  analysis.conflicts.forEach(conflict=>{
+    const px=ox+conflict.x*scale;
+
+    ctx.strokeStyle="rgba(225,29,72,.7)";
+    ctx.setLineDash([6,5]);
+    ctx.lineWidth=2;
+
+    ctx.beginPath();
+    ctx.moveTo(px,0);
+    ctx.lineTo(px,h);
+    ctx.stroke();
+
+    ctx.setLineDash([]);
+  });
+}
+
+function loadExample(name){
+  const examples={
+    function:[[1,2],[2,3],[3,4]],
+    notFunction:[[1,2],[1,5],[3,4]],
+    sameOutput:[[1,2],[2,2],[3,2]],
+    negative:[[-3,1],[-1,4],[2,-2],[4,3]]
+  };
+
+  pairsContainer.innerHTML="";
+  examples[name].forEach(([x,y])=>addPair(x,y));
+  checkRelation();
+}
+
+function generatePractice(){
+  const shouldBeFunction=Math.random()>.5;
+  const count=3+Math.floor(Math.random()*3);
+  const pairs=[];
+  const usedX=[];
+
+  for(let i=0;i<count;i++){
+    let x;
+
+    do{
+      x=Math.floor(Math.random()*9)-4;
+    }while(usedX.includes(x));
+
+    usedX.push(x);
+    const y=Math.floor(Math.random()*9)-4;
+    pairs.push([x,y]);
+  }
+
+  if(!shouldBeFunction){
+    const index=Math.floor(Math.random()*pairs.length);
+    const x=pairs[index][0];
+    let newY=pairs[index][1];
+
+    while(newY===pairs[index][1]){
+      newY=Math.floor(Math.random()*9)-4;
+    }
+
+    pairs.push([x,newY]);
+  }
+
+  currentPractice={
+    pairs,
+    answer:shouldBeFunction?"yes":"no"
+  };
+
+  document.getElementById("practiceRelation").textContent=relationText(pairs);
+
+  const feedback=document.getElementById("feedback");
+  feedback.className="feedback";
+  feedback.textContent="";
+}
+
+function checkPractice(answer){
+  attempts++;
+  const feedback=document.getElementById("feedback");
+
+  if(answer===currentPractice.answer){
+    correct++;
+    feedback.className="feedback ok";
+    feedback.textContent="Correcto. Has aplicado adecuadamente la definición de función.";
+  }else{
+    const analysis=analyzeFunction(currentPractice.pairs);
+    feedback.className="feedback bad";
+
+    feedback.textContent=analysis.isFunction
+      ?"Incorrecto. Ningún primer componente aparece con dos imágenes distintas."
+      :`Incorrecto. El valor x=${analysis.conflicts[0].x} tiene más de una imagen.`;
+  }
+
+  document.getElementById("score").textContent=
+    `Aciertos: ${correct} · Intentos: ${attempts}`;
+}
+
+document.getElementById("addPairBtn").addEventListener("click",()=>{
+  addPair();
+});
+
+document.getElementById("checkBtn").addEventListener("click",checkRelation);
+
+document.querySelectorAll(".chip").forEach(chip=>{
+  chip.addEventListener("click",()=>{
+    loadExample(chip.dataset.example);
+  });
+});
+
+document.querySelectorAll(".option").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    checkPractice(btn.dataset.answer);
+  });
+});
+
+document.getElementById("newPracticeBtn").addEventListener("click",generatePractice);
+window.addEventListener("resize",resizeCanvas);
+
+addPair(1,2);
+addPair(2,3);
+addPair(3,4);
+
+requestAnimationFrame(()=>{
+  resizeCanvas();
+  checkRelation();
+  generatePractice();
+});
+</script>
+</body>
+</html>

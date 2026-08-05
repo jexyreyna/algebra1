@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Laboratorio de Ecuaciones Exponenciales — USIL</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  /* =========================================================
+     TOKENS DE DISENO — Paleta y tipografia originales
+     ========================================================= */
+  :root{
+    --navy:#0F2A66;
+    --navy-deep:#081B47;
+    --navy-soft:#E7ECF7;
+    --bg:#F3F5FA;
+    --panel:#FFFFFF;
+    --line:#E1E6F0;
+    --ink:#1B2540;
+    --ink-soft:#5D6580;
+    --gold:#C99A3C;
+    --gold-soft:#F7EED9;
+    --green:#1F8A5F;
+    --green-soft:#E4F3EC;
+    --red:#C0392B;
+    --red-soft:#FBE7E4;
+    --blue:#2563EB;
+    --blue-soft:#DBEAFE;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter', sans-serif;
+    min-height:100vh;
+  }
+
+  /* =========================================================
+     BARRA SUPERIOR
+     ========================================================= */
+  .band{
+    background:linear-gradient(120deg, var(--navy-deep), var(--navy) 70%);
+    padding:20px 22px;
+    display:flex; align-items:center; gap:16px;
+  }
+  .band .logo{
+    width:52px; height:52px; border-radius:10px; flex-shrink:0;
+    object-fit:cover;
+    background:var(--navy-deep);
+  }
+  .band .word{ color:#fff; }
+  .band .word .inst{
+    font-family:'JetBrains Mono', monospace; font-size:11.5px; letter-spacing:.16em;
+    text-transform:uppercase; color:var(--gold); font-weight:700; margin-bottom:3px;
+  }
+  .band .word .name{
+    font-family:'Fraunces', serif; font-weight:600; font-size:19px; letter-spacing:.01em;
+  }
+
+  /* =========================================================
+     CONTENEDOR PRINCIPAL
+     ========================================================= */
+  .wrap{max-width:1160px; margin:0 auto; padding:26px 20px 60px;}
+
+  header{margin-bottom:20px;}
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--navy); font-weight:700; margin-bottom:10px;
+  }
+  h1{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:clamp(26px, 4vw, 38px);
+    margin:0 0 8px;
+    line-height:1.15;
+    letter-spacing:-.01em;
+    color:var(--navy-deep);
+  }
+  .sub{color:var(--ink-soft); font-size:14.5px; max-width:700px; line-height:1.55;}
+
+  /* =========================================================
+     DIALOGO DEL ENUNCIADO
+     ========================================================= */
+  .dialogue{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:24px;
+    margin:22px 0 26px;
+  }
+  .dialogue .tag{
+    font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:.12em;
+    text-transform:uppercase; color:var(--gold); font-weight:700; margin-bottom:14px;
+  }
+  .chat{
+    display:flex; flex-direction:column; gap:14px;
+  }
+  .msg{
+    display:flex; gap:12px; align-items:flex-start;
+    max-width:90%;
+  }
+  .msg.me{ align-self:flex-end; flex-direction:row-reverse; }
+  .msg .avatar{
+    width:36px; height:36px; border-radius:50%; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Fraunces', serif; font-weight:700; font-size:14px; color:#fff;
+  }
+  .msg .bubble{
+    background:var(--navy-soft); border-radius:12px; padding:12px 16px;
+    font-size:14px; line-height:1.6; color:var(--ink);
+  }
+  .msg.me .bubble{ background:var(--gold-soft); }
+  .msg .who{
+    font-size:11px; font-weight:700; color:var(--navy); margin-bottom:2px;
+    font-family:'JetBrains Mono', monospace; text-transform:uppercase; letter-spacing:.08em;
+  }
+  .msg.me .who{ color:var(--gold); }
+  .question-box{
+    margin-top:18px; padding-top:18px; border-top:1px dashed var(--line);
+    text-align:center;
+  }
+  .question-box .q{
+    font-family:'Fraunces', serif; font-weight:600; font-size:20px;
+    color:var(--navy-deep);
+  }
+
+  /* =========================================================
+     LAYOUT PRINCIPAL
+     ========================================================= */
+  .layout{display:grid; grid-template-columns:280px 1fr; gap:20px; align-items:start;}
+  @media (max-width:900px){ .layout{grid-template-columns:1fr;} }
+
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:20px;
+  }
+  .panel h2{
+    font-family:'Fraunces', serif;
+    font-size:16.5px; font-weight:600;
+    margin:0 0 4px; color:var(--navy-deep);
+  }
+  .panel .h2-sub{font-size:12px; color:var(--ink-soft); margin-bottom:16px;}
+
+  .field{margin-bottom:16px;}
+  .field label{
+    display:flex; justify-content:space-between; align-items:baseline;
+    font-size:13px; color:var(--ink-soft); margin-bottom:6px;
+  }
+  .field label .val{
+    font-family:'JetBrains Mono', monospace; font-weight:700; color:var(--navy); font-size:14px;
+  }
+  .field input[type=range]{ width:100%; accent-color:var(--navy); height:4px; cursor:pointer; }
+
+  .reset-btn, .action-btn{
+    width:100%; margin-top:6px; padding:11px 12px; border-radius:9px;
+    border:1px solid var(--line); background:var(--navy-soft); color:var(--navy-deep);
+    font-weight:600; font-size:13px; cursor:pointer; font-family:'Inter',sans-serif;
+    transition:background .15s;
+  }
+  .reset-btn:hover, .action-btn:hover{background:#DBE3F4;}
+  .action-btn.primary{
+    background:var(--navy); color:#fff; border-color:var(--navy);
+  }
+  .action-btn.primary:hover{background:var(--navy-deep);}
+  .action-btn:disabled{
+    opacity:.5; cursor:not-allowed;
+  }
+
+  /* =========================================================
+     TABLA DE PATRONES
+     ========================================================= */
+  .pattern-table{
+    width:100%; border-collapse:collapse; margin:14px 0;
+    font-size:14px;
+  }
+  .pattern-table th, .pattern-table td{
+    border:1px solid var(--line); padding:10px 14px; text-align:center;
+  }
+  .pattern-table th{
+    background:var(--navy-soft); font-family:'JetBrains Mono', monospace;
+    font-size:12px; text-transform:uppercase; letter-spacing:.08em;
+    color:var(--navy); font-weight:700;
+  }
+  .pattern-table td{
+    background:var(--panel); color:var(--ink);
+    font-family:'JetBrains Mono', monospace; font-weight:600;
+  }
+  .pattern-table tr.highlight td{
+    background:var(--gold-soft); color:var(--navy-deep);
+  }
+
+  /* =========================================================
+     LINEA DE TIEMPO
+     ========================================================= */
+  .timeline{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:8px; margin:18px 0; padding:16px; background:var(--panel);
+    border:1px solid var(--line); border-radius:14px;
+    overflow-x:auto;
+  }
+  .t-node{
+    display:flex; flex-direction:column; align-items:center; gap:6px;
+    min-width:56px;
+  }
+  .t-node .dot{
+    width:36px; height:36px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'JetBrains Mono', monospace; font-weight:700; font-size:13px;
+    background:var(--navy-soft); color:var(--navy); border:2px solid var(--line);
+    transition:all .3s ease;
+  }
+  .t-node.active .dot{
+    background:var(--navy); color:#fff; border-color:var(--navy);
+    transform:scale(1.1);
+  }
+  .t-node.unknown .dot{
+    background:var(--gold-soft); color:var(--gold); border-color:var(--gold);
+    animation:pulse 1.5s infinite;
+  }
+  .t-node.solved .dot{
+    background:var(--green); color:#fff; border-color:var(--green);
+    transform:scale(1.15);
+  }
+  @keyframes pulse{
+    0%,100%{transform:scale(1);}
+    50%{transform:scale(1.15);}
+  }
+  .t-node .label{
+    font-size:11px; color:var(--ink-soft); font-weight:600;
+    font-family:'JetBrains Mono', monospace;
+  }
+  .t-connector{
+    flex:1; height:2px; background:var(--line); min-width:20px;
+    position:relative;
+  }
+  .t-connector::after{
+    content:''; position:absolute; right:-4px; top:-3px;
+    width:0; height:0; border-top:4px solid transparent;
+    border-bottom:4px solid transparent; border-left:6px solid var(--line);
+  }
+
+  /* =========================================================
+     BARRAS DE CRECIMIENTO
+     ========================================================= */
+  .growth-bars{
+    display:flex; align-items:flex-end; gap:10px;
+    height:180px; padding:16px; background:var(--panel);
+    border:1px solid var(--line); border-radius:14px;
+    margin:14px 0;
+  }
+  .g-bar{
+    flex:1; display:flex; flex-direction:column; align-items:center; gap:6px;
+    min-width:40px;
+  }
+  .g-bar .bar{
+    width:100%; max-width:60px;
+    background:linear-gradient(180deg, var(--navy), var(--navy-deep));
+    border-radius:6px 6px 0 0;
+    transition:height .6s cubic-bezier(.34,1.56,.64,1);
+    position:relative;
+  }
+  .g-bar .bar::after{
+    content:attr(data-val);
+    position:absolute; top:-20px; left:50%; transform:translateX(-50%);
+    font-family:'JetBrains Mono', monospace; font-size:11px; font-weight:700;
+    color:var(--navy); white-space:nowrap;
+  }
+  .g-bar .week{
+    font-size:12px; color:var(--ink-soft); font-weight:600;
+    font-family:'JetBrains Mono', monospace;
+  }
+  .g-bar.unknown .bar{
+    background:linear-gradient(180deg, var(--gold), #E9CE8E);
+  }
+  .g-bar.unknown .week{ color:var(--gold); font-weight:700; }
+
+  /* =========================================================
+     PASOS DE RESOLUCION
+     ========================================================= */
+  .step-section{
+    margin-top:20px;
+  }
+  .step-nav{
+    display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px;
+  }
+  .step-pill{
+    padding:8px 14px; border-radius:20px; border:1px solid var(--line);
+    background:var(--panel); font-size:12px; font-weight:600;
+    color:var(--ink-soft); cursor:pointer; transition:all .2s;
+    font-family:'Inter', sans-serif;
+  }
+  .step-pill:hover{ background:var(--navy-soft); }
+  .step-pill.active{
+    background:var(--navy); color:#fff; border-color:var(--navy);
+  }
+  .step-pill.locked{
+    opacity:.4; cursor:not-allowed;
+  }
+  .step-card{
+    background:var(--panel); border:1px solid var(--line); border-radius:14px;
+    padding:20px 22px; display:none;
+  }
+  .step-card.visible{ display:block; animation:fadeIn .4s ease; }
+  @keyframes fadeIn{ from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);} }
+  .step-card .st-title{
+    font-family:'Fraunces', serif; font-weight:600; font-size:17px;
+    color:var(--navy-deep); margin-bottom:10px;
+  }
+  .step-card .st-desc{
+    font-size:14px; color:var(--ink-soft); line-height:1.65; margin-bottom:14px;
+  }
+  .step-card .st-formula{
+    background:var(--navy-soft); border-radius:10px; padding:16px;
+    font-size:15px; overflow-x:auto; margin-bottom:14px;
+  }
+  .step-card .st-question{
+    font-size:14px; font-weight:600; color:var(--navy); margin-bottom:10px;
+  }
+  .step-card .choices{
+    display:flex; flex-direction:column; gap:8px;
+  }
+  .choice{
+    padding:12px 16px; border-radius:10px; border:1px solid var(--line);
+    background:var(--bg); cursor:pointer; font-size:14px;
+    transition:all .2s; display:flex; align-items:center; gap:10px;
+  }
+  .choice:hover{ background:var(--navy-soft); border-color:var(--navy); }
+  .choice.correct{
+    background:var(--green-soft); border-color:var(--green); color:var(--green);
+  }
+  .choice.wrong{
+    background:var(--red-soft); border-color:var(--red); color:var(--red);
+  }
+  .choice .check{
+    width:20px; height:20px; border-radius:50%; border:2px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+    font-size:11px; font-weight:700; flex-shrink:0;
+  }
+  .choice.correct .check{ border-color:var(--green); background:var(--green); color:#fff; }
+  .choice.wrong .check{ border-color:var(--red); background:var(--red); color:#fff; }
+
+  /* =========================================================
+     VEREDICTO / RESPUESTA
+     ========================================================= */
+  .verdict{
+    margin-top:18px;
+    border-radius:14px;
+    padding:22px 24px;
+    border:1px solid var(--green);
+    background:linear-gradient(135deg, var(--green-soft), var(--panel));
+    display:none;
+  }
+  .verdict.visible{ display:block; animation:fadeIn .5s ease; }
+  .verdict .title{
+    font-family:'JetBrains Mono', monospace; font-size:11.5px; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--green); font-weight:700; margin-bottom:10px;
+  }
+  .verdict .big{
+    font-family:'Fraunces', serif; font-weight:600; font-size:clamp(19px,3vw,25px);
+    color:var(--navy-deep); line-height:1.3;
+  }
+  .verdict .note{font-size:13px; color:var(--ink-soft); margin-top:8px; line-height:1.55;}
+
+  /* =========================================================
+     ERRORES COMUNES
+     ========================================================= */
+  .errors{
+    background:var(--panel); border:1px solid var(--line); border-radius:14px;
+    padding:20px; margin-top:20px;
+  }
+  .errors .tag{
+    font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:.12em;
+    text-transform:uppercase; color:var(--red); font-weight:700; margin-bottom:14px;
+  }
+  .err-item{
+    display:grid; grid-template-columns:28px 1fr; gap:12px; align-items:start;
+    margin-bottom:14px; padding-bottom:14px; border-bottom:1px dashed var(--line);
+  }
+  .err-item:last-child{ margin-bottom:0; padding-bottom:0; border-bottom:none; }
+  .err-item .icon{
+    width:24px; height:24px; border-radius:50%; background:var(--red-soft);
+    display:flex; align-items:center; justify-content:center;
+    font-size:13px; color:var(--red); font-weight:700;
+  }
+  .err-item .err-formula{
+    font-family:'JetBrains Mono', monospace; font-size:14px; color:var(--red);
+    margin-bottom:4px;
+  }
+  .err-item .err-why{
+    font-size:13px; color:var(--ink-soft); line-height:1.55;
+  }
+
+  /* =========================================================
+     TEORIA (COLAPSABLE)
+     ========================================================= */
+  .theory-wrap{ margin-top:20px; }
+  .theory-toggle{
+    display:flex; align-items:center; gap:10px;
+    padding:14px 18px; border-radius:10px;
+    background:var(--panel); border:1px solid var(--line);
+    cursor:pointer; font-size:14px; font-weight:600; color:var(--navy);
+    transition:background .2s;
+  }
+  .theory-toggle:hover{ background:var(--navy-soft); }
+  .theory-toggle .arrow{
+    margin-left:auto; transition:transform .3s; font-size:12px;
+  }
+  .theory-toggle.open .arrow{ transform:rotate(180deg); }
+  .theory-body{
+    display:none;
+    background:var(--panel); border:1px solid var(--line); border-top:none;
+    border-radius:0 0 14px 14px; padding:18px 20px;
+  }
+  .theory-body.visible{ display:block; animation:fadeIn .3s ease; }
+  .theory-body .box{
+    background:var(--navy-soft); border-radius:10px; padding:14px 16px; margin-top:8px;
+    font-size:14px;
+  }
+  .theory-body p{font-size:13.5px; color:var(--ink-soft); line-height:1.6; margin:6px 0;}
+
+  /* =========================================================
+     VERIFICACION
+     ========================================================= */
+  .verify{
+    background:var(--green-soft); border:1px solid var(--green);
+    border-radius:14px; padding:18px 20px; margin-top:16px;
+    display:none;
+  }
+  .verify.visible{ display:block; animation:fadeIn .5s ease; }
+  .verify .tag{
+    font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:.12em;
+    text-transform:uppercase; color:var(--green); font-weight:700; margin-bottom:10px;
+  }
+  .verify-row{
+    display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+    font-family:'JetBrains Mono', monospace; font-size:15px; color:var(--navy-deep);
+  }
+  .verify-row .eq{ color:var(--ink-soft); }
+  .verify-row .result{ font-weight:700; }
+  .verify-row .ok{
+    width:28px; height:28px; border-radius:50%; background:var(--green);
+    display:flex; align-items:center; justify-content:center;
+    color:#fff; font-size:14px; font-weight:700;
+  }
+
+  /* =========================================================
+     SECCIONES OCULTAS / TRANSICIONES
+     ========================================================= */
+  .reveal{
+    display:none;
+  }
+  .reveal.visible{
+    display:block; animation:fadeIn .5s ease;
+  }
+
+  footer{text-align:center; color:var(--ink-soft); font-size:12px; margin-top:30px;}
+
+  /* Scrollbar elegante */
+  ::-webkit-scrollbar{width:8px; height:8px;}
+  ::-webkit-scrollbar-track{background:var(--bg);}
+  ::-webkit-scrollbar-thumb{background:var(--line); border-radius:4px;}
+  ::-webkit-scrollbar-thumb:hover{background:#C5CCE0;}
+</style>
+<base target="_blank">
+</head>
+<body>
+
+<!-- ========================================================= -->
+<!-- BARRA SUPERIOR                                              -->
+<!-- ========================================================= -->
+<div class="band"></div>
+</div>
+
+<!-- ========================================================= -->
+<!-- CONTENEDOR PRINCIPAL                                        -->
+<!-- ========================================================= -->
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">El mundial de futbol &middot; venta de entradas</div>
+    <h1>Cuantas semanas se necesitan?</h1>
+    <div class="sub">En este laboratorio descubriras por que el crecimiento de las ventas se modela con una ecuacion exponencial. No memorizaras: construiras el modelo con tus propias manos.</div>
+  </header>
+
+  <!-- ======================================================= -->
+  <!-- DIALOGO DEL ENUNCIADO                                   -->
+  <!-- ======================================================= -->
+  <div class="dialogue">
+    <div class="tag">Conversacion en la sala del comite</div>
+    <div class="chat">
+      <div class="msg">
+        <div class="avatar" style="background:var(--navy);">G</div>
+        <div class="bubble">
+          <div class="who">Gerente de boleteria</div>
+          "La primera semana vendimos <strong id="d-v0">2 000</strong> entradas."
+        </div>
+      </div>
+      <div class="msg me">
+        <div class="avatar" style="background:var(--gold);">A</div>
+        <div class="bubble">
+          <div class="who">Analista de datos</div>
+          "Cada semana la venta se multiplica por <strong id="d-b">2</strong>. El crecimiento es exponencial."
+        </div>
+      </div>
+      <div class="msg">
+        <div class="avatar" style="background:var(--green);">D</div>
+        <div class="bubble">
+          <div class="who">Director del torneo</div>
+          "Necesitamos llegar a <strong id="d-M">128 000</strong> entradas vendidas en una sola semana."
+        </div>
+      </div>
+    </div>
+    <div class="question-box">
+      <div class="q">En que semana <em>x</em> se alcanzara esa meta?</div>
+    </div>
+  </div>
+
+  <!-- ======================================================= -->
+  <!-- LAYOUT: Panel izquierdo + Area de experimentacion         -->
+  <!-- ======================================================= -->
+  <div class="layout">
+
+    <!-- Panel izquierdo: Datos conocidos -->
+    <div>
+      <div class="panel">
+        <h2>Datos conocidos</h2>
+        <div class="h2-sub">Ajusta los valores para experimentar con distintos escenarios</div>
+
+        <div class="field">
+          <label>Venta inicial (semana 1) <span class="val" id="val-v0">2 000</span></label>
+          <input type="range" id="v0" min="500" max="5000" step="500" value="2000">
+        </div>
+        <div class="field">
+          <label>Factor de crecimiento semanal <span class="val" id="val-b">x2</span></label>
+          <input type="range" id="bSel" min="2" max="5" step="1" value="2">
+        </div>
+        <div class="field">
+          <label>Meta de entradas <span class="val" id="val-M">128 000</span></label>
+          <input type="range" id="MSel" min="3" max="8" step="1" value="7">
+        </div>
+
+        <button class="reset-btn" id="resetBtn">Restaurar escenario original</button>
+      </div>
+
+      <div class="theory-wrap">
+        <div class="theory-toggle" id="theoryToggle">
+          <span>&#128218;</span> Quieres recordar la teoria?
+          <span class="arrow">&#9660;</span>
+        </div>
+        <div class="theory-body" id="theoryBody">
+          <p>Ecuacion exponencial elemental: si <b>b</b> es real positivo y distinto de 1, la ecuacion <b>b<sup>x</sup> = a</b> se llama ecuacion exponencial elemental.</p>
+          <div class="box">Si $b^x = b^n$, entonces $x = n$</div>
+          <p style="margin-top:10px;">Este metodo de "igualar bases" solo aplica cuando ambos lados de la ecuacion pueden escribirse como potencias de la misma base.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Area derecha: Experiencia de laboratorio -->
+    <div>
+
+      <!-- PASO 0: Descubrir el patron -->
+      <div class="panel" id="discoverPanel">
+        <h2>&#128269; Paso 0: Observa el comportamiento</h2>
+        <div class="h2-sub">Antes de escribir una ecuacion, mira que sucede semana a semana</div>
+
+        <!-- Tabla de patrones -->
+        <table class="pattern-table" id="patternTable">
+          <thead>
+            <tr><th>Semana</th><th>Entradas vendidas</th><th>Operacion</th></tr>
+          </thead>
+          <tbody id="patternBody"></tbody>
+        </table>
+
+        <!-- Barras de crecimiento -->
+        <div class="growth-bars" id="growthBars"></div>
+
+        <!-- Linea de tiempo -->
+        <div class="timeline" id="timeline"></div>
+
+        <!-- Pregunta de descubrimiento -->
+        <div id="discoveryQuestion" style="margin-top:14px;">
+          <div class="st-question">Que patron observas en la tabla y en las barras?</div>
+          <div class="choices" id="discoveryChoices"></div>
+        </div>
+      </div>
+
+      <!-- PASO 1-6: Resolucion guiada -->
+      <div class="step-section reveal" id="solverSection">
+        <div class="step-nav" id="stepNav"></div>
+        <div id="stepCards"></div>
+      </div>
+
+      <!-- Veredicto final -->
+      <div class="verdict" id="verdict">
+        <div class="title">Respuesta</div>
+        <div class="big" id="verdictText"></div>
+        <div class="note" id="verdictNote"></div>
+      </div>
+
+      <!-- Verificacion -->
+      <div class="verify" id="verifyBox">
+        <div class="tag">Verificacion</div>
+        <div class="verify-row" id="verifyRow"></div>
+      </div>
+
+      <!-- Errores comunes -->
+      <div class="errors reveal" id="errorsBox">
+        <div class="tag">&#9888; Errores comunes que debes evitar</div>
+        <div id="errorsList"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <footer>El metodo de "igualar bases" solo aplica cuando ambos lados de la ecuacion pueden escribirse como potencias de la misma base.</footer>
+</div>
+
+<!-- ========================================================= -->
+<!-- JAVASCRIPT                                                -->
+<!-- ========================================================= -->
+<script>
+/* =============================================================
+   UTILIDADES
+   ============================================================= */
+function fmtInt(x){ return Math.round(x).toLocaleString('es-PE'); }
+function K(el, tex, display){
+  display = display !== false;
+  if(!el) return;
+  try{ katex.render(tex, el, {throwOnError:false, displayMode:display}); }
+  catch(e){ el.textContent = tex; }
+}
+
+/* =============================================================
+   ESTADO GLOBAL
+   ============================================================= */
+var state = {
+  v0: 2000,
+  b: 2,
+  x: 6,
+  M: 128000,
+  discovered: false,
+  currentStep: 0,
+  maxUnlocked: 0
+};
+
+/* =============================================================
+   REFERENCIAS DOM
+   ============================================================= */
+var els = {
+  v0: document.getElementById('v0'),
+  bSel: document.getElementById('bSel'),
+  MSel: document.getElementById('MSel'),
+  valV0: document.getElementById('val-v0'),
+  valB: document.getElementById('val-b'),
+  valM: document.getElementById('val-M'),
+  dV0: document.getElementById('d-v0'),
+  dB: document.getElementById('d-b'),
+  dM: document.getElementById('d-M'),
+  patternBody: document.getElementById('patternBody'),
+  growthBars: document.getElementById('growthBars'),
+  timeline: document.getElementById('timeline'),
+  discoveryChoices: document.getElementById('discoveryChoices'),
+  solverSection: document.getElementById('solverSection'),
+  stepNav: document.getElementById('stepNav'),
+  stepCards: document.getElementById('stepCards'),
+  verdict: document.getElementById('verdict'),
+  verdictText: document.getElementById('verdictText'),
+  verdictNote: document.getElementById('verdictNote'),
+  verifyBox: document.getElementById('verifyBox'),
+  verifyRow: document.getElementById('verifyRow'),
+  errorsBox: document.getElementById('errorsBox'),
+  errorsList: document.getElementById('errorsList'),
+  theoryToggle: document.getElementById('theoryToggle'),
+  theoryBody: document.getElementById('theoryBody')
+};
+
+/* =============================================================
+   CALCULO DE LA META
+   La meta se deriva para que SIEMPRE sea potencia exacta de b.
+   El slider de "Meta" controla el exponente x (3-8).
+   ============================================================= */
+function computeMeta(){
+  state.v0 = parseInt(els.v0.value);
+  state.b  = parseInt(els.bSel.value);
+  state.x  = parseInt(els.MSel.value);
+  state.M  = state.v0 * Math.pow(state.b, state.x);
+}
+
+/* =============================================================
+   RENDERIZADO DE DATOS CONOCIDOS
+   ============================================================= */
+function renderKnowns(){
+  els.valV0.textContent = fmtInt(state.v0);
+  els.valB.textContent  = 'x' + state.b;
+  els.valM.textContent  = fmtInt(state.M);
+  els.dV0.textContent   = fmtInt(state.v0);
+  els.dB.textContent    = state.b;
+  els.dM.textContent    = fmtInt(state.M);
+}
+
+/* =============================================================
+   TABLA DE PATRONES
+   ============================================================= */
+function renderPatternTable(){
+  var tbody = els.patternBody;
+  tbody.innerHTML = '';
+  for(var i=1; i<=state.x; i++){
+    var val = state.v0 * Math.pow(state.b, i-1);
+    var tr = document.createElement('tr');
+    if(i === state.x) tr.classList.add('highlight');
+    tr.innerHTML = '<td>' + i + '</td><td>' + fmtInt(val) + '</td><td>' + fmtInt(state.v0) + ' x ' + state.b + '<sup>' + (i-1) + '</sup></td>';
+    tbody.appendChild(tr);
+  }
+}
+
+/* =============================================================
+   BARRAS DE CRECIMIENTO
+   ============================================================= */
+function renderGrowthBars(){
+  var box = els.growthBars;
+  box.innerHTML = '';
+  var maxVal = state.M;
+  for(var i=1; i<=state.x; i++){
+    var val = state.v0 * Math.pow(state.b, i-1);
+    var pct = (val / maxVal) * 100;
+    var bar = document.createElement('div');
+    bar.className = 'g-bar' + (i===state.x ? ' unknown' : '');
+    bar.innerHTML = '<div class="bar" data-val="' + fmtInt(val) + '" style="height:0%"></div><div class="week">' + (i===state.x ? '?' : i) + '</div>';
+    box.appendChild(bar);
+    (function(b, p){ setTimeout(function(){ b.querySelector('.bar').style.height = Math.max(p, 4) + '%'; }, i*80); })(bar, pct);
+  }
+}
+
+/* =============================================================
+   LINEA DE TIEMPO
+   ============================================================= */
+function renderTimeline(){
+  var box = els.timeline;
+  box.innerHTML = '';
+  for(var i=1; i<=state.x; i++){
+    var node = document.createElement('div');
+    node.className = 't-node' + (i===state.x ? ' unknown' : ' active');
+    node.innerHTML = '<div class="dot">' + (i===state.x ? '?' : i) + '</div><div class="label">' + (i===state.x ? 'Meta' : 'Sem ' + i) + '</div>';
+    box.appendChild(node);
+    if(i < state.x){
+      var conn = document.createElement('div');
+      conn.className = 't-connector';
+      box.appendChild(conn);
+    }
+  }
+}
+
+/* =============================================================
+   PREGUNTA DE DESCUBRIMIENTO
+   ============================================================= */
+function renderDiscoveryQuestion(){
+  var box = els.discoveryChoices;
+  box.innerHTML = '';
+  var choices = [
+    { text: "Las ventas aumentan una cantidad fija cada semana (crecimiento lineal).", correct: false },
+    { text: "Las ventas se multiplican por el mismo factor cada semana (crecimiento exponencial).", correct: true },
+    { text: "Las ventas se dividen entre dos cada semana (decrecimiento).", correct: false }
+  ];
+  choices.forEach(function(c){
+    var btn = document.createElement('div');
+    btn.className = 'choice';
+    btn.innerHTML = '<div class="check"></div><span>' + c.text + '</span>';
+    btn.addEventListener('click', function(){
+      Array.from(box.children).forEach(function(ch){
+        ch.classList.remove('correct','wrong');
+        ch.querySelector('.check').textContent = '';
+      });
+      if(c.correct){
+        btn.classList.add('correct');
+        btn.querySelector('.check').textContent = '\u2713';
+        if(!state.discovered){
+          state.discovered = true;
+          setTimeout(function(){
+            els.solverSection.classList.add('visible');
+            renderStepNav();
+            renderStepCard(0);
+            renderErrors();
+            els.errorsBox.classList.add('visible');
+            window.scrollTo({top: els.solverSection.offsetTop - 20, behavior:'smooth'});
+          }, 400);
+        }
+      } else {
+        btn.classList.add('wrong');
+        btn.querySelector('.check').textContent = '\u2715';
+      }
+    });
+    box.appendChild(btn);
+  });
+}
+
+/* =============================================================
+   PASOS DE RESOLUCION
+   ============================================================= */
+var stepsData = [
+  {
+    title: "Paso 1: Definir la variable",
+    desc: "Llamamos $x$ a la cantidad de semanas transcurridas desde la primera venta. Queremos saber en que semana la venta alcanza la meta.",
+    formula: function(s){ return "\\text{Sea } x = \\text{numero de semanas}"; },
+    interactive: false
+  },
+  {
+    title: "Paso 2: Construir el modelo",
+    desc: "Como cada semana la venta se multiplica por el factor de crecimiento, despues de $x$ semanas la venta sera la inicial multiplicada por el factor elevado a $x$. Cual es el modelo correcto?",
+    formula: function(s){ return ""; },
+    interactive: true,
+    choices: function(s){
+      return [
+        { tex: fmtInt(s.v0) + " + " + s.b + "x = " + fmtInt(s.M), correct: false, why: "Esto representa un crecimiento lineal, no exponencial." },
+        { tex: fmtInt(s.v0) + " \\cdot " + s.b + "^{x} = " + fmtInt(s.M), correct: true, why: "Correcto! La venta inicial se multiplica por el factor $b$ elevado al numero de semanas." },
+        { tex: fmtInt(s.v0) + " \\cdot x^{" + s.b + "} = " + fmtInt(s.M), correct: false, why: "Aqui la variable esta en la base, no en el exponente." }
+      ];
+    }
+  },
+  {
+    title: "Paso 3: Despejar la potencia",
+    desc: "Dividimos ambos lados entre la venta inicial para aislar la potencia con la incognita.",
+    formula: function(s){ return s.b + "^{x} = \\dfrac{" + fmtInt(s.M) + "}{" + fmtInt(s.v0) + "} = " + fmtInt(s.M/s.v0); },
+    interactive: false
+  },
+  {
+    title: "Paso 4: Expresar como potencia de la misma base",
+    desc: "Escribimos " + fmtInt(state.M/state.v0) + " como una potencia de base " + state.b + ". Observa: cada semana multiplicamos por " + state.b + ", asi que despues de $x$ semanas hemos multiplicado $x$ veces.",
+    formula: function(s){ return s.b + "^{x} = " + s.b + "^{" + s.x + "}"; },
+    interactive: false
+  },
+  {
+    title: "Paso 5: Igualar exponentes",
+    desc: "Como las bases son iguales y la base es positiva y distinta de 1, los exponentes deben ser iguales. Esta es la propiedad fundamental de las ecuaciones exponenciales.",
+    formula: function(s){ return "x = " + s.x; },
+    interactive: false
+  },
+  {
+    title: "Paso 6: Interpretar la respuesta",
+    desc: "El valor de $x$ nos indica la semana en la que se alcanza la meta. No olvides verificar!",
+    formula: function(s){ return "\\text{Semana } \\boxed{" + s.x + "}"; },
+    interactive: false,
+    onShow: function(){ showVerdict(); }
+  }
+];
+
+function renderStepNav(){
+  els.stepNav.innerHTML = '';
+  stepsData.forEach(function(st, idx){
+    var pill = document.createElement('button');
+    pill.className = 'step-pill' + (idx===state.currentStep ? ' active' : '') + (idx>state.maxUnlocked ? ' locked' : '');
+    pill.textContent = (idx+1);
+    pill.disabled = idx > state.maxUnlocked;
+    pill.addEventListener('click', function(){
+      if(idx <= state.maxUnlocked){
+        state.currentStep = idx;
+        renderStepNav();
+        renderStepCard(idx);
+      }
+    });
+    els.stepNav.appendChild(pill);
+  });
+}
+
+function renderStepCard(idx){
+  var box = els.stepCards;
+  box.innerHTML = '';
+  var st = stepsData[idx];
+  var card = document.createElement('div');
+  card.className = 'step-card visible';
+
+  var html = '<div class="st-title">' + st.title + '</div>' +
+             '<div class="st-desc">' + st.desc + '</div>';
+
+  var f = st.formula(state);
+  if(f){
+    html += '<div class="st-formula" id="step-formula"></div>';
+  }
+
+  if(st.interactive && st.choices){
+    html += '<div class="choices" id="step-choices"></div>';
+  }
+
+  if(idx < stepsData.length - 1){
+    html += '<button class="action-btn primary" id="step-next" style="margin-top:14px; width:auto; display:inline-block;">Continuar al paso ' + (idx+2) + ' &rarr;</button>';
+  }
+
+  card.innerHTML = html;
+  box.appendChild(card);
+
+  if(f){
+    K(document.getElementById('step-formula'), f, true);
+  }
+
+  if(st.interactive && st.choices){
+    var cBox = document.getElementById('step-choices');
+    st.choices(state).forEach(function(c){
+      var btn = document.createElement('div');
+      btn.className = 'choice';
+      var uid = 'c-' + Math.random().toString(36).slice(2);
+      btn.innerHTML = '<div class="check"></div><span id="' + uid + '"></span>';
+      cBox.appendChild(btn);
+      K(document.getElementById(uid), c.tex, false);
+      btn.addEventListener('click', function(){
+        Array.from(cBox.children).forEach(function(ch){
+          ch.classList.remove('correct','wrong');
+          ch.querySelector('.check').textContent = '';
+        });
+        if(c.correct){
+          btn.classList.add('correct');
+          btn.querySelector('.check').textContent = '\u2713';
+          if(state.maxUnlocked < idx + 1){
+            state.maxUnlocked = idx + 1;
+            renderStepNav();
+          }
+          var nextBtn = document.getElementById('step-next');
+          if(nextBtn) nextBtn.style.display = 'inline-block';
+        } else {
+          btn.classList.add('wrong');
+          btn.querySelector('.check').textContent = '\u2715';
+          var why = document.createElement('div');
+          why.style.cssText = "margin-top:8px; font-size:13px; color:var(--ink-soft); padding:10px; background:var(--red-soft); border-radius:8px; border:1px solid var(--red);";
+          why.textContent = c.why;
+          if(!btn.nextElementSibling || !btn.nextElementSibling.classList.contains('err-tip')){
+            why.className = 'err-tip';
+            btn.after(why);
+          }
+        }
+      });
+    });
+    var nextBtn = document.getElementById('step-next');
+    if(nextBtn) nextBtn.style.display = 'none';
+  }
+
+  var nextBtn = document.getElementById('step-next');
+  if(nextBtn){
+    nextBtn.addEventListener('click', function(){
+      state.currentStep = idx + 1;
+      if(state.currentStep > state.maxUnlocked) state.maxUnlocked = state.currentStep;
+      renderStepNav();
+      renderStepCard(state.currentStep);
+    });
+  }
+
+  if(st.onShow) st.onShow();
+}
+
+/* =============================================================
+   VEREDICTO FINAL
+   ============================================================= */
+function showVerdict(){
+  els.verdict.classList.add('visible');
+  els.verdictText.innerHTML = 'Vendiendo <strong>' + fmtInt(state.v0) + '</strong> entradas en la semana 1 y multiplicandose por <strong>' + state.b + '</strong> cada semana, la meta de <strong>' + fmtInt(state.M) + '</strong> entradas se alcanza en la <strong>semana ' + state.x + '</strong>.';
+  els.verdictNote.textContent = 'Se comprueba: ' + fmtInt(state.v0) + ' x ' + state.b + '^' + state.x + ' = ' + fmtInt(state.M);
+
+  els.verifyBox.classList.add('visible');
+  var pow = Math.pow(state.b, state.x);
+  els.verifyRow.innerHTML = '<span>' + fmtInt(state.v0) + ' x ' + state.b + '<sup>' + state.x + '</sup></span>' +
+    '<span class="eq">=</span>' +
+    '<span>' + fmtInt(state.v0) + ' x ' + fmtInt(pow) + '</span>' +
+    '<span class="eq">=</span>' +
+    '<span class="result">' + fmtInt(state.M) + '</span>' +
+    '<div class="ok">&#10003;</div>';
+
+  document.querySelectorAll('.t-node.unknown .dot').forEach(function(d){
+    d.textContent = state.x;
+    d.parentElement.classList.remove('unknown');
+    d.parentElement.classList.add('solved');
+  });
+  document.querySelectorAll('.g-bar.unknown .week').forEach(function(w){
+    w.textContent = state.x;
+    w.parentElement.classList.remove('unknown');
+  });
+}
+
+/* =============================================================
+   ERRORES COMUNES
+   ============================================================= */
+function renderErrors(){
+  els.errorsList.innerHTML = '';
+  var errors = [
+    {
+      formula: fmtInt(state.v0) + " + " + state.b + "x = " + fmtInt(state.M),
+      why: "Este modelo supone que cada semana se suma una cantidad fija (crecimiento lineal). Pero el enunciado dice que la venta se MULTIPLICA por un factor, no que se le suma."
+    },
+    {
+      formula: fmtInt(state.v0) + " \\cdot x = " + fmtInt(state.M),
+      why: "Aqui se asume que la venta inicial se multiplica por el numero de semanas. Eso seria proporcionalidad directa, no exponencial. La venta se multiplica por " + state.b + " cada semana, no por $x$."
+    },
+    {
+      formula: fmtInt(state.v0) + " \\cdot " + state.b + " \\cdot x = " + fmtInt(state.M),
+      why: "Esta expresion mezcla multiplicacion por el factor con multiplicacion por la semana. El crecimiento exponencial requiere que el factor este en el EXPONENTE, no multiplicando a $x$."
+    }
+  ];
+  errors.forEach(function(err){
+    var item = document.createElement('div');
+    item.className = 'err-item';
+    var uid = 'e-' + Math.random().toString(36).slice(2);
+    item.innerHTML = '<div class="icon">&#10005;</div><div><div class="err-formula" id="' + uid + '"></div><div class="err-why">' + err.why + '</div></div>';
+    els.errorsList.appendChild(item);
+    K(document.getElementById(uid), err.formula, false);
+  });
+}
+
+/* =============================================================
+   TEORIA COLAPSABLE
+   ============================================================= */
+els.theoryToggle.addEventListener('click', function(){
+  var open = els.theoryBody.classList.toggle('visible');
+  els.theoryToggle.classList.toggle('open', open);
+});
+
+/* =============================================================
+   RESET
+   ============================================================= */
+document.getElementById('resetBtn').addEventListener('click', function(){
+  els.v0.value = 2000;
+  els.bSel.value = 2;
+  els.MSel.value = 7;
+  state.discovered = false;
+  state.currentStep = 0;
+  state.maxUnlocked = 0;
+  els.solverSection.classList.remove('visible');
+  els.verdict.classList.remove('visible');
+  els.verifyBox.classList.remove('visible');
+  els.errorsBox.classList.remove('visible');
+  init();
+});
+
+/* =============================================================
+   INICIALIZACION
+   ============================================================= */
+function init(){
+  computeMeta();
+  renderKnowns();
+  renderPatternTable();
+  renderGrowthBars();
+  renderTimeline();
+  renderDiscoveryQuestion();
+}
+
+[els.v0, els.bSel, els.MSel].forEach(function(el){
+  el.addEventListener('input', function(){
+    computeMeta();
+    renderKnowns();
+    renderPatternTable();
+    renderGrowthBars();
+    renderTimeline();
+    if(state.discovered){
+      renderStepNav();
+      renderStepCard(state.currentStep);
+      renderErrors();
+    }
+  });
+});
+
+init();
+</script>
+</body>
+</html>

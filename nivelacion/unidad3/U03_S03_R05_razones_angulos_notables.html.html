@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Práctica de razones trigonométricas de ángulos notables</title>
+
+<style>
+:root{
+  --bg1:#07111f;
+  --bg2:#121a34;
+  --card:rgba(255,255,255,.085);
+  --line:rgba(255,255,255,.14);
+  --text:#f8fafc;
+  --muted:#cbd5e1;
+  --cyan:#22d3ee;
+  --violet:#8b5cf6;
+  --green:#34d399;
+  --red:#fb7185;
+  --yellow:#fbbf24;
+  --input:rgba(7,17,31,.78);
+  --shadow:0 25px 70px rgba(0,0,0,.38);
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  min-height:100vh;
+  color:var(--text);
+  font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+  background:
+    radial-gradient(circle at 12% 18%,rgba(34,211,238,.18),transparent 28%),
+    radial-gradient(circle at 86% 10%,rgba(139,92,246,.22),transparent 30%),
+    linear-gradient(135deg,var(--bg1),var(--bg2));
+  padding:30px 16px;
+}
+.app{width:min(1200px,100%);margin:auto}
+header{text-align:center;margin-bottom:26px}
+.badge{
+  display:inline-flex;
+  padding:8px 14px;
+  border-radius:999px;
+  border:1px solid rgba(34,211,238,.28);
+  background:rgba(34,211,238,.09);
+  color:#a5f3fc;
+  font-size:.85rem;
+  font-weight:800;
+}
+h1{
+  margin:15px 0 8px;
+  font-size:clamp(2rem,5vw,3.55rem);
+  letter-spacing:-.045em;
+  line-height:1.05;
+}
+.subtitle{
+  max-width:850px;
+  margin:auto;
+  color:var(--muted);
+  line-height:1.65;
+}
+.layout{
+  display:grid;
+  grid-template-columns:minmax(350px,.9fr) minmax(430px,1.1fr);
+  gap:22px;
+  align-items:start;
+}
+.card{
+  border:1px solid var(--line);
+  background:var(--card);
+  backdrop-filter:blur(18px);
+  box-shadow:var(--shadow);
+  border-radius:24px;
+  overflow:hidden;
+}
+.content{padding:24px}
+.title{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin:0 0 20px;
+  font-size:1.12rem;
+}
+.icon{
+  width:40px;
+  height:40px;
+  display:grid;
+  place-items:center;
+  border-radius:13px;
+  background:linear-gradient(135deg,var(--cyan),var(--violet));
+  font-weight:900;
+}
+.angle-grid{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:9px;
+}
+.angle-btn{
+  min-height:53px;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:14px;
+  background:rgba(255,255,255,.07);
+  color:var(--muted);
+  cursor:pointer;
+  font-weight:900;
+  font-size:1rem;
+  transition:.18s;
+}
+.angle-btn:hover{transform:translateY(-2px)}
+.angle-btn.active{
+  color:white;
+  background:linear-gradient(135deg,rgba(34,211,238,.25),rgba(139,92,246,.25));
+  border-color:rgba(125,211,252,.42);
+  box-shadow:0 0 0 3px rgba(34,211,238,.08);
+}
+.mode-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:16px;
+}
+.mode-btn{
+  min-height:45px;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:13px;
+  background:rgba(255,255,255,.07);
+  color:var(--muted);
+  cursor:pointer;
+  font-weight:850;
+}
+.mode-btn.active{
+  color:white;
+  background:linear-gradient(135deg,rgba(34,211,238,.2),rgba(139,92,246,.2));
+}
+.preview{
+  margin-top:18px;
+  padding:17px 12px;
+  border-radius:17px;
+  border:1px solid rgba(255,255,255,.1);
+  background:rgba(7,17,31,.52);
+  text-align:center;
+  font-family:"Cambria Math","Times New Roman",serif;
+  font-size:clamp(1.15rem,3.5vw,1.55rem);
+  line-height:1.65;
+}
+.actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:11px;
+  margin-top:17px;
+}
+button{
+  min-height:49px;
+  border:0;
+  border-radius:13px;
+  cursor:pointer;
+  color:white;
+  font-size:.94rem;
+  font-weight:850;
+  transition:.18s;
+}
+button:hover{transform:translateY(-2px);filter:brightness(1.08)}
+.primary{background:linear-gradient(135deg,var(--cyan),var(--violet))}
+.secondary{
+  background:rgba(255,255,255,.1);
+  border:1px solid rgba(255,255,255,.12);
+}
+.memory{
+  margin-top:18px;
+  padding:17px;
+  border-radius:17px;
+  background:rgba(255,255,255,.055);
+  border:1px solid rgba(255,255,255,.09);
+}
+.memory h3{margin:0 0 10px;font-size:.98rem}
+.memory p{
+  margin:7px 0;
+  color:var(--muted);
+  line-height:1.55;
+  font-size:.88rem;
+}
+.diagram{
+  width:100%;
+  aspect-ratio:1.48;
+  min-height:320px;
+  margin-bottom:18px;
+  border-radius:18px;
+  overflow:hidden;
+  background:#f8fafc;
+}
+canvas{width:100%;height:100%;display:block}
+.status{
+  display:inline-flex;
+  padding:8px 12px;
+  margin-bottom:15px;
+  border-radius:999px;
+  color:#a7f3d0;
+  background:rgba(16,185,129,.12);
+  border:1px solid rgba(52,211,153,.24);
+  font-size:.84rem;
+  font-weight:850;
+}
+.ratios{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:11px;
+}
+.ratio{
+  padding:16px 10px;
+  border-radius:16px;
+  background:rgba(7,17,31,.48);
+  border:1px solid rgba(255,255,255,.08);
+  text-align:center;
+}
+.ratio-name{
+  color:#a5f3fc;
+  font-weight:900;
+  margin-bottom:7px;
+}
+.ratio-value{
+  font-family:"Cambria Math","Times New Roman",serif;
+  font-size:1.25rem;
+}
+.info-box{
+  margin-top:15px;
+  padding:14px;
+  border-radius:14px;
+  background:rgba(251,191,36,.08);
+  border:1px solid rgba(251,191,36,.2);
+  color:#fde68a;
+  line-height:1.55;
+  font-size:.86rem;
+}
+.quiz{
+  margin-top:20px;
+  padding:20px;
+  border-radius:19px;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.1);
+}
+.quiz h3{margin:0 0 8px}
+.quiz p{color:var(--muted);line-height:1.5}
+.question{
+  margin:13px 0;
+  padding:15px;
+  border-radius:14px;
+  background:rgba(7,17,31,.48);
+  font-family:"Cambria Math","Times New Roman",serif;
+  font-size:1.25rem;
+  text-align:center;
+}
+.quiz-options{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+.option{
+  background:rgba(255,255,255,.09);
+  border:1px solid rgba(255,255,255,.12);
+}
+.feedback{
+  display:none;
+  margin-top:12px;
+  padding:12px;
+  border-radius:12px;
+}
+.feedback.ok{
+  display:block;
+  color:#a7f3d0;
+  background:rgba(16,185,129,.12);
+  border:1px solid rgba(52,211,153,.24);
+}
+.feedback.bad{
+  display:block;
+  color:#fecdd3;
+  background:rgba(244,63,94,.12);
+  border:1px solid rgba(251,113,133,.25);
+}
+.score{
+  margin-top:13px;
+  color:var(--muted);
+  text-align:center;
+  font-size:.88rem;
+}
+.table-wrap{
+  margin-top:22px;
+  overflow-x:auto;
+  border-radius:20px;
+  border:1px solid var(--line);
+  box-shadow:var(--shadow);
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  background:rgba(7,17,31,.72);
+}
+th,td{
+  padding:14px 13px;
+  border-bottom:1px solid rgba(255,255,255,.08);
+  text-align:center;
+}
+th{background:rgba(255,255,255,.07);color:#a5f3fc}
+td{font-family:"Cambria Math","Times New Roman",serif}
+tr:last-child td{border-bottom:0}
+.note{
+  margin-top:16px;
+  text-align:center;
+  color:#94a3b8;
+  font-size:.8rem;
+  line-height:1.5;
+}
+@media(max-width:900px){
+  .layout{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+  body{padding:18px 10px}
+  .content{padding:18px}
+  .angle-grid{grid-template-columns:repeat(3,1fr)}
+  .ratios,.quiz-options{grid-template-columns:1fr}
+  .diagram{min-height:280px}
+}
+</style>
+</head>
+
+<body>
+<main class="app">
+<header>
+  <div class="badge">sen · cos · tan</div>
+  <h1>Ángulos agudos notables</h1>
+  <p class="subtitle">
+    Practica las razones trigonométricas de
+    <strong>30°, 45°, 60°, 37° y 53°</strong>.
+    Los tres primeros poseen valores exactos con radicales; 37° y 53° se trabajan
+    con la aproximación escolar del triángulo 3–4–5.
+  </p>
+</header>
+
+<section class="layout">
+<article class="card">
+<div class="content">
+  <h2 class="title"><span class="icon">θ</span> Selecciona un ángulo</h2>
+
+  <div class="angle-grid" id="angleGrid">
+    <button class="angle-btn active" data-angle="30">30°</button>
+    <button class="angle-btn" data-angle="45">45°</button>
+    <button class="angle-btn" data-angle="60">60°</button>
+    <button class="angle-btn" data-angle="37">37°</button>
+    <button class="angle-btn" data-angle="53">53°</button>
+  </div>
+
+  <div class="mode-row">
+    <button class="mode-btn active" id="studyModeBtn">Modo estudio</button>
+    <button class="mode-btn" id="hiddenModeBtn">Ocultar respuestas</button>
+  </div>
+
+  <div class="preview" id="preview"></div>
+
+  <div class="actions">
+    <button class="primary" id="newQuestionBtn">Nueva pregunta</button>
+    <button class="secondary" id="revealBtn">Mostrar valores</button>
+  </div>
+
+  <section class="memory">
+    <h3>Reglas de memoria</h3>
+    <p><strong>30°–60°–90°:</strong> lados opuestos \(1,\sqrt3,2\).</p>
+    <p><strong>45°–45°–90°:</strong> lados \(1,1,\sqrt2\).</p>
+    <p><strong>37°–53°:</strong> aproximación escolar mediante lados \(3,4,5\).</p>
+    <p><strong>Complementarios:</strong> \(\sen\theta=\cos(90^\circ-\theta)\).</p>
+  </section>
+</div>
+</article>
+
+<article class="card">
+<div class="content">
+  <h2 class="title"><span class="icon">✓</span> Triángulo y razones</h2>
+
+  <div class="diagram"><canvas id="triangle"></canvas></div>
+
+  <div id="answerPanel"></div>
+
+  <section class="quiz">
+    <h3>Práctica interactiva</h3>
+    <p>Selecciona el valor correcto de la razón indicada.</p>
+    <div class="question" id="question">sen 30° = ?</div>
+    <div class="quiz-options" id="quizOptions"></div>
+    <div class="feedback" id="feedback"></div>
+    <div class="score" id="score">Aciertos: 0 · Intentos: 0</div>
+  </section>
+</div>
+</article>
+</section>
+
+<section class="table-wrap">
+<table>
+<thead>
+<tr>
+  <th>Ángulo</th>
+  <th>sen</th>
+  <th>cos</th>
+  <th>tan</th>
+  <th>Modelo</th>
+</tr>
+</thead>
+<tbody>
+<tr><td>30°</td><td>1/2</td><td>√3/2</td><td>√3/3</td><td>Exacto</td></tr>
+<tr><td>45°</td><td>√2/2</td><td>√2/2</td><td>1</td><td>Exacto</td></tr>
+<tr><td>60°</td><td>√3/2</td><td>1/2</td><td>√3</td><td>Exacto</td></tr>
+<tr><td>37°</td><td>3/5</td><td>4/5</td><td>3/4</td><td>Aproximación 3–4–5</td></tr>
+<tr><td>53°</td><td>4/5</td><td>3/5</td><td>4/3</td><td>Aproximación 3–4–5</td></tr>
+</tbody>
+</table>
+</section>
+
+<p class="note">
+  Matemáticamente, \(37^\circ\) y \(53^\circ\) no tienen exactamente las razones
+  \(3/5,4/5,3/4\) y \(4/5,3/5,4/3\); son aproximaciones habituales porque
+  \(\arctan(3/4)\approx36.87^\circ\) y \(\arctan(4/3)\approx53.13^\circ\).
+</p>
+</main>
+
+<script>
+const data={
+  30:{
+    sin:"1/2",cos:"√3/2",tan:"√3/3",
+    sides:[Math.sqrt(3),1,2],
+    labels:["√3","1","2"],
+    exact:true
+  },
+  45:{
+    sin:"√2/2",cos:"√2/2",tan:"1",
+    sides:[1,1,Math.sqrt(2)],
+    labels:["1","1","√2"],
+    exact:true
+  },
+  60:{
+    sin:"√3/2",cos:"1/2",tan:"√3",
+    sides:[1,Math.sqrt(3),2],
+    labels:["1","√3","2"],
+    exact:true
+  },
+  37:{
+    sin:"3/5",cos:"4/5",tan:"3/4",
+    sides:[4,3,5],
+    labels:["4","3","5"],
+    exact:false
+  },
+  53:{
+    sin:"4/5",cos:"3/5",tan:"4/3",
+    sides:[3,4,5],
+    labels:["3","4","5"],
+    exact:false
+  }
+};
+
+let selectedAngle=30;
+let hidden=false;
+let currentQuestion=null;
+let attempts=0;
+let correct=0;
+
+const canvas=document.getElementById("triangle");
+const ctx=canvas.getContext("2d");
+const preview=document.getElementById("preview");
+const answerPanel=document.getElementById("answerPanel");
+
+function updateView(){
+  const d=data[selectedAngle];
+  preview.innerHTML=
+    `Ángulo θ = ${selectedAngle}°<br>`+
+    `cateto opuesto : cateto adyacente : hipotenusa = `+
+    `${d.labels[1]} : ${d.labels[0]} : ${d.labels[2]}`;
+
+  answerPanel.innerHTML=`
+    <div class="status">● ${d.exact?"Valores exactos":"Valores escolares aproximados"}</div>
+    <div class="ratios">
+      <div class="ratio">
+        <div class="ratio-name">sen ${selectedAngle}°</div>
+        <div class="ratio-value">${hidden?"?":d.sin}</div>
+      </div>
+      <div class="ratio">
+        <div class="ratio-name">cos ${selectedAngle}°</div>
+        <div class="ratio-value">${hidden?"?":d.cos}</div>
+      </div>
+      <div class="ratio">
+        <div class="ratio-name">tan ${selectedAngle}°</div>
+        <div class="ratio-value">${hidden?"?":d.tan}</div>
+      </div>
+    </div>
+    ${d.exact?"":`
+      <div class="info-box">
+        Para ${selectedAngle}° se utiliza la aproximación del triángulo 3–4–5.
+        El ángulo geométrico exacto del modelo es aproximadamente
+        ${selectedAngle===37?"36.87°":"53.13°"}.
+      </div>
+    `}
+  `;
+  drawTriangle();
+}
+
+function resizeCanvas(){
+  const rect=canvas.getBoundingClientRect();
+  const dpr=window.devicePixelRatio||1;
+  canvas.width=Math.round(rect.width*dpr);
+  canvas.height=Math.round(rect.height*dpr);
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  drawTriangle();
+}
+
+function drawTriangle(){
+  const rect=canvas.getBoundingClientRect();
+  const w=rect.width,h=rect.height;
+  ctx.clearRect(0,0,w,h);
+  ctx.fillStyle="#f8fafc";
+  ctx.fillRect(0,0,w,h);
+
+  const d=data[selectedAngle];
+  const adjacent=d.sides[0];
+  const opposite=d.sides[1];
+  const scale=Math.min((w-120)/adjacent,(h-100)/opposite);
+
+  const x0=58;
+  const y0=h-48;
+  const x1=x0+adjacent*scale;
+  const y1=y0;
+  const x2=x0;
+  const y2=y0-opposite*scale;
+
+  ctx.fillStyle="rgba(34,211,238,.12)";
+  ctx.beginPath();
+  ctx.moveTo(x0,y0);
+  ctx.lineTo(x1,y1);
+  ctx.lineTo(x2,y2);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.strokeStyle="#334155";
+  ctx.lineWidth=3;
+  ctx.beginPath();
+  ctx.moveTo(x0,y0);
+  ctx.lineTo(x1,y1);
+  ctx.lineTo(x2,y2);
+  ctx.closePath();
+  ctx.stroke();
+
+  ctx.strokeStyle="#7c3aed";
+  ctx.lineWidth=2;
+  ctx.strokeRect(x0,y0-17,17,17);
+
+  const acute=Math.atan2(opposite,adjacent);
+  ctx.strokeStyle="#0891b2";
+  ctx.lineWidth=2.5;
+  ctx.beginPath();
+  ctx.arc(x1,y1,25,Math.PI,Math.PI+acute);
+  ctx.stroke();
+
+  ctx.fillStyle="#0891b2";
+  ctx.font="bold 15px Inter, sans-serif";
+  ctx.textAlign="center";
+  ctx.fillText(`${selectedAngle}°`,x1-34,y1-18);
+
+  ctx.fillStyle="#0f172a";
+  ctx.font="bold 13px Inter, sans-serif";
+  ctx.fillText(`adyacente = ${d.labels[0]}`,(x0+x1)/2,y0+24);
+
+  ctx.save();
+  ctx.translate(x0-25,(y0+y2)/2);
+  ctx.rotate(-Math.PI/2);
+  ctx.fillText(`opuesto = ${d.labels[1]}`,0,0);
+  ctx.restore();
+
+  const mx=(x1+x2)/2;
+  const my=(y1+y2)/2;
+  ctx.save();
+  ctx.translate(mx+15,my-8);
+  ctx.rotate(Math.atan2(y2-y1,x2-x1));
+  ctx.fillText(`hipotenusa = ${d.labels[2]}`,0,0);
+  ctx.restore();
+}
+
+function buildQuestion(){
+  const angles=[30,45,60,37,53];
+  const functions=["sin","cos","tan"];
+  const angle=angles[Math.floor(Math.random()*angles.length)];
+  const fn=functions[Math.floor(Math.random()*functions.length)];
+  const correctValue=data[angle][fn];
+
+  const allValues=[
+    "1/2","√3/2","√3/3","√2/2","1","√3",
+    "3/5","4/5","3/4","4/3"
+  ];
+
+  const distractors=allValues
+    .filter(v=>v!==correctValue)
+    .sort(()=>Math.random()-.5)
+    .slice(0,3);
+
+  const options=[correctValue,...distractors].sort(()=>Math.random()-.5);
+  currentQuestion={angle,fn,correctValue};
+
+  const names={sin:"sen",cos:"cos",tan:"tan"};
+  document.getElementById("question").textContent=
+    `${names[fn]} ${angle}° = ?`;
+
+  const box=document.getElementById("quizOptions");
+  box.innerHTML="";
+  options.forEach(value=>{
+    const btn=document.createElement("button");
+    btn.className="option";
+    btn.textContent=value;
+    btn.addEventListener("click",()=>checkAnswer(value));
+    box.appendChild(btn);
+  });
+
+  const feedback=document.getElementById("feedback");
+  feedback.className="feedback";
+  feedback.textContent="";
+}
+
+function checkAnswer(value){
+  attempts++;
+  const feedback=document.getElementById("feedback");
+
+  if(value===currentQuestion.correctValue){
+    correct++;
+    feedback.className="feedback ok";
+    feedback.textContent="Correcto.";
+  }else{
+    feedback.className="feedback bad";
+    feedback.textContent=`Incorrecto. El valor correcto es ${currentQuestion.correctValue}.`;
+  }
+
+  document.getElementById("score").textContent=
+    `Aciertos: ${correct} · Intentos: ${attempts}`;
+}
+
+document.querySelectorAll(".angle-btn").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    document.querySelectorAll(".angle-btn").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    selectedAngle=Number(btn.dataset.angle);
+    updateView();
+  });
+});
+
+document.getElementById("studyModeBtn").addEventListener("click",()=>{
+  hidden=false;
+  document.getElementById("studyModeBtn").classList.add("active");
+  document.getElementById("hiddenModeBtn").classList.remove("active");
+  updateView();
+});
+
+document.getElementById("hiddenModeBtn").addEventListener("click",()=>{
+  hidden=true;
+  document.getElementById("hiddenModeBtn").classList.add("active");
+  document.getElementById("studyModeBtn").classList.remove("active");
+  updateView();
+});
+
+document.getElementById("revealBtn").addEventListener("click",()=>{
+  hidden=false;
+  document.getElementById("studyModeBtn").classList.add("active");
+  document.getElementById("hiddenModeBtn").classList.remove("active");
+  updateView();
+});
+
+document.getElementById("newQuestionBtn").addEventListener("click",buildQuestion);
+window.addEventListener("resize",resizeCanvas);
+
+requestAnimationFrame(()=>{
+  resizeCanvas();
+  updateView();
+  buildQuestion();
+});
+</script>
+</body>
+</html>

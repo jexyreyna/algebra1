@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hace N años: la edad del padre</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #14172B;
+    --panel: #1E2240;
+    --panel-2: #242952;
+    --border: #313866;
+    --text: #F2EFE6;
+    --text-dim: #A8ACC8;
+    --gold: #E8B84B;
+    --coral: #F0665C;
+    --teal: #5FC9B8;
+    --grid: #2A2F55;
+    --green: #6FCF97;
+    --red: #F0665C;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(circle at 15% 8%, #1c2145 0%, transparent 45%),
+      var(--bg);
+    color:var(--text);
+    font-family:'Inter', sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:36px 24px 64px;}
+
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12.5px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--gold);
+    margin-bottom:10px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .eyebrow::before{content:"";width:22px;height:1px;background:var(--gold);display:inline-block;}
+  h1{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:clamp(26px,4vw,40px);
+    line-height:1.1;
+    margin:0 0 14px;
+    letter-spacing:-.01em;
+  }
+  h1 em{color:var(--gold);font-style:italic;font-weight:500;}
+  .lede{
+    color:var(--text-dim);
+    font-size:15.5px;
+    line-height:1.6;
+    max-width:680px;
+    margin:0 0 28px;
+  }
+
+  .statement{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:20px 24px;
+    margin-bottom:32px;
+    font-size:15.5px;
+    line-height:1.6;
+  }
+  .statement b{color:var(--gold);}
+  .statement .teal-b{color:var(--teal);font-weight:600;}
+  .statement .coral-b{color:var(--coral);font-weight:600;}
+
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start;}
+  @media (max-width:920px){ .grid{grid-template-columns:1fr;} }
+
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:22px 24px 26px;
+  }
+  .panel h2{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:18px;
+    margin:0 0 4px;
+  }
+  .panel .sub{color:var(--text-dim);font-size:13px;margin:0 0 18px;}
+
+  .control-group{margin-bottom:20px;}
+  .control-group:last-child{margin-bottom:0;}
+  .control-title{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:var(--text-dim);
+    margin-bottom:10px;
+    display:flex;align-items:center;gap:8px;
+  }
+  .dot{width:9px;height:9px;border-radius:50%;display:inline-block;}
+  .dot.teal{background:var(--teal);}
+  .dot.coral{background:var(--coral);}
+  .dot.gold{background:var(--gold);}
+
+  .slider-row{
+    display:grid;
+    grid-template-columns:76px 1fr 58px;
+    align-items:center;
+    gap:10px;
+    margin-bottom:10px;
+  }
+  .slider-row label{
+    font-family:'JetBrains Mono',monospace;
+    font-size:13px;
+    font-weight:700;
+    color:var(--text);
+  }
+  input[type=range]{
+    -webkit-appearance:none;
+    width:100%;
+    height:4px;
+    border-radius:2px;
+    background:var(--grid);
+    outline:none;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    width:16px;height:16px;border-radius:50%;
+    background:var(--gold);
+    cursor:pointer;
+    border:2px solid #14172B;
+    box-shadow:0 0 0 1px var(--gold);
+  }
+  input[type=range]::-moz-range-thumb{
+    width:16px;height:16px;border-radius:50%;
+    background:var(--gold);cursor:pointer;border:2px solid #14172B;
+  }
+  .slider-val{
+    font-family:'JetBrains Mono',monospace;
+    font-size:13px;
+    text-align:right;
+    background:var(--panel-2);
+    border:1px solid var(--border);
+    border-radius:6px;
+    padding:4px 6px;
+    color:var(--text);
+  }
+
+  .btn{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12.5px;
+    letter-spacing:.03em;
+    background:var(--panel-2);
+    border:1px solid var(--border);
+    color:var(--text);
+    border-radius:8px;
+    padding:9px 14px;
+    cursor:pointer;
+    transition:border-color .15s, color .15s;
+  }
+  .btn:hover{border-color:var(--gold);color:var(--gold);}
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px;}
+
+  .warn-box{
+    background:rgba(240,102,92,.1);
+    border:1px solid var(--coral);
+    color:var(--coral);
+    border-radius:10px;
+    padding:12px 14px;
+    font-size:13.5px;
+    line-height:1.5;
+    margin-top:14px;
+  }
+
+  .step{
+    display:grid;
+    grid-template-columns:26px 1fr;
+    gap:12px;
+    padding:14px 0;
+    border-top:1px solid var(--border);
+  }
+  .step:first-of-type{border-top:none;padding-top:0;}
+  .step-num{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:17px;
+    color:var(--gold);
+    line-height:1.3;
+  }
+  .step-body h3{
+    margin:0 0 6px;
+    font-size:14px;
+    font-weight:600;
+    color:var(--text);
+  }
+  .step-body p{
+    margin:0 0 8px;
+    font-size:13.5px;
+    color:var(--text-dim);
+    line-height:1.55;
+  }
+  .eqline{
+    font-family:'JetBrains Mono',monospace;
+    font-size:14px;
+    background:var(--panel-2);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:8px 12px;
+    display:inline-block;
+    margin:2px 6px 2px 0;
+  }
+  .eqline.result{border-color:var(--gold);color:var(--gold);font-weight:700;}
+
+  /* options */
+  .option{
+    display:grid;
+    grid-template-columns:34px 1fr 70px;
+    align-items:center;
+    gap:12px;
+    padding:12px 14px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    margin-bottom:10px;
+    background:var(--panel-2);
+  }
+  .option-letter{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:18px;
+    color:var(--text-dim);
+    text-align:center;
+  }
+  .option-body .eq{
+    font-family:'JetBrains Mono',monospace;
+    font-size:14.5px;
+    font-weight:700;
+  }
+  .option-body .note{
+    font-size:12px;
+    color:var(--text-dim);
+    margin-top:3px;
+  }
+  .badge{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    font-weight:700;
+    text-align:center;
+    border-radius:6px;
+    padding:5px 8px;
+  }
+  .badge.ok{background:rgba(111,207,151,.15);color:var(--green);border:1px solid var(--green);}
+  .badge.no{background:rgba(240,102,92,.12);color:var(--red);border:1px solid var(--red);}
+  .option.is-ok{border-color:var(--green);}
+
+  .graph-panel{position:sticky;top:20px;}
+  svg{width:100%;height:auto;display:block;}
+  .legend{display:flex;gap:18px;flex-wrap:wrap;margin-top:14px;}
+  .legend-item{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--text-dim);font-family:'JetBrains Mono',monospace;}
+  .legend-swatch{width:16px;height:3px;border-radius:2px;}
+
+  footer{
+    margin-top:36px;
+    text-align:center;
+    color:var(--text-dim);
+    font-size:12px;
+    font-family:'JetBrains Mono',monospace;
+    letter-spacing:.04em;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow">Álgebra · Problemas de edades</div>
+  <h1>Traducir un problema de <em>edades</em> a una ecuación</h1>
+  <p class="lede">Cambia cuántos años atrás ocurrió el hecho, cuántas veces mayor era una edad, y las edades actuales, para ver cómo se arma la ecuación correcta y por qué las otras opciones fallan.</p>
+
+  <div class="statement" id="statement-text">
+    La edad actual de una persona es <span class="teal-b">x</span> años, y la edad de su padre es <span class="coral-b">y</span> años.
+    <br><b>Hace 5 años</b>, la edad del padre era <b>el triple</b> de la edad de la persona. ¿Qué ecuación describe esto?
+  </div>
+
+  <div class="grid">
+
+    <!-- LEFT: controls + steps -->
+    <div>
+      <div class="panel" style="margin-bottom:24px;">
+        <h2>Parámetros del problema</h2>
+        <p class="sub">Define hace cuántos años ocurrió, y cuántas veces era mayor la edad del padre.</p>
+
+        <div class="control-group">
+          <div class="control-title"><span class="dot gold"></span>Datos del enunciado</div>
+          <div class="slider-row">
+            <label>hace N años</label>
+            <input type="range" id="N" min="1" max="20" step="1" value="5">
+            <div class="slider-val" id="N-val">5</div>
+          </div>
+          <div class="slider-row">
+            <label>multiplicador k</label>
+            <input type="range" id="k" min="2" max="6" step="1" value="3">
+            <div class="slider-val" id="k-val">3</div>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <div class="control-title"><span class="dot teal"></span>Edad actual de la persona (x)</div>
+          <div class="slider-row">
+            <label>x hoy</label>
+            <input type="range" id="x" min="6" max="70" step="1" value="15">
+            <div class="slider-val" id="x-val">15</div>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <div class="control-title"><span class="dot coral"></span>Edad actual del padre (y)</div>
+          <div class="slider-row">
+            <label>y hoy</label>
+            <input type="range" id="y" min="6" max="120" step="1" value="35">
+            <div class="slider-val" id="y-val">35</div>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn" id="btn-generate">Generar ejemplo consistente</button>
+          <button class="btn" id="btn-shuffle">Mezclar orden de opciones</button>
+        </div>
+
+        <div id="warn-slot"></div>
+      </div>
+
+      <div class="panel">
+        <h2>Traducción paso a paso</h2>
+        <p class="sub">El razonamiento se recalcula en vivo con tus valores.</p>
+        <div id="steps"></div>
+      </div>
+    </div>
+
+    <!-- RIGHT: timeline + options -->
+    <div>
+      <div class="panel graph-panel" style="margin-bottom:24px;">
+        <h2>Línea de tiempo</h2>
+        <p class="sub">Compara "hace N años" con "hoy" para cada persona, y comprueba la relación de triple.</p>
+        <svg id="timeline" viewBox="0 0 560 380" xmlns="http://www.w3.org/2000/svg"></svg>
+        <div class="legend">
+          <div class="legend-item"><span class="legend-swatch" style="background:var(--teal);"></span>Persona</div>
+          <div class="legend-item"><span class="legend-swatch" style="background:var(--coral);"></span>Padre</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>¿Cuál ecuación es correcta?</h2>
+        <p class="sub">Cada opción se evalúa con tus edades actuales (x, y) para ver si se cumple.</p>
+        <div id="options"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>x = edad actual de la persona &nbsp;·&nbsp; y = edad actual del padre &nbsp;·&nbsp; "hace N años" resta N a ambas edades</footer>
+</div>
+
+<script>
+const state = { N:5, k:3, x:15, y:35 };
+let order = [0,1,2,3]; // indices into OPTION_DEFS
+
+['N','k','x','y'].forEach(id=>{
+  const el = document.getElementById(id);
+  el.addEventListener('input', ()=>{
+    state[id] = parseFloat(el.value);
+    document.getElementById(id+'-val').textContent = fmtNum(state[id]);
+    render();
+  });
+  document.getElementById(id+'-val').textContent = fmtNum(state[id]);
+});
+
+document.getElementById('btn-generate').addEventListener('click', ()=>{
+  const {N,k} = state;
+  const minX = N + 3;
+  if(state.x < minX){
+    state.x = minX;
+    document.getElementById('x').value = minX;
+    document.getElementById('x-val').textContent = fmtNum(minX);
+  }
+  const xHaceN = state.x - N;
+  const y = k*xHaceN + N;
+  state.y = Math.min(y, parseFloat(document.getElementById('y').max));
+  document.getElementById('y').value = state.y;
+  document.getElementById('y-val').textContent = fmtNum(state.y);
+  render();
+});
+
+document.getElementById('btn-shuffle').addEventListener('click', ()=>{
+  for(let i=order.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [order[i],order[j]] = [order[j],order[i]];
+  }
+  render();
+});
+
+function fmtNum(n){
+  n = Math.round(n*1000)/1000;
+  return n.toString();
+}
+
+// Option definitions: sign for y-term and sign for x-term. '-','-' is the algebraically correct one.
+const OPTION_DEFS = [
+  { sy:'+', sx:'+', note:'Suma N en vez de restar en ambas edades: trata "hace N años" como si fuera "dentro de N años".' },
+  { sy:'+', sx:'-', note:'Suma N en la edad del padre pero resta en la de la persona: inconsistente entre los dos lados.' },
+  { sy:'-', sx:'+', note:'Resta N en la edad del padre pero suma en la de la persona: inconsistente entre los dos lados.' },
+  { sy:'-', sx:'-', note:'Resta N a ambas edades: así se traduce correctamente "hace N años" para las dos personas.' },
+];
+
+function eqString(def, N, k){
+  const sy = def.sy === '+' ? '+' : '−';
+  const sx = def.sx === '+' ? '+' : '−';
+  return `y ${sy} ${N} = ${k}(x ${sx} ${N})`;
+}
+
+function evalOption(def, N, k, x, y){
+  const lhs = def.sy === '+' ? y + N : y - N;
+  const rhs = k * (def.sx === '+' ? x + N : x - N);
+  return Math.abs(lhs - rhs) < 1e-6;
+}
+
+function render(){
+  const {N,k,x,y} = state;
+  document.getElementById('statement-text').innerHTML =
+    `La edad actual de una persona es <span class="teal-b">x</span> años, y la edad de su padre es <span class="coral-b">y</span> años.
+     <br><b>Hace ${N} años</b>, la edad del padre era <b>${k===2?'el doble':k===3?'el triple':k===4?'el cuádruple':k+' veces'}</b> de la edad de la persona. ¿Qué ecuación describe esto?`;
+
+  const warnSlot = document.getElementById('warn-slot');
+  warnSlot.innerHTML = '';
+  const xHaceN = x - N;
+  const yHaceN = y - N;
+  if(xHaceN < 0 || yHaceN < 0){
+    warnSlot.innerHTML = `<div class="warn-box">Con x = ${x} y N = ${N}, la edad "hace ${N} años" sería negativa. Sube x (o y) o baja N para que el ejemplo tenga sentido.</div>`;
+  }
+
+  // Steps
+  document.getElementById('steps').innerHTML = `
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h3>Edades hace N años</h3>
+        <p>"Hace ${N} años" significa restar ${N} a cada edad actual.</p>
+        <div class="eqline">persona: x − ${N}</div>
+        <div class="eqline">padre: y − ${N}</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h3>Relación de "${k===2?'el doble':k===3?'el triple':k===4?'el cuádruple':k+' veces'}"</h3>
+        <p>La edad del padre hace ${N} años era ${k} veces la edad de la persona hace ${N} años.</p>
+        <div class="eqline result">y − ${N} = ${k}(x − ${N})</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h3>Errores típicos</h3>
+        <p>Sumar en vez de restar N (o restar solo de un lado) da una ecuación que no representa el pasado.</p>
+      </div>
+    </div>
+  `;
+
+  // Options
+  const letters = ['A','B','C','D'];
+  const optsHtml = order.map((defIdx, pos)=>{
+    const def = OPTION_DEFS[defIdx];
+    const ok = evalOption(def, N, k, x, y);
+    const isCorrectDef = (def.sy === '-' && def.sx === '-');
+    return `
+      <div class="option ${ok ? 'is-ok' : ''}">
+        <div class="option-letter">${letters[pos]}</div>
+        <div class="option-body">
+          <div class="eq">${eqString(def, N, k)}</div>
+          <div class="note">${def.note}${isCorrectDef ? ' <b style="color:var(--gold)">(traducción correcta)</b>' : ''}</div>
+        </div>
+        <div class="badge ${ok ? 'ok':'no'}">${ok ? '✓ cumple' : '✗ no'}</div>
+      </div>
+    `;
+  }).join('');
+  document.getElementById('options').innerHTML = optsHtml;
+
+  drawTimeline(N,k,x,y);
+}
+
+function drawTimeline(N,k,x,y){
+  const svg = document.getElementById('timeline');
+  const W = 560, H = 380;
+  const padL = 46, padR = 20;
+  const maxVal = Math.max(x, y, k*Math.max(x-N,0)+N, N+1) * 1.12;
+  const sx = v => padL + (v/maxVal) * (W-padL-padR);
+
+  const xHaceN = x-N, yHaceN = y-N;
+  const rows = [
+    { label:'Persona', color:'var(--teal)', haceN: xHaceN, hoy: x, yPos: 70 },
+    { label:'Padre',   color:'var(--coral)', haceN: yHaceN, hoy: y, yPos: 160 },
+  ];
+
+  let rowsSvg = '';
+  rows.forEach(r=>{
+    const yPos = r.yPos;
+    rowsSvg += `<text x="${padL}" y="${yPos-16}" fill="${r.color}" font-family="JetBrains Mono, monospace" font-size="13" font-weight="700">${r.label}</text>`;
+    rowsSvg += `<line x1="${padL}" y1="${yPos}" x2="${W-padR}" y2="${yPos}" stroke="var(--grid)" stroke-width="2"/>`;
+    const xa = sx(Math.max(r.haceN,0));
+    const xb = sx(r.hoy);
+    rowsSvg += `<line x1="${xa}" y1="${yPos}" x2="${xb}" y2="${yPos}" stroke="${r.color}" stroke-width="3"/>`;
+    rowsSvg += `<circle cx="${xa}" cy="${yPos}" r="6" fill="${r.color}" stroke="#14172B" stroke-width="2"/>`;
+    rowsSvg += `<circle cx="${xb}" cy="${yPos}" r="6" fill="${r.color}" stroke="#14172B" stroke-width="2" opacity="0.55"/>`;
+    rowsSvg += `<text x="${xa}" y="${yPos+22}" fill="var(--text)" font-family="JetBrains Mono, monospace" font-size="12" text-anchor="middle">${r.haceN}</text>`;
+    rowsSvg += `<text x="${xa}" y="${yPos+36}" fill="var(--text-dim)" font-family="JetBrains Mono, monospace" font-size="10" text-anchor="middle">hace ${N}a</text>`;
+    rowsSvg += `<text x="${xb}" y="${yPos+22}" fill="var(--text)" font-family="JetBrains Mono, monospace" font-size="12" text-anchor="middle">${r.hoy}</text>`;
+    rowsSvg += `<text x="${xb}" y="${yPos+36}" fill="var(--text-dim)" font-family="JetBrains Mono, monospace" font-size="10" text-anchor="middle">hoy</text>`;
+  });
+
+  // Multiplier proof bars
+  const proofY0 = 250;
+  const barH = 22;
+  const unit = Math.max(xHaceN,0);
+  const unitPx = sx(unit) - sx(0);
+  let proofSvg = `<text x="${padL}" y="${proofY0-14}" fill="var(--text-dim)" font-family="JetBrains Mono, monospace" font-size="12">Comprobación: ¿y − ${N} = ${k} × (x − ${N})?</text>`;
+
+  // teal repeated unit segments
+  let cursor = padL;
+  for(let i=0;i<k;i++){
+    const segColor = i%2===0 ? 'var(--teal)' : '#3f8f85';
+    proofSvg += `<rect x="${cursor}" y="${proofY0}" width="${Math.max(unitPx,0)}" height="${barH}" fill="${segColor}" opacity="0.9"/>`;
+    cursor += unitPx;
+  }
+  proofSvg += `<text x="${padL}" y="${proofY0+barH+16}" fill="var(--teal)" font-family="JetBrains Mono, monospace" font-size="11">${k} × (x − ${N}) = ${k} × ${unit} = ${k*unit}</text>`;
+
+  // coral actual padre-haceN bar
+  const yBarPx = sx(Math.max(yHaceN,0)) - sx(0);
+  const proofY1 = proofY0 + barH + 34;
+  proofSvg += `<rect x="${padL}" y="${proofY1}" width="${Math.max(yBarPx,0)}" height="${barH}" fill="var(--coral)" opacity="0.9"/>`;
+  proofSvg += `<text x="${padL}" y="${proofY1+barH+16}" fill="var(--coral)" font-family="JetBrains Mono, monospace" font-size="11">y − ${N} = ${yHaceN}</text>`;
+
+  const match = Math.abs(k*unit - yHaceN) < 1e-6;
+  const resultY = proofY1 + barH + 40;
+  proofSvg += `<text x="${padL}" y="${resultY}" fill="${match ? 'var(--green)' : 'var(--red)'}" font-family="JetBrains Mono, monospace" font-size="13" font-weight="700">${match ? '✓ las barras coinciden: la relación se cumple' : '✗ las barras no coinciden: la relación no se cumple con estos valores'}</text>`;
+
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.innerHTML = rowsSvg + proofSvg;
+}
+
+render();
+</script>
+</body>
+</html>

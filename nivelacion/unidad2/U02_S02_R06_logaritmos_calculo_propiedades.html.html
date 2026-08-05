@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Logaritmos: cálculo y propiedades</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0F2A66;
+    --navy-deep:#081B47;
+    --navy-soft:#E7ECF7;
+    --bg:#F3F5FA;
+    --panel:#FFFFFF;
+    --line:#E1E6F0;
+    --ink:#1B2540;
+    --ink-soft:#5D6580;
+    --gold:#C99A3C;
+    --gold-soft:#F7EED9;
+    --green:#1F8A5F;
+    --green-soft:#E4F3EC;
+    --red:#C0392B;
+    --red-soft:#FBE7E4;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter', sans-serif;
+    min-height:100vh;
+  }
+  .band{
+    background:linear-gradient(120deg, var(--navy-deep), var(--navy) 70%);
+    padding:20px 22px;
+    display:flex; align-items:center; gap:16px;
+  }
+  .band img{ width:52px; height:52px; border-radius:10px; flex-shrink:0; }
+  .band .word{ color:#fff; }
+  .band .word .inst{
+    font-family:'JetBrains Mono', monospace; font-size:11.5px; letter-spacing:.16em;
+    text-transform:uppercase; color:var(--gold); font-weight:700; margin-bottom:3px;
+  }
+  .band .word .name{
+    font-family:'Fraunces', serif; font-weight:600; font-size:19px; letter-spacing:.01em;
+  }
+
+  .wrap{max-width:1160px; margin:0 auto; padding:26px 20px 60px;}
+
+  header{margin-bottom:22px;}
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--navy); font-weight:700; margin-bottom:10px;
+  }
+  h1{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:clamp(26px, 4vw, 38px);
+    margin:0 0 8px;
+    line-height:1.15;
+    letter-spacing:-.01em;
+    color:var(--navy-deep);
+  }
+  .sub{color:var(--ink-soft); font-size:14.5px; max-width:720px; line-height:1.55;}
+
+  h2.section-title{
+    font-family:'Fraunces', serif; font-weight:600; font-size:20px;
+    color:var(--navy-deep); margin:34px 0 4px;
+  }
+  .section-sub{font-size:13px; color:var(--ink-soft); margin-bottom:16px;}
+
+  /* FLASHCARDS */
+  .cards-grid{
+    display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+    gap:14px;
+  }
+  .flip-card{ height:150px; perspective:1200px; cursor:pointer; }
+  .flip-inner{
+    position:relative; width:100%; height:100%;
+    transition:transform .5s cubic-bezier(.4,.2,.2,1);
+    transform-style:preserve-3d;
+  }
+  .flip-card.flipped .flip-inner{ transform:rotateY(180deg); }
+  .flip-face{
+    position:absolute; inset:0; backface-visibility:hidden;
+    border-radius:12px; padding:16px; display:flex; flex-direction:column;
+    justify-content:center; align-items:center; text-align:center; gap:8px;
+  }
+  .flip-front{
+    background:var(--panel); border:1px solid var(--line);
+  }
+  .flip-front .flabel{
+    font-family:'JetBrains Mono', monospace; font-size:10.5px; letter-spacing:.1em;
+    text-transform:uppercase; color:var(--gold); font-weight:700;
+  }
+  .flip-front .fformula{font-size:17px;}
+  .flip-front .hint{font-size:10.5px; color:#B7BFCF; margin-top:4px;}
+  .flip-back{
+    background:linear-gradient(135deg, var(--navy-deep), var(--navy));
+    color:#fff; transform:rotateY(180deg);
+  }
+  .flip-back .bformula{font-size:15px; margin-bottom:6px;}
+  .flip-back .bnote{font-size:12px; color:#CBD8EE; line-height:1.5;}
+
+  .layout{display:grid; grid-template-columns:280px 1fr; gap:20px; align-items:start;}
+  @media (max-width:900px){ .layout{grid-template-columns:1fr;} }
+
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:20px;
+  }
+  .panel h3{
+    font-family:'Fraunces', serif;
+    font-size:16.5px; font-weight:600;
+    margin:0 0 4px; color:var(--navy-deep);
+  }
+  .panel .h3-sub{font-size:12px; color:var(--ink-soft); margin-bottom:16px;}
+
+  .field{margin-bottom:16px;}
+  .field label{
+    display:flex; justify-content:space-between; align-items:baseline;
+    font-size:13px; color:var(--ink-soft); margin-bottom:6px;
+  }
+  .field label .val{
+    font-family:'JetBrains Mono', monospace; font-weight:700; color:var(--navy); font-size:14px;
+  }
+  .field input[type=range]{ width:100%; accent-color:var(--navy); height:4px; cursor:pointer; }
+
+  .reset-btn{
+    width:100%; margin-top:6px; padding:11px 12px; border-radius:9px;
+    border:1px solid var(--line); background:var(--navy-soft); color:var(--navy-deep);
+    font-weight:600; font-size:13px; cursor:pointer; font-family:'Inter',sans-serif;
+    transition:background .15s;
+  }
+  .reset-btn:hover{background:#DBE3F4;}
+  .reset-btn:focus-visible{outline:2px solid var(--navy); outline-offset:2px;}
+
+  .alert{
+    margin-top:12px; background:var(--red-soft); color:#8A2C1E;
+    border-radius:10px; padding:12px 14px; font-size:13px; line-height:1.5; display:none;
+  }
+  .alert.show{display:block;}
+
+  .steps{display:grid; gap:12px; margin-top:4px;}
+  .step{
+    background:var(--panel); border:1px solid var(--line); border-radius:14px;
+    padding:16px 18px; display:grid; grid-template-columns:32px 1fr; gap:14px; align-items:start;
+  }
+  .step .num{
+    font-family:'Fraunces', serif; font-weight:700; font-size:15px;
+    color:#fff; background:var(--navy); width:28px; height:28px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  }
+  .step.check .num{background:var(--green);}
+  .step .title{font-weight:600; font-size:14px; color:var(--navy-deep); margin-bottom:6px;}
+  .step .desc{font-size:13px; color:var(--ink-soft); line-height:1.55; margin-bottom:8px;}
+  .step .formula{font-size:15px; overflow-x:auto; padding:2px 0;}
+
+  .result-card{
+    margin-top:14px;
+    background:linear-gradient(135deg, var(--gold-soft), var(--panel));
+    border:1px solid var(--gold);
+    border-radius:14px; padding:18px 20px; text-align:center;
+  }
+  .result-card .lbl{
+    font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:.1em;
+    text-transform:uppercase; color:#8A6A1E; font-weight:700; margin-bottom:6px;
+  }
+  .result-card .num{
+    font-family:'Fraunces', serif; font-weight:700; font-size:30px; color:var(--navy-deep);
+  }
+
+  /* PROPERTY EXPLORER */
+  .prop-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(280px,1fr)); gap:14px; margin-top:16px; }
+  .prop-card{
+    background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:18px 20px;
+  }
+  .prop-card .ptitle{
+    font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:.1em;
+    text-transform:uppercase; color:var(--navy); font-weight:700; margin-bottom:10px;
+  }
+  .prop-card .peq{font-size:15px; margin-bottom:6px;}
+  .prop-card .pcheck{
+    display:flex; align-items:center; gap:8px; margin-top:10px;
+    font-size:13px; color:var(--green); font-weight:600;
+  }
+  .prop-card .pcheck .dot{
+    width:20px; height:20px; border-radius:50%; background:var(--green-soft);
+    color:var(--green); display:flex; align-items:center; justify-content:center; font-size:12px;
+  }
+
+  .explorer-controls{
+    display:grid; grid-template-columns:repeat(auto-fit, minmax(150px,1fr));
+    gap:16px; margin-bottom:6px;
+  }
+
+  footer{text-align:center; color:var(--ink-soft); font-size:12px; margin-top:36px;}
+</style>
+<base target="_blank">
+</head>
+<body>
+
+<div class="band"></div>
+    <div class="name">Laboratorio de Logaritmos</div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">Nivel básico &middot; cálculo y propiedades</div>
+    <h1>Logaritmos: cálculo y propiedades</h1>
+    <div class="sub">Repasa las reglas fundamentales, calcula logaritmos paso a paso y comprueba con números reales por qué funcionan las propiedades del producto, el cociente y la potencia.</div>
+  </header>
+
+  <!-- TEORÍA -->
+  <h2 class="section-title">Repasa la teoría</h2>
+  <div class="section-sub">Toca cada tarjeta para ver la propiedad y un ejemplo.</div>
+  <div class="cards-grid" id="cardsGrid"></div>
+
+  <!-- CALCULADORA -->
+  <h2 class="section-title">Calculadora de logaritmos</h2>
+  <div class="section-sub">Introduce la base y el argumento; el resultado se calcula y se comprueba paso a paso.</div>
+  <div class="layout">
+    <div class="panel">
+      <h3>Datos</h3>
+      <div class="h3-sub">log<sub>b</sub>(x)</div>
+
+      <div class="field">
+        <label>Base (b) <span class="val" id="val-b">2</span></label>
+        <input type="range" id="calcB" min="1.5" max="12" step="0.5" value="2">
+      </div>
+      <div class="field">
+        <label>Argumento (x) <span class="val" id="val-x">8</span></label>
+        <input type="range" id="calcX" min="1" max="200" step="1" value="8">
+      </div>
+
+      <button class="reset-btn" id="resetCalc">Restaurar ejemplo (log₂ 8)</button>
+      <div class="alert" id="calcAlert"></div>
+    </div>
+
+    <div>
+      <div class="steps" id="calcSteps"></div>
+      <div class="result-card">
+        <div class="lbl">Resultado</div>
+        <div class="num" id="calcResult">log₂(8) = 3</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXPLORADOR DE PROPIEDADES -->
+  <h2 class="section-title">Explorador de propiedades</h2>
+  <div class="section-sub">Cambia los valores y verifica que ambos lados de cada propiedad dan el mismo resultado.</div>
+  <div class="panel">
+    <div class="explorer-controls">
+      <div class="field">
+        <label>Base (b) <span class="val" id="val-pb">2</span></label>
+        <input type="range" id="propB" min="1.5" max="12" step="0.5" value="2">
+      </div>
+      <div class="field">
+        <label>x <span class="val" id="val-px">8</span></label>
+        <input type="range" id="propX" min="1" max="100" step="1" value="8">
+      </div>
+      <div class="field">
+        <label>y <span class="val" id="val-py">4</span></label>
+        <input type="range" id="propY" min="1" max="100" step="1" value="4">
+      </div>
+      <div class="field">
+        <label>n (exponente) <span class="val" id="val-pn">3</span></label>
+        <input type="range" id="propN" min="1" max="6" step="1" value="3">
+      </div>
+    </div>
+    <div class="alert" id="propAlert"></div>
+    <div class="prop-grid" id="propGrid"></div>
+  </div>
+
+  <footer>Recuerda: la base debe ser positiva y distinta de 1; el argumento del logaritmo siempre debe ser positivo.</footer>
+</div>
+
+<script>
+function fmt(x, d=4){
+  if (Object.is(x,-0)) x = 0;
+  const r = Math.round(x*10000)/10000;
+  if (Math.abs(r-Math.round(r)) < 1e-6) return String(Math.round(r));
+  return r.toFixed(d).replace(/0+$/,'').replace(/\.$/,'');
+}
+function K(el, tex, display=true){
+  try{ katex.render(tex, el, {throwOnError:false, displayMode:display}); }
+  catch(e){ el.textContent = tex; }
+}
+function validBase(b){ return b > 0 && Math.abs(b-1) > 1e-9; }
+function validArg(x){ return x > 0; }
+function logb(x,b){ return Math.log(x)/Math.log(b); }
+
+/* ---------- FLASHCARDS ---------- */
+const cardsData = [
+  { label:'Definición', front:'\\log_b x = y', back:'\\Leftrightarrow\\ b^y = x', note:'con b > 0, b ≠ 1, x > 0. El logaritmo es el exponente al que hay que elevar la base para obtener x.' },
+  { label:'Log. de la base', front:'\\log_b b = 1', back:'b^1 = b', note:'Ejemplo: log₅(5) = 1, porque 5¹ = 5.' },
+  { label:'Log. de 1', front:'\\log_b 1 = 0', back:'b^0 = 1', note:'Ejemplo: log₇(1) = 0, porque cualquier base elevada a 0 da 1.' },
+  { label:'Producto', front:'\\log_b(xy)', back:'=\\ \\log_b x + \\log_b y', note:'Ejemplo: log₂(4·8) = log₂4 + log₂8 = 2 + 3 = 5.' },
+  { label:'Cociente', front:'\\log_b\\!\\left(\\dfrac{x}{y}\\right)', back:'=\\ \\log_b x - \\log_b y', note:'Ejemplo: log₃(27/9) = log₃27 − log₃9 = 3 − 2 = 1.' },
+  { label:'Potencia', front:'\\log_b(x^n)', back:'=\\ n\\log_b x', note:'Ejemplo: log₂(8²) = 2·log₂8 = 2·3 = 6.' },
+  { label:'Cambio de base', front:'\\log_b x', back:'=\\ \\dfrac{\\ln x}{\\ln b}', note:'Útil si la calculadora solo tiene ln o log₁₀. Ejemplo: log₅20 = ln20/ln5 ≈ 1.861.' },
+  { label:'Inversas', front:'b^{\\log_b x} = x', back:'\\log_b(b^{x}) = x', note:'La función logarítmica y la exponencial son inversas entre sí.' },
+];
+
+const cardsGrid = document.getElementById('cardsGrid');
+cardsData.forEach((c,i)=>{
+  const card = document.createElement('div');
+  card.className = 'flip-card';
+  card.innerHTML = `
+    <div class="flip-inner">
+      <div class="flip-face flip-front">
+        <div class="flabel">${c.label}</div>
+        <div class="fformula" id="cf-${i}"></div>
+        <div class="hint">toca para ver</div>
+      </div>
+      <div class="flip-face flip-back">
+        <div class="bformula" id="cb-${i}"></div>
+        <div class="bnote">${c.note}</div>
+      </div>
+    </div>`;
+  card.addEventListener('click', ()=> card.classList.toggle('flipped'));
+  cardsGrid.appendChild(card);
+  K(document.getElementById(`cf-${i}`), c.front, false);
+  K(document.getElementById(`cb-${i}`), c.back, false);
+});
+
+/* ---------- CALCULADORA ---------- */
+const calcB = document.getElementById('calcB');
+const calcX = document.getElementById('calcX');
+
+function renderCalc(){
+  const b = parseFloat(calcB.value);
+  const x = parseFloat(calcX.value);
+  document.getElementById('val-b').textContent = fmt(b);
+  document.getElementById('val-x').textContent = fmt(x);
+
+  const alertBox = document.getElementById('calcAlert');
+  const stepsBox = document.getElementById('calcSteps');
+  alertBox.className = 'alert';
+  alertBox.innerHTML = '';
+  stepsBox.innerHTML = '';
+
+  if (!validBase(b)){
+    alertBox.classList.add('show');
+    alertBox.innerHTML = '<strong>Base inválida.</strong> La base debe ser positiva y distinta de 1.';
+    document.getElementById('calcResult').textContent = '—';
+    return;
+  }
+  if (!validArg(x)){
+    alertBox.classList.add('show');
+    alertBox.innerHTML = '<strong>Argumento inválido.</strong> El logaritmo solo está definido para x > 0.';
+    document.getElementById('calcResult').textContent = '—';
+    return;
+  }
+
+  const y = logb(x,b);
+  const check = Math.pow(b,y);
+
+  addStep(1, false, 'Planteamos la definición',
+    `Buscamos el exponente y tal que, al elevar la base a esa potencia, obtengamos x.`,
+    `\\log_{${fmt(b)}}(${fmt(x)}) = y \\ \\Leftrightarrow\\ ${fmt(b)}^{\\,y} = ${fmt(x)}`);
+
+  addStep(2, false, 'Aplicamos cambio de base',
+    `Usamos logaritmo natural (ln) para poder calcularlo con cualquier base:`,
+    `y = \\dfrac{\\ln(${fmt(x)})}{\\ln(${fmt(b)})}`);
+
+  addStep(3, false, 'Sustituimos los valores',
+    `Evaluamos ambos logaritmos naturales:`,
+    `y = \\dfrac{${fmt(Math.log(x))}}{${fmt(Math.log(b))}} = ${fmt(y)}`);
+
+  const div = document.createElement('div');
+  div.className = 'step check';
+  div.innerHTML = `<div class="num">4</div><div><div class="title">Comprobamos</div><div class="desc">Elevamos la base al resultado obtenido; debe devolvernos el argumento original.</div><div class="formula" id="calc-check"></div></div>`;
+  stepsBox.appendChild(div);
+  K(document.getElementById('calc-check'), `${fmt(b)}^{${fmt(y)}} = ${fmt(check)} \\ ${Math.abs(check-x)<1e-6*Math.max(1,x) ? '\\checkmark' : ''}`);
+
+  document.getElementById('calcResult').textContent = `log${fmt(b)==='2'?'₂':''}(${fmt(x)}) = ${fmt(y)}`;
+  K(document.getElementById('calcResult'), `\\log_{${fmt(b)}}(${fmt(x)}) = ${fmt(y)}`, false);
+
+  function addStep(num, isCheck, title, desc, tex){
+    const div = document.createElement('div');
+    div.className = 'step' + (isCheck ? ' check' : '');
+    div.innerHTML = `<div class="num">${num}</div><div><div class="title">${title}</div><div class="desc">${desc}</div><div class="formula" id="calc-f-${num}"></div></div>`;
+    stepsBox.appendChild(div);
+    K(document.getElementById(`calc-f-${num}`), tex);
+  }
+}
+[calcB, calcX].forEach(el => el.addEventListener('input', renderCalc));
+document.getElementById('resetCalc').addEventListener('click', ()=>{
+  calcB.value = 2; calcX.value = 8; renderCalc();
+});
+
+/* ---------- EXPLORADOR DE PROPIEDADES ---------- */
+const propB = document.getElementById('propB');
+const propX = document.getElementById('propX');
+const propY = document.getElementById('propY');
+const propN = document.getElementById('propN');
+
+function renderProps(){
+  const b = parseFloat(propB.value);
+  const x = parseFloat(propX.value);
+  const y = parseFloat(propY.value);
+  const n = parseFloat(propN.value);
+
+  document.getElementById('val-pb').textContent = fmt(b);
+  document.getElementById('val-px').textContent = fmt(x);
+  document.getElementById('val-py').textContent = fmt(y);
+  document.getElementById('val-pn').textContent = fmt(n);
+
+  const alertBox = document.getElementById('propAlert');
+  const grid = document.getElementById('propGrid');
+  alertBox.className = 'alert';
+  alertBox.innerHTML = '';
+  grid.innerHTML = '';
+
+  if (!validBase(b) || !validArg(x) || !validArg(y)){
+    alertBox.classList.add('show');
+    alertBox.innerHTML = '<strong>Valores inválidos.</strong> La base debe ser positiva y distinta de 1; x e y deben ser positivos.';
+    return;
+  }
+
+  const logx = logb(x,b), logy = logb(y,b);
+
+  addProp('Propiedad del producto',
+    `\\log_{${fmt(b)}}(${fmt(x)}\\cdot ${fmt(y)})`, logb(x*y,b),
+    `\\log_{${fmt(b)}}${fmt(x)} + \\log_{${fmt(b)}}${fmt(y)}`, logx+logy);
+
+  addProp('Propiedad del cociente',
+    `\\log_{${fmt(b)}}\\!\\left(\\dfrac{${fmt(x)}}{${fmt(y)}}\\right)`, logb(x/y,b),
+    `\\log_{${fmt(b)}}${fmt(x)} - \\log_{${fmt(b)}}${fmt(y)}`, logx-logy);
+
+  addProp('Propiedad de la potencia',
+    `\\log_{${fmt(b)}}(${fmt(x)}^{${fmt(n)}})`, logb(Math.pow(x,n),b),
+    `${fmt(n)}\\cdot\\log_{${fmt(b)}}${fmt(x)}`, n*logx);
+
+  function addProp(title, lhsTex, lhsVal, rhsTex, rhsVal){
+    const ok = Math.abs(lhsVal-rhsVal) < 1e-6*Math.max(1,Math.abs(lhsVal));
+    const card = document.createElement('div');
+    card.className = 'prop-card';
+    card.innerHTML = `
+      <div class="ptitle">${title}</div>
+      <div class="peq" id="p-lhs-${title}"></div>
+      <div class="peq" id="p-rhs-${title}"></div>
+      <div class="pcheck"><span class="dot">${ok ? '✓' : '≈'}</span> ambos lados coinciden</div>`;
+    grid.appendChild(card);
+    K(document.getElementById(`p-lhs-${title}`), `${lhsTex} = ${fmt(lhsVal)}`, false);
+    K(document.getElementById(`p-rhs-${title}`), `${rhsTex} = ${fmt(rhsVal)}`, false);
+  }
+}
+[propB, propX, propY, propN].forEach(el => el.addEventListener('input', renderProps));
+
+renderCalc();
+renderProps();
+</script>
+</body>
+</html>

@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ecuación de una circunferencia</title>
+
+  <style>
+    :root{
+      --bg1:#07111f;
+      --bg2:#131b36;
+      --card:rgba(255,255,255,.085);
+      --line:rgba(255,255,255,.14);
+      --text:#f8fafc;
+      --muted:#cbd5e1;
+      --cyan:#22d3ee;
+      --violet:#8b5cf6;
+      --green:#34d399;
+      --red:#fb7185;
+      --input:rgba(7,17,31,.78);
+      --shadow:0 25px 70px rgba(0,0,0,.38);
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at 12% 18%,rgba(34,211,238,.18),transparent 28%),
+        radial-gradient(circle at 86% 10%,rgba(139,92,246,.22),transparent 30%),
+        linear-gradient(135deg,var(--bg1),var(--bg2));
+      padding:30px 16px;
+    }
+
+    .app{width:min(1180px,100%);margin:0 auto}
+    header{text-align:center;margin-bottom:28px}
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 14px;
+      border-radius:999px;
+      border:1px solid rgba(34,211,238,.28);
+      background:rgba(34,211,238,.09);
+      color:#a5f3fc;
+      font-size:.85rem;
+      font-weight:800;
+    }
+
+    h1{
+      margin:16px 0 8px;
+      font-size:clamp(2rem,5vw,3.65rem);
+      line-height:1.04;
+      letter-spacing:-.045em;
+    }
+
+    .subtitle{
+      max-width:800px;
+      margin:0 auto;
+      color:var(--muted);
+      line-height:1.65;
+    }
+
+    .layout{
+      display:grid;
+      grid-template-columns:minmax(330px,.88fr) minmax(430px,1.12fr);
+      gap:22px;
+      align-items:start;
+    }
+
+    .card{
+      border:1px solid var(--line);
+      border-radius:24px;
+      background:var(--card);
+      backdrop-filter:blur(18px);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+
+    .content{padding:24px}
+
+    .title{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      margin:0 0 20px;
+      font-size:1.12rem;
+    }
+
+    .icon{
+      width:40px;
+      height:40px;
+      display:grid;
+      place-items:center;
+      border-radius:13px;
+      background:linear-gradient(135deg,var(--cyan),var(--violet));
+      font-weight:900;
+    }
+
+    .preview{
+      margin-bottom:20px;
+      padding:19px 12px;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(7,17,31,.55);
+      text-align:center;
+      font-family:"Cambria Math","Times New Roman",serif;
+      font-size:clamp(1.2rem,4vw,1.75rem);
+      overflow-wrap:anywhere;
+    }
+
+    .inputs{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:13px;
+    }
+
+    .field label{
+      display:block;
+      margin-bottom:8px;
+      color:var(--muted);
+      font-size:.86rem;
+      font-weight:750;
+    }
+
+    .field input{
+      width:100%;
+      min-height:52px;
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:14px;
+      background:var(--input);
+      color:var(--text);
+      outline:none;
+      padding:11px 12px;
+      text-align:center;
+      font-size:1.04rem;
+      transition:.2s ease;
+    }
+
+    .field input:focus{
+      border-color:var(--cyan);
+      box-shadow:0 0 0 4px rgba(34,211,238,.12);
+      transform:translateY(-1px);
+    }
+
+    .radius-mode{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin:16px 0 12px;
+    }
+
+    .mode-btn{
+      min-height:42px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.07);
+      color:var(--muted);
+      font-weight:800;
+      cursor:pointer;
+    }
+
+    .mode-btn.active{
+      background:linear-gradient(135deg,rgba(34,211,238,.22),rgba(139,92,246,.22));
+      color:white;
+      border-color:rgba(125,211,252,.35);
+    }
+
+    .actions{
+      display:grid;
+      grid-template-columns:1fr 52px;
+      gap:12px;
+      margin-top:18px;
+    }
+
+    button{
+      min-height:50px;
+      border:0;
+      border-radius:14px;
+      cursor:pointer;
+      color:white;
+      font-size:.95rem;
+      font-weight:850;
+      transition:.18s ease;
+    }
+
+    button:hover{transform:translateY(-2px);filter:brightness(1.08)}
+
+    .primary{
+      background:linear-gradient(135deg,var(--cyan),var(--violet));
+      box-shadow:0 12px 26px rgba(34,211,238,.18);
+    }
+
+    .secondary{
+      background:rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.12);
+    }
+
+    .examples{margin-top:18px}
+
+    .examples p{
+      margin:0 0 10px;
+      color:var(--muted);
+      font-size:.86rem;
+      font-weight:750;
+    }
+
+    .chips{display:flex;flex-wrap:wrap;gap:8px}
+
+    .chip{
+      min-height:36px;
+      padding:7px 11px;
+      border-radius:999px;
+      background:rgba(139,92,246,.10);
+      border:1px solid rgba(167,139,250,.20);
+      color:#ddd6fe;
+      font-size:.8rem;
+    }
+
+    .note{
+      margin-top:17px;
+      color:#94a3b8;
+      font-size:.8rem;
+      line-height:1.5;
+      text-align:center;
+    }
+
+    .graph-wrap{
+      width:100%;
+      aspect-ratio:1.3;
+      min-height:330px;
+      margin-bottom:18px;
+      border-radius:18px;
+      overflow:hidden;
+      background:#f8fafc;
+      border:1px solid rgba(255,255,255,.12);
+    }
+
+    canvas{width:100%;height:100%;display:block}
+
+    .message{
+      display:none;
+      margin-bottom:15px;
+      padding:13px 14px;
+      border-radius:14px;
+      line-height:1.5;
+    }
+
+    .message.error{
+      display:block;
+      color:#fecdd3;
+      background:rgba(244,63,94,.12);
+      border:1px solid rgba(251,113,133,.25);
+    }
+
+    .status{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      margin-bottom:16px;
+      border-radius:999px;
+      color:#a7f3d0;
+      background:rgba(16,185,129,.12);
+      border:1px solid rgba(52,211,153,.24);
+      font-size:.84rem;
+      font-weight:850;
+    }
+
+    .solution{
+      padding:20px;
+      border-radius:18px;
+      background:linear-gradient(135deg,rgba(34,211,238,.10),rgba(139,92,246,.10));
+      border:1px solid rgba(125,211,252,.16);
+    }
+
+    .solution + .solution{margin-top:12px}
+
+    .solution-label{
+      margin-bottom:9px;
+      color:var(--muted);
+      font-size:.82rem;
+      font-weight:850;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+    }
+
+    .answer{
+      padding:15px;
+      border-radius:14px;
+      background:rgba(7,17,31,.52);
+      text-align:center;
+      font-family:"Cambria Math","Times New Roman",serif;
+      font-size:clamp(1.08rem,3.5vw,1.55rem);
+      overflow-wrap:anywhere;
+    }
+
+    .steps{margin-top:18px}
+    .steps h3{margin:0 0 12px;font-size:1rem}
+
+    .step{
+      position:relative;
+      padding:14px 14px 14px 48px;
+      border-radius:15px;
+      background:rgba(7,17,31,.38);
+      border:1px solid rgba(255,255,255,.08);
+    }
+
+    .step + .step{margin-top:10px}
+
+    .step-number{
+      position:absolute;
+      top:13px;
+      left:13px;
+      width:25px;
+      height:25px;
+      display:grid;
+      place-items:center;
+      border-radius:9px;
+      background:linear-gradient(135deg,var(--cyan),var(--violet));
+      font-size:.78rem;
+      font-weight:900;
+    }
+
+    .step-title{
+      margin-bottom:5px;
+      color:#e0f2fe;
+      font-weight:800;
+    }
+
+    .math{
+      font-family:"Cambria Math","Times New Roman",serif;
+      line-height:1.7;
+      overflow-wrap:anywhere;
+    }
+
+    .decimal{
+      margin-top:16px;
+      padding:13px;
+      border-radius:14px;
+      background:rgba(255,255,255,.06);
+      color:var(--muted);
+      line-height:1.55;
+    }
+
+    .hidden{display:none}
+
+    @media(max-width:900px){
+      .layout{grid-template-columns:1fr}
+    }
+
+    @media(max-width:480px){
+      body{padding:18px 10px}
+      .content{padding:18px}
+      .inputs{grid-template-columns:1fr}
+      .graph-wrap{min-height:290px}
+    }
+  </style>
+</head>
+
+<body>
+  <main class="app">
+    <header>
+      <div class="badge">○ Geometría analítica interactiva</div>
+      <h1>Ecuación de una circunferencia</h1>
+      <p class="subtitle">
+        Ingresa el centro <strong>C(h,k)</strong> y el radio.
+        La aplicación genera la ecuación ordinaria y la ecuación general,
+        manteniendo fracciones y radicales en forma exacta.
+      </p>
+    </header>
+
+    <section class="layout">
+      <article class="card">
+        <div class="content">
+          <h2 class="title"><span class="icon">C,r</span> Datos geométricos</h2>
+
+          <div class="preview" id="preview">(x−2)²+(y+1)²=9</div>
+
+          <div class="inputs">
+            <div class="field">
+              <label for="h">Coordenada h del centro</label>
+              <input id="h" type="number" step="any" value="2" />
+            </div>
+            <div class="field">
+              <label for="k">Coordenada k del centro</label>
+              <input id="k" type="number" step="any" value="-1" />
+            </div>
+          </div>
+
+          <div class="radius-mode">
+            <button type="button" class="mode-btn active" id="radiusBtn">Ingresar radio r</button>
+            <button type="button" class="mode-btn" id="squareBtn">Ingresar r²</button>
+          </div>
+
+          <div class="field" id="radiusField">
+            <label for="radius">Radio r</label>
+            <input id="radius" type="number" step="any" value="3" />
+          </div>
+
+          <div class="field hidden" id="squareField">
+            <label for="radiusSquared">Valor exacto de r²</label>
+            <input id="radiusSquared" type="number" step="any" value="9" />
+          </div>
+
+          <div class="actions">
+            <button class="primary" id="solveBtn">Calcular ecuación</button>
+            <button class="secondary" id="resetBtn" title="Restablecer">↻</button>
+          </div>
+
+          <div class="examples">
+            <p>Ejemplos rápidos</p>
+            <div class="chips">
+              <button class="chip" data-h="2" data-k="-1" data-mode="r" data-v="3">Centro entero</button>
+              <button class="chip" data-h="0.5" data-k="-1.5" data-mode="r2" data-v="13">Fracciones y √13</button>
+              <button class="chip" data-h="-2" data-k="3" data-mode="r2" data-v="8">Radio 2√2</button>
+              <button class="chip" data-h="1.25" data-k="0.5" data-mode="r" data-v="2.5">Datos decimales</button>
+            </div>
+          </div>
+
+          <p class="note">
+            Los decimales finitos se convierten internamente en fracciones exactas.
+            El radio debe ser estrictamente positivo.
+          </p>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="content">
+          <h2 class="title"><span class="icon">✓</span> Gráfica y ecuaciones</h2>
+
+          <div class="graph-wrap">
+            <canvas id="graph"></canvas>
+          </div>
+
+          <div id="errorMessage" class="message"></div>
+          <div id="resultArea"></div>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <script>
+    const hInput=document.getElementById("h");
+    const kInput=document.getElementById("k");
+    const radiusInput=document.getElementById("radius");
+    const radiusSquaredInput=document.getElementById("radiusSquared");
+    const preview=document.getElementById("preview");
+    const resultArea=document.getElementById("resultArea");
+    const errorMessage=document.getElementById("errorMessage");
+    const canvas=document.getElementById("graph");
+    const ctx=canvas.getContext("2d");
+
+    let mode="r";
+
+    function gcd(a,b){
+      a=Math.abs(Math.round(a));
+      b=Math.abs(Math.round(b));
+      while(b)[a,b]=[b,a%b];
+      return a||1;
+    }
+
+    function normalizeFraction(num,den){
+      if(den===0)throw new Error("El denominador no puede ser cero.");
+      if(den<0){num=-num;den=-den}
+      const g=gcd(num,den);
+      return{num:num/g,den:den/g};
+    }
+
+    function decimalToFraction(value){
+      const text=String(value).trim();
+      if(!text||!Number.isFinite(Number(text))){
+        throw new Error("Todos los datos deben ser números reales válidos.");
+      }
+
+      if(/^[+-]?\d+$/.test(text)){
+        return{num:Number(text),den:1};
+      }
+
+      const fixed=Number(text).toFixed(12).replace(/0+$/,"").replace(/\.$/,"");
+      const sign=fixed.startsWith("-")?-1:1;
+      const clean=fixed.replace("-","");
+
+      if(!clean.includes(".")){
+        return{num:sign*Number(clean),den:1};
+      }
+
+      const[i,d]=clean.split(".");
+      return normalizeFraction(
+        sign*(Number(i)*10**d.length+Number(d)),
+        10**d.length
+      );
+    }
+
+    function add(a,b){
+      return normalizeFraction(a.num*b.den+b.num*a.den,a.den*b.den);
+    }
+
+    function subtract(a,b){
+      return normalizeFraction(a.num*b.den-b.num*a.den,a.den*b.den);
+    }
+
+    function multiply(a,b){
+      return normalizeFraction(a.num*b.num,a.den*b.den);
+    }
+
+    function square(a){
+      return multiply(a,a);
+    }
+
+    function negate(a){
+      return{num:-a.num,den:a.den};
+    }
+
+    function fractionText(f){
+      f=normalizeFraction(f.num,f.den);
+      if(f.den===1)return String(f.num).replace("-","−");
+      return `${String(f.num).replace("-","−")}/${f.den}`;
+    }
+
+    function simplifySqrtInteger(n){
+      n=Math.abs(n);
+      if(n===0)return{outside:0,inside:1};
+      let outside=1,inside=n;
+
+      for(let p=2;p*p<=inside;p++){
+        const sq=p*p;
+        while(inside%sq===0){
+          outside*=p;
+          inside/=sq;
+        }
+      }
+      return{outside,inside};
+    }
+
+    function sqrtFractionText(f){
+      f=normalizeFraction(f.num,f.den);
+      if(f.num<0)throw new Error("r² no puede ser negativo.");
+      if(f.num===0)return"0";
+
+      const sn=simplifySqrtInteger(f.num);
+      const sd=simplifySqrtInteger(f.den);
+
+      let coeff=sn.outside;
+      let radicand=sn.inside*sd.inside;
+      let denominator=sd.outside*sd.inside;
+
+      const sr=simplifySqrtInteger(radicand);
+      coeff*=sr.outside;
+      radicand=sr.inside;
+
+      const g=gcd(coeff,denominator);
+      coeff/=g;
+      denominator/=g;
+
+      if(radicand===1){
+        return denominator===1?String(coeff):`${coeff}/${denominator}`;
+      }
+
+      const radical=coeff===1?`√${radicand}`:`${coeff}√${radicand}`;
+      return denominator===1?radical:`${radical}/${denominator}`;
+    }
+
+    function binomial(variable,center){
+      const text=fractionText({num:Math.abs(center.num),den:center.den});
+      if(center.num===0)return variable;
+      return center.num>0?`${variable}−${text}`:`${variable}+${text}`;
+    }
+
+    function signedTerm(coefficient,variable){
+      coefficient=normalizeFraction(coefficient.num,coefficient.den);
+      if(coefficient.num===0)return"";
+
+      const sign=coefficient.num>0?"+":"−";
+      const abs={num:Math.abs(coefficient.num),den:coefficient.den};
+      const coeff=fractionText(abs);
+      const body=coeff==="1"&&variable?variable:`${coeff}${variable}`;
+      return` ${sign} ${body}`;
+    }
+
+    function ordinaryEquation(h,k,r2){
+      return `(${binomial("x",h)})²+(${binomial("y",k)})²=${fractionText(r2)}`;
+    }
+
+    function generalEquation(h,k,r2){
+      const D=negate({num:2*h.num,den:h.den});
+      const E=negate({num:2*k.num,den:k.den});
+      const F=subtract(add(square(h),square(k)),r2);
+
+      return `x²+y²${signedTerm(D,"x")}${signedTerm(E,"y")}${signedTerm(F,"")}=0`;
+    }
+
+    function getData(){
+      const h=decimalToFraction(hInput.value);
+      const k=decimalToFraction(kInput.value);
+      let r2;
+
+      if(mode==="r"){
+        const r=decimalToFraction(radiusInput.value);
+        if(r.num<=0)throw new Error("El radio debe ser estrictamente positivo.");
+        r2=square(r);
+      }else{
+        r2=decimalToFraction(radiusSquaredInput.value);
+        if(r2.num<=0)throw new Error("El valor de r² debe ser estrictamente positivo.");
+      }
+
+      return{h,k,r2};
+    }
+
+    function updatePreview(){
+      try{
+        const{h,k,r2}=getData();
+        preview.textContent=ordinaryEquation(h,k,r2);
+      }catch{
+        preview.textContent="(x−h)²+(y−k)²=r²";
+      }
+      drawGraph();
+    }
+
+    function setMode(newMode){
+      mode=newMode;
+      document.getElementById("radiusBtn").classList.toggle("active",mode==="r");
+      document.getElementById("squareBtn").classList.toggle("active",mode==="r2");
+      document.getElementById("radiusField").classList.toggle("hidden",mode!=="r");
+      document.getElementById("squareField").classList.toggle("hidden",mode!=="r2");
+      updatePreview();
+    }
+
+    function resizeCanvas(){
+      const rect=canvas.getBoundingClientRect();
+      const dpr=window.devicePixelRatio||1;
+      canvas.width=Math.round(rect.width*dpr);
+      canvas.height=Math.round(rect.height*dpr);
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+      drawGraph();
+    }
+
+    function drawGraph(){
+      const rect=canvas.getBoundingClientRect();
+      const w=rect.width,h=rect.height;
+      ctx.clearRect(0,0,w,h);
+      ctx.fillStyle="#f8fafc";
+      ctx.fillRect(0,0,w,h);
+
+      let hVal=Number(hInput.value);
+      let kVal=Number(kInput.value);
+      let rVal=mode==="r"
+        ?Number(radiusInput.value)
+        :Math.sqrt(Number(radiusSquaredInput.value));
+
+      if(![hVal,kVal,rVal].every(Number.isFinite)||rVal<=0)return;
+
+      const extent=Math.max(5,Math.abs(hVal)+rVal,Math.abs(kVal)+rVal)+1;
+      const range=Math.ceil(extent);
+      const scale=Math.min(w,h)/(2*range);
+      const ox=w/2,oy=h/2;
+
+      ctx.strokeStyle="#dbe4ef";
+      ctx.lineWidth=1;
+
+      for(let i=-range;i<=range;i++){
+        const x=ox+i*scale;
+        const y=oy-i*scale;
+
+        ctx.beginPath();
+        ctx.moveTo(x,0);
+        ctx.lineTo(x,h);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(0,y);
+        ctx.lineTo(w,y);
+        ctx.stroke();
+      }
+
+      ctx.strokeStyle="#334155";
+      ctx.lineWidth=1.6;
+
+      ctx.beginPath();
+      ctx.moveTo(0,oy);
+      ctx.lineTo(w,oy);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(ox,0);
+      ctx.lineTo(ox,h);
+      ctx.stroke();
+
+      ctx.fillStyle="#475569";
+      ctx.font="12px Inter, sans-serif";
+
+      for(let i=-range;i<=range;i++){
+        if(i!==0){
+          ctx.textAlign="center";
+          ctx.textBaseline="top";
+          ctx.fillText(i,ox+i*scale,oy+5);
+
+          ctx.textAlign="right";
+          ctx.textBaseline="middle";
+          ctx.fillText(i,ox-6,oy-i*scale);
+        }
+      }
+
+      const sx=x=>ox+x*scale;
+      const sy=y=>oy-y*scale;
+
+      ctx.strokeStyle="#7c3aed";
+      ctx.lineWidth=3;
+      ctx.beginPath();
+      ctx.arc(sx(hVal),sy(kVal),rVal*scale,0,Math.PI*2);
+      ctx.stroke();
+
+      ctx.strokeStyle="#0891b2";
+      ctx.lineWidth=2;
+      ctx.setLineDash([6,5]);
+      ctx.beginPath();
+      ctx.moveTo(sx(hVal),sy(kVal));
+      ctx.lineTo(sx(hVal+rVal),sy(kVal));
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.fillStyle="#0891b2";
+      ctx.beginPath();
+      ctx.arc(sx(hVal),sy(kVal),6,0,Math.PI*2);
+      ctx.fill();
+
+      ctx.fillStyle="#0f172a";
+      ctx.font="bold 13px Inter, sans-serif";
+      ctx.textAlign="left";
+      ctx.textBaseline="bottom";
+      ctx.fillText(`C(${hVal}, ${kVal})`,sx(hVal)+9,sy(kVal)-8);
+
+      ctx.fillStyle="#475569";
+      ctx.font="bold 12px Inter, sans-serif";
+      ctx.textAlign="center";
+      ctx.textBaseline="bottom";
+      ctx.fillText(`r = ${Number(rVal.toFixed(4))}`,sx(hVal+rVal/2),sy(kVal)-7);
+    }
+
+    function solve(){
+      errorMessage.className="message";
+      errorMessage.textContent="";
+
+      try{
+        const{h,k,r2}=getData();
+        const ordinary=ordinaryEquation(h,k,r2);
+        const general=generalEquation(h,k,r2);
+        const radiusExact=sqrtFractionText(r2);
+
+        const D=negate({num:2*h.num,den:h.den});
+        const E=negate({num:2*k.num,den:k.den});
+        const F=subtract(add(square(h),square(k)),r2);
+
+        resultArea.innerHTML=`
+          <div class="status">● Circunferencia real determinada</div>
+
+          <div class="solution">
+            <div class="solution-label">Ecuación ordinaria</div>
+            <div class="answer">${ordinary}</div>
+          </div>
+
+          <div class="solution">
+            <div class="solution-label">Ecuación general</div>
+            <div class="answer">${general}</div>
+          </div>
+
+          <div class="steps">
+            <h3>Procedimiento</h3>
+
+            <div class="step">
+              <span class="step-number">1</span>
+              <div class="step-title">Datos geométricos</div>
+              <div class="math">
+                Centro C(${fractionText(h)}, ${fractionText(k)}), &nbsp;
+                radio r=${radiusExact}
+              </div>
+            </div>
+
+            <div class="step">
+              <span class="step-number">2</span>
+              <div class="step-title">Forma ordinaria</div>
+              <div class="math">
+                (x−h)²+(y−k)²=r²
+              </div>
+            </div>
+
+            <div class="step">
+              <span class="step-number">3</span>
+              <div class="step-title">Sustitución</div>
+              <div class="math">${ordinary}</div>
+            </div>
+
+            <div class="step">
+              <span class="step-number">4</span>
+              <div class="step-title">Coeficientes de la forma general</div>
+              <div class="math">
+                D=${fractionText(D)}, &nbsp;
+                E=${fractionText(E)}, &nbsp;
+                F=${fractionText(F)}
+              </div>
+            </div>
+
+            <div class="step">
+              <span class="step-number">5</span>
+              <div class="step-title">Forma general simplificada</div>
+              <div class="math">${general}</div>
+            </div>
+          </div>
+
+          <div class="decimal">
+            Radio aproximado: r ≈ ${Math.sqrt(r2.num/r2.den).toFixed(8)}
+          </div>
+        `;
+
+        drawGraph();
+      }catch(error){
+        errorMessage.textContent=error.message;
+        errorMessage.className="message error";
+        resultArea.innerHTML="";
+      }
+    }
+
+    [hInput,kInput,radiusInput,radiusSquaredInput].forEach(input=>{
+      input.addEventListener("input",updatePreview);
+      input.addEventListener("keydown",event=>{
+        if(event.key==="Enter")solve();
+      });
+    });
+
+    document.getElementById("radiusBtn").addEventListener("click",()=>setMode("r"));
+    document.getElementById("squareBtn").addEventListener("click",()=>setMode("r2"));
+    document.getElementById("solveBtn").addEventListener("click",solve);
+
+    document.getElementById("resetBtn").addEventListener("click",()=>{
+      hInput.value=2;
+      kInput.value=-1;
+      radiusInput.value=3;
+      radiusSquaredInput.value=9;
+      setMode("r");
+      solve();
+    });
+
+    document.querySelectorAll(".chip").forEach(chip=>{
+      chip.addEventListener("click",()=>{
+        hInput.value=chip.dataset.h;
+        kInput.value=chip.dataset.k;
+
+        if(chip.dataset.mode==="r"){
+          radiusInput.value=chip.dataset.v;
+          setMode("r");
+        }else{
+          radiusSquaredInput.value=chip.dataset.v;
+          setMode("r2");
+        }
+
+        solve();
+      });
+    });
+
+    window.addEventListener("resize",resizeCanvas);
+
+    updatePreview();
+    requestAnimationFrame(()=>{
+      resizeCanvas();
+      solve();
+    });
+  </script>
+</body>
+</html>

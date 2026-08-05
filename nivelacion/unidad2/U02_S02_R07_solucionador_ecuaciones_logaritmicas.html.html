@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Solucionador de ecuaciones logarítmicas</title>
+
+  <style>
+    :root {
+      --bg1: #07111f;
+      --bg2: #131b36;
+      --card: rgba(255,255,255,.085);
+      --line: rgba(255,255,255,.14);
+      --text: #f8fafc;
+      --muted: #cbd5e1;
+      --cyan: #22d3ee;
+      --violet: #8b5cf6;
+      --green: #34d399;
+      --red: #fb7185;
+      --input: rgba(7,17,31,.78);
+      --shadow: 0 25px 70px rgba(0,0,0,.38);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 18%, rgba(34,211,238,.18), transparent 28%),
+        radial-gradient(circle at 86% 10%, rgba(139,92,246,.22), transparent 30%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+      padding: 30px 16px;
+    }
+
+    .app {
+      width: min(1120px, 100%);
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(34,211,238,.28);
+      background: rgba(34,211,238,.09);
+      color: #a5f3fc;
+      font-size: .85rem;
+      font-weight: 800;
+    }
+
+    h1 {
+      margin: 16px 0 8px;
+      font-size: clamp(2rem, 5vw, 3.65rem);
+      line-height: 1.04;
+      letter-spacing: -.045em;
+    }
+
+    .subtitle {
+      max-width: 750px;
+      margin: 0 auto;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(330px,.9fr) minmax(380px,1.1fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: var(--card);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .content { padding: 24px; }
+
+    .title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 0 0 20px;
+      font-size: 1.12rem;
+    }
+
+    .icon {
+      width: 40px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      border-radius: 13px;
+      background: linear-gradient(135deg,var(--cyan),var(--violet));
+      font-weight: 900;
+    }
+
+    .preview {
+      margin-bottom: 20px;
+      padding: 20px 12px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(7,17,31,.55);
+      text-align: center;
+      font-family: "Cambria Math","Times New Roman",serif;
+      font-size: clamp(1.35rem,4vw,2rem);
+      overflow-wrap: anywhere;
+    }
+
+    .inputs {
+      display: grid;
+      grid-template-columns: repeat(2,1fr);
+      gap: 13px;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: .87rem;
+      font-weight: 750;
+    }
+
+    .field input {
+      width: 100%;
+      min-height: 52px;
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 14px;
+      background: var(--input);
+      color: var(--text);
+      outline: none;
+      padding: 11px 12px;
+      text-align: center;
+      font-size: 1.04rem;
+      transition: .2s ease;
+    }
+
+    .field input:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 4px rgba(34,211,238,.12);
+      transform: translateY(-1px);
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 52px;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    button {
+      min-height: 50px;
+      border: 0;
+      border-radius: 14px;
+      cursor: pointer;
+      color: white;
+      font-size: .96rem;
+      font-weight: 850;
+      transition: .18s ease;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.08);
+    }
+
+    .primary {
+      background: linear-gradient(135deg,var(--cyan),var(--violet));
+      box-shadow: 0 12px 26px rgba(34,211,238,.18);
+    }
+
+    .secondary {
+      background: rgba(255,255,255,.10);
+      border: 1px solid rgba(255,255,255,.12);
+    }
+
+    .examples { margin-top: 18px; }
+
+    .examples p {
+      margin: 0 0 10px;
+      color: var(--muted);
+      font-size: .86rem;
+      font-weight: 750;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      min-height: 36px;
+      padding: 7px 11px;
+      border-radius: 999px;
+      background: rgba(139,92,246,.10);
+      border: 1px solid rgba(167,139,250,.20);
+      color: #ddd6fe;
+      font-size: .8rem;
+    }
+
+    .note {
+      margin-top: 17px;
+      color: #94a3b8;
+      font-size: .8rem;
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    .message {
+      display: none;
+      margin-bottom: 15px;
+      padding: 13px 14px;
+      border-radius: 14px;
+      line-height: 1.5;
+    }
+
+    .message.error {
+      display: block;
+      color: #fecdd3;
+      background: rgba(244,63,94,.12);
+      border: 1px solid rgba(251,113,133,.25);
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      margin-bottom: 16px;
+      border-radius: 999px;
+      color: #a7f3d0;
+      background: rgba(16,185,129,.12);
+      border: 1px solid rgba(52,211,153,.24);
+      font-size: .84rem;
+      font-weight: 850;
+    }
+
+    .solution {
+      padding: 20px;
+      border-radius: 18px;
+      background: linear-gradient(135deg,rgba(34,211,238,.10),rgba(139,92,246,.10));
+      border: 1px solid rgba(125,211,252,.16);
+    }
+
+    .solution-label {
+      margin-bottom: 9px;
+      color: var(--muted);
+      font-size: .82rem;
+      font-weight: 850;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .answer {
+      padding: 15px;
+      border-radius: 14px;
+      background: rgba(7,17,31,.52);
+      text-align: center;
+      font-family: "Cambria Math","Times New Roman",serif;
+      font-size: clamp(1.25rem,4vw,1.8rem);
+      overflow-wrap: anywhere;
+    }
+
+    .steps { margin-top: 18px; }
+    .steps h3 { margin: 0 0 12px; font-size: 1rem; }
+
+    .step {
+      position: relative;
+      padding: 14px 14px 14px 48px;
+      border-radius: 15px;
+      background: rgba(7,17,31,.38);
+      border: 1px solid rgba(255,255,255,.08);
+    }
+
+    .step + .step { margin-top: 10px; }
+
+    .step-number {
+      position: absolute;
+      top: 13px;
+      left: 13px;
+      width: 25px;
+      height: 25px;
+      display: grid;
+      place-items: center;
+      border-radius: 9px;
+      background: linear-gradient(135deg,var(--cyan),var(--violet));
+      font-size: .78rem;
+      font-weight: 900;
+    }
+
+    .step-title {
+      margin-bottom: 5px;
+      color: #e0f2fe;
+      font-weight: 800;
+    }
+
+    .math {
+      font-family: "Cambria Math","Times New Roman",serif;
+      line-height: 1.7;
+      overflow-wrap: anywhere;
+    }
+
+    .decimal {
+      margin-top: 16px;
+      padding: 13px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.06);
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .empty {
+      padding: 34px 16px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    sub { font-size: .7em; }
+
+    @media (max-width: 850px) {
+      .layout { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 480px) {
+      body { padding: 18px 10px; }
+      .content { padding: 18px; }
+      .inputs { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="app">
+    <header>
+      <div class="badge">log Herramienta algebraica interactiva</div>
+      <h1>Ecuaciones logarítmicas</h1>
+      <p class="subtitle">
+        Resuelve ecuaciones de la forma
+        <strong>log<sub>b</sub>(ax+c)=d</strong>.
+        La solución se obtiene exactamente y se reduce a una fracción irreducible.
+      </p>
+    </header>
+
+    <section class="layout">
+      <article class="card">
+        <div class="content">
+          <h2 class="title"><span class="icon">log</span> Datos de la ecuación</h2>
+
+          <div class="preview" id="preview">
+            log<sub>2</sub>(3x+1)=4
+          </div>
+
+          <div class="inputs">
+            <div class="field">
+              <label for="b">Base b</label>
+              <input id="b" type="number" step="any" value="2" />
+            </div>
+
+            <div class="field">
+              <label for="a">Coeficiente a</label>
+              <input id="a" type="number" step="any" value="3" />
+            </div>
+
+            <div class="field">
+              <label for="c">Constante c</label>
+              <input id="c" type="number" step="any" value="1" />
+            </div>
+
+            <div class="field">
+              <label for="d">Segundo miembro d</label>
+              <input id="d" type="number" step="any" value="4" />
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="primary" id="solveBtn">Resolver ecuación</button>
+            <button class="secondary" id="resetBtn" title="Restablecer">↻</button>
+          </div>
+
+          <div class="examples">
+            <p>Ejemplos rápidos</p>
+            <div class="chips">
+              <button class="chip" data-b="2" data-a="3" data-c="1" data-d="4">Fracción 5</button>
+              <button class="chip" data-b="3" data-a="4" data-c="-2" data-d="2">Fracción 11/4</button>
+              <button class="chip" data-b="0.5" data-a="2" data-c="3" data-d="-2">Base entre 0 y 1</button>
+              <button class="chip" data-b="4" data-a="-3" data-c="20" data-d="1">Coeficiente negativo</button>
+            </div>
+          </div>
+
+          <p class="note">
+            Condiciones: b &gt; 0, b ≠ 1, a ≠ 0 y ax+c &gt; 0.
+          </p>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="content">
+          <h2 class="title"><span class="icon">✓</span> Solución exacta</h2>
+          <div id="errorMessage" class="message"></div>
+          <div id="resultArea">
+            <div class="empty">
+              Ingresa los valores y pulsa <strong>Resolver ecuación</strong>.
+            </div>
+          </div>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <script>
+    const ids = ["b","a","c","d"];
+    const inputs = Object.fromEntries(ids.map(id => [id, document.getElementById(id)]));
+    const preview = document.getElementById("preview");
+    const resultArea = document.getElementById("resultArea");
+    const errorMessage = document.getElementById("errorMessage");
+
+    function gcd(a,b) {
+      a = Math.abs(Math.round(a));
+      b = Math.abs(Math.round(b));
+      while (b) [a,b] = [b,a%b];
+      return a || 1;
+    }
+
+    function normalizeFraction(num,den) {
+      if (den === 0) throw new Error("El denominador no puede ser cero.");
+      if (den < 0) {
+        num = -num;
+        den = -den;
+      }
+      const g = gcd(num,den);
+      return {num:num/g, den:den/g};
+    }
+
+    function decimalToFraction(value) {
+      const text = String(value).trim();
+
+      if (!text || !Number.isFinite(Number(text))) {
+        throw new Error("Todos los datos deben ser números reales válidos.");
+      }
+
+      if (/^[+-]?\d+$/.test(text)) {
+        return {num:Number(text), den:1};
+      }
+
+      const fixed = Number(text).toFixed(12).replace(/0+$/,"").replace(/\.$/,"");
+      const sign = fixed.startsWith("-") ? -1 : 1;
+      const clean = fixed.replace("-","");
+
+      if (!clean.includes(".")) {
+        return {num:sign*Number(clean), den:1};
+      }
+
+      const [integerPart, decimalPart] = clean.split(".");
+      const den = 10 ** decimalPart.length;
+      const num = sign * (Number(integerPart)*den + Number(decimalPart));
+
+      return normalizeFraction(num,den);
+    }
+
+    function fractionText(frac) {
+      const f = normalizeFraction(frac.num,frac.den);
+      if (f.den === 1) return String(f.num).replace("-", "−");
+      return `${String(f.num).replace("-", "−")}/${f.den}`;
+    }
+
+    function formatLinear(a,c) {
+      let result = "";
+
+      if (a === 1) result = "x";
+      else if (a === -1) result = "−x";
+      else result = `${a}x`.replace("-", "−");
+
+      if (c > 0) result += `+${c}`;
+      if (c < 0) result += `−${Math.abs(c)}`;
+
+      return result;
+    }
+
+    function updatePreview() {
+      const b = Number(inputs.b.value);
+      const a = Number(inputs.a.value);
+      const c = Number(inputs.c.value);
+      const d = Number(inputs.d.value);
+
+      if (![b,a,c,d].every(Number.isFinite)) {
+        preview.innerHTML = "log<sub>b</sub>(ax+c)=d";
+        return;
+      }
+
+      preview.innerHTML =
+        `log<sub>${b}</sub>(${formatLinear(a,c)}) = ${d}`;
+    }
+
+    function solve() {
+      errorMessage.className = "message";
+      errorMessage.textContent = "";
+
+      try {
+        const b = Number(inputs.b.value);
+        const a = Number(inputs.a.value);
+        const c = Number(inputs.c.value);
+        const d = Number(inputs.d.value);
+
+        if (![b,a,c,d].every(Number.isFinite)) {
+          throw new Error("Todos los datos deben ser números reales válidos.");
+        }
+
+        if (b <= 0) throw new Error("La base b debe ser positiva.");
+        if (b === 1) throw new Error("La base b debe ser distinta de 1.");
+        if (a === 0) throw new Error("El coeficiente a debe ser distinto de cero.");
+
+        const power = Math.pow(b,d);
+
+        if (!Number.isFinite(power)) {
+          throw new Error("El valor b^d es demasiado grande para calcularse.");
+        }
+
+        const powerFrac = decimalToFraction(power);
+        const cFrac = decimalToFraction(c);
+        const aFrac = decimalToFraction(a);
+
+        const numerator = normalizeFraction(
+          powerFrac.num*cFrac.den - cFrac.num*powerFrac.den,
+          powerFrac.den*cFrac.den
+        );
+
+        const xFrac = normalizeFraction(
+          numerator.num*aFrac.den,
+          numerator.den*aFrac.num
+        );
+
+        const x = xFrac.num/xFrac.den;
+        const argument = a*x+c;
+
+        if (!(argument > 0)) {
+          throw new Error("La solución obtenida no pertenece al dominio del logaritmo.");
+        }
+
+        const exact = fractionText(xFrac);
+        const powerText = Number.isInteger(power)
+          ? String(power)
+          : power.toFixed(10).replace(/0+$/,"").replace(/\.$/,"");
+
+        resultArea.innerHTML = `
+          <div class="status">● Solución real válida</div>
+
+          <div class="solution">
+            <div class="solution-label">Resultado exacto</div>
+            <div class="answer">x = ${exact}</div>
+          </div>
+
+          <div class="steps">
+            <h3>Procedimiento</h3>
+
+            <div class="step">
+              <span class="step-number">1</span>
+              <div class="step-title">Forma logarítmica</div>
+              <div class="math">
+                log<sub>${b}</sub>(${formatLinear(a,c)}) = ${d}
+              </div>
+            </div>
+
+            <div class="step">
+              <span class="step-number">2</span>
+              <div class="step-title">Pasar a forma exponencial</div>
+              <div class="math">
+                ${formatLinear(a,c)} = ${b}<sup>${d}</sup> = ${powerText}
+              </div>
+            </div>
+
+            <div class="step">
+              <span class="step-number">3</span>
+              <div class="step-title">Despejar x</div>
+              <div class="math">
+                x = (${powerText} − (${c})) / (${a})
+              </div>
+            </div>
+
+            <div class="step">
+              <span class="step-number">4</span>
+              <div class="step-title">Reducir la fracción</div>
+              <div class="math">
+                x = ${exact}
+              </div>
+            </div>
+
+            <div class="step">
+              <span class="step-number">5</span>
+              <div class="step-title">Verificar el dominio</div>
+              <div class="math">
+                ax+c = ${argument.toFixed(10).replace(/0+$/,"").replace(/\.$/,"")} &gt; 0
+              </div>
+            </div>
+          </div>
+
+          <div class="decimal">
+            Aproximación decimal: x ≈ ${x.toFixed(8)}
+          </div>
+        `;
+      } catch (error) {
+        errorMessage.textContent = error.message;
+        errorMessage.className = "message error";
+        resultArea.innerHTML = `
+          <div class="empty">
+            Corrige los datos para obtener una solución real válida.
+          </div>
+        `;
+      }
+    }
+
+    ids.forEach(id => {
+      inputs[id].addEventListener("input", updatePreview);
+      inputs[id].addEventListener("keydown", event => {
+        if (event.key === "Enter") solve();
+      });
+    });
+
+    document.getElementById("solveBtn").addEventListener("click", solve);
+
+    document.getElementById("resetBtn").addEventListener("click", () => {
+      inputs.b.value = 2;
+      inputs.a.value = 3;
+      inputs.c.value = 1;
+      inputs.d.value = 4;
+      updatePreview();
+      solve();
+    });
+
+    document.querySelectorAll(".chip").forEach(chip => {
+      chip.addEventListener("click", () => {
+        inputs.b.value = chip.dataset.b;
+        inputs.a.value = chip.dataset.a;
+        inputs.c.value = chip.dataset.c;
+        inputs.d.value = chip.dataset.d;
+        updatePreview();
+        solve();
+      });
+    });
+
+    updatePreview();
+    solve();
+  </script>
+</body>
+</html>

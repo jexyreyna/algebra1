@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Práctica de dominio y rango desde una gráfica</title>
+
+<style>
+:root{
+  --bg1:#07111f;
+  --bg2:#121a34;
+  --card:rgba(255,255,255,.085);
+  --line:rgba(255,255,255,.14);
+  --text:#f8fafc;
+  --muted:#cbd5e1;
+  --cyan:#22d3ee;
+  --violet:#8b5cf6;
+  --green:#34d399;
+  --red:#fb7185;
+  --yellow:#fbbf24;
+  --input:rgba(7,17,31,.78);
+  --shadow:0 25px 70px rgba(0,0,0,.38);
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  min-height:100vh;
+  color:var(--text);
+  font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+  background:
+    radial-gradient(circle at 12% 18%,rgba(34,211,238,.18),transparent 28%),
+    radial-gradient(circle at 86% 10%,rgba(139,92,246,.22),transparent 30%),
+    linear-gradient(135deg,var(--bg1),var(--bg2));
+  padding:30px 16px;
+}
+.app{width:min(1220px,100%);margin:auto}
+header{text-align:center;margin-bottom:26px}
+.badge{
+  display:inline-flex;
+  padding:8px 14px;
+  border-radius:999px;
+  border:1px solid rgba(34,211,238,.28);
+  background:rgba(34,211,238,.09);
+  color:#a5f3fc;
+  font-size:.85rem;
+  font-weight:800;
+}
+h1{
+  margin:15px 0 8px;
+  font-size:clamp(2rem,5vw,3.5rem);
+  letter-spacing:-.045em;
+  line-height:1.05;
+}
+.subtitle{
+  max-width:860px;
+  margin:auto;
+  color:var(--muted);
+  line-height:1.65;
+}
+.layout{
+  display:grid;
+  grid-template-columns:minmax(360px,.92fr) minmax(450px,1.08fr);
+  gap:22px;
+  align-items:start;
+}
+.card{
+  border:1px solid var(--line);
+  background:var(--card);
+  backdrop-filter:blur(18px);
+  box-shadow:var(--shadow);
+  border-radius:24px;
+  overflow:hidden;
+}
+.content{padding:24px}
+.title{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin:0 0 20px;
+  font-size:1.12rem;
+}
+.icon{
+  width:40px;
+  height:40px;
+  display:grid;
+  place-items:center;
+  border-radius:13px;
+  background:linear-gradient(135deg,var(--cyan),var(--violet));
+  font-weight:900;
+}
+.preview{
+  margin-bottom:17px;
+  padding:16px 12px;
+  border-radius:16px;
+  background:rgba(7,17,31,.5);
+  border:1px solid rgba(255,255,255,.09);
+  text-align:center;
+  font-family:"Cambria Math","Times New Roman",serif;
+  font-size:1.12rem;
+  line-height:1.55;
+}
+.point-table{
+  display:grid;
+  gap:10px;
+}
+.point-row{
+  display:grid;
+  grid-template-columns:34px 1fr 1fr 112px 44px;
+  gap:9px;
+  align-items:end;
+  padding:10px;
+  border-radius:15px;
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.08);
+}
+.point-number{
+  width:30px;
+  height:30px;
+  display:grid;
+  place-items:center;
+  border-radius:10px;
+  background:linear-gradient(135deg,var(--cyan),var(--violet));
+  font-size:.8rem;
+  font-weight:900;
+  margin-bottom:9px;
+}
+.field label{
+  display:block;
+  margin-bottom:6px;
+  color:var(--muted);
+  font-size:.78rem;
+  font-weight:750;
+}
+input,select{
+  width:100%;
+  min-height:43px;
+  padding:9px 10px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.14);
+  outline:none;
+  background:var(--input);
+  color:var(--text);
+  font-size:.95rem;
+  text-align:center;
+}
+input:focus,select:focus{
+  border-color:var(--cyan);
+  box-shadow:0 0 0 4px rgba(34,211,238,.12);
+}
+.remove-btn{
+  min-height:43px;
+  width:44px;
+  padding:0;
+  background:rgba(244,63,94,.13);
+  border:1px solid rgba(251,113,133,.2);
+  color:#fecdd3;
+}
+.actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:11px;
+  margin-top:16px;
+}
+button{
+  min-height:48px;
+  border:0;
+  border-radius:13px;
+  cursor:pointer;
+  color:white;
+  font-size:.93rem;
+  font-weight:850;
+  transition:.18s;
+}
+button:hover{
+  transform:translateY(-2px);
+  filter:brightness(1.08);
+}
+.primary{background:linear-gradient(135deg,var(--cyan),var(--violet))}
+.secondary{
+  background:rgba(255,255,255,.1);
+  border:1px solid rgba(255,255,255,.12);
+}
+.examples{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:14px;
+}
+.chip{
+  min-height:35px;
+  padding:7px 11px;
+  border-radius:999px;
+  background:rgba(139,92,246,.1);
+  border:1px solid rgba(167,139,250,.2);
+  color:#ddd6fe;
+  font-size:.79rem;
+}
+.rule{
+  margin-top:17px;
+  padding:14px;
+  border-radius:14px;
+  color:#fde68a;
+  background:rgba(251,191,36,.08);
+  border:1px solid rgba(251,191,36,.2);
+  line-height:1.55;
+  font-size:.86rem;
+}
+.graph{
+  width:100%;
+  aspect-ratio:1.35;
+  min-height:350px;
+  margin-bottom:18px;
+  border-radius:18px;
+  overflow:hidden;
+  background:#f8fafc;
+  touch-action:none;
+}
+canvas{
+  width:100%;
+  height:100%;
+  display:block;
+}
+.status{
+  display:inline-flex;
+  padding:8px 12px;
+  margin-bottom:15px;
+  border-radius:999px;
+  color:#a7f3d0;
+  background:rgba(16,185,129,.12);
+  border:1px solid rgba(52,211,153,.24);
+  font-size:.84rem;
+  font-weight:850;
+}
+.answers{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+.answer-box{
+  padding:18px;
+  border-radius:17px;
+  background:linear-gradient(135deg,rgba(34,211,238,.09),rgba(139,92,246,.09));
+  border:1px solid rgba(125,211,252,.15);
+}
+.answer-label{
+  color:var(--muted);
+  font-size:.8rem;
+  font-weight:850;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  margin-bottom:8px;
+}
+.answer{
+  padding:13px;
+  border-radius:13px;
+  background:rgba(7,17,31,.5);
+  text-align:center;
+  font-family:"Cambria Math","Times New Roman",serif;
+  font-size:1.3rem;
+}
+.steps{margin-top:18px}
+.steps h3{margin:0 0 12px;font-size:1rem}
+.step{
+  position:relative;
+  padding:14px 14px 14px 48px;
+  border-radius:15px;
+  background:rgba(7,17,31,.38);
+  border:1px solid rgba(255,255,255,.08);
+}
+.step+.step{margin-top:10px}
+.step-number{
+  position:absolute;
+  top:13px;
+  left:13px;
+  width:25px;
+  height:25px;
+  display:grid;
+  place-items:center;
+  border-radius:9px;
+  background:linear-gradient(135deg,var(--cyan),var(--violet));
+  font-size:.78rem;
+  font-weight:900;
+}
+.step-title{
+  margin-bottom:5px;
+  color:#e0f2fe;
+  font-weight:800;
+}
+.math{
+  font-family:"Cambria Math","Times New Roman",serif;
+  line-height:1.65;
+}
+.practice{
+  margin-top:22px;
+  padding:21px;
+  border:1px solid var(--line);
+  border-radius:22px;
+  background:var(--card);
+  box-shadow:var(--shadow);
+}
+.practice h2{margin:0 0 8px}
+.practice p{
+  color:var(--muted);
+  line-height:1.5;
+}
+.practice-question{
+  margin:14px 0;
+  padding:17px;
+  border-radius:15px;
+  background:rgba(7,17,31,.48);
+  text-align:center;
+  font-family:"Cambria Math","Times New Roman",serif;
+  font-size:1.22rem;
+}
+.practice-options{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+.option{
+  background:rgba(255,255,255,.09);
+  border:1px solid rgba(255,255,255,.12);
+}
+.feedback{
+  display:none;
+  margin-top:12px;
+  padding:12px;
+  border-radius:12px;
+}
+.feedback.ok{
+  display:block;
+  color:#a7f3d0;
+  background:rgba(16,185,129,.12);
+  border:1px solid rgba(52,211,153,.24);
+}
+.feedback.bad{
+  display:block;
+  color:#fecdd3;
+  background:rgba(244,63,94,.12);
+  border:1px solid rgba(251,113,133,.25);
+}
+.score{
+  margin-top:13px;
+  text-align:center;
+  color:var(--muted);
+  font-size:.87rem;
+}
+.note{
+  margin-top:17px;
+  text-align:center;
+  color:#94a3b8;
+  font-size:.8rem;
+}
+@media(max-width:940px){
+  .layout{grid-template-columns:1fr}
+}
+@media(max-width:650px){
+  body{padding:18px 10px}
+  .content{padding:18px}
+  .point-row{grid-template-columns:30px 1fr 1fr}
+  .point-row .field:nth-of-type(3){grid-column:2/4}
+  .remove-btn{grid-column:3}
+  .answers,.actions,.practice-options{grid-template-columns:1fr}
+  .graph{min-height:300px}
+}
+</style>
+</head>
+
+<body>
+<main class="app">
+
+<header>
+  <div class="badge">Funciones desde su gráfica</div>
+  <h1>Dominio y rango</h1>
+  <p class="subtitle">
+    Construye una gráfica mediante puntos unidos por segmentos, arrastra los puntos
+    y determina el dominio y el rango de la función usando intervalos.
+  </p>
+</header>
+
+<section class="layout">
+
+<article class="card">
+<div class="content">
+  <h2 class="title"><span class="icon">ƒ</span> Configuración de la gráfica</h2>
+
+  <div class="preview" id="preview">
+    Puntos: (1,2), (3,4), (5,3)
+  </div>
+
+  <div class="point-table" id="pointTable"></div>
+
+  <div class="actions">
+    <button class="secondary" id="addPointBtn">Agregar punto</button>
+    <button class="primary" id="calculateBtn">Calcular dominio y rango</button>
+  </div>
+
+  <div class="examples">
+    <button class="chip" data-example="original">Ejemplo de la imagen</button>
+    <button class="chip" data-example="open">Extremo abierto</button>
+    <button class="chip" data-example="decreasing">Función decreciente</button>
+    <button class="chip" data-example="zigzag">Gráfica con varios tramos</button>
+  </div>
+
+  <div class="rule">
+    El <strong>dominio</strong> se obtiene proyectando la gráfica sobre el eje \(x\).
+    El <strong>rango</strong> se obtiene proyectándola sobre el eje \(y\).
+    Los puntos abiertos producen extremos no incluidos.
+  </div>
+</div>
+</article>
+
+<article class="card">
+<div class="content">
+  <h2 class="title"><span class="icon">✓</span> Gráfica interactiva</h2>
+
+  <div class="graph">
+    <canvas id="graph"></canvas>
+  </div>
+
+  <div id="resultArea"></div>
+</div>
+</article>
+
+</section>
+
+<section class="practice">
+  <h2>Modo de práctica</h2>
+  <p>Observa la gráfica generada y selecciona el dominio o rango correcto.</p>
+
+  <div class="practice-question" id="practiceQuestion"></div>
+
+  <div class="practice-options" id="practiceOptions"></div>
+
+  <div id="feedback" class="feedback"></div>
+
+  <button class="primary" id="newPracticeBtn" style="width:100%;margin-top:12px">
+    Nuevo ejercicio
+  </button>
+
+  <div class="score" id="score">Aciertos: 0 · Intentos: 0</div>
+</section>
+
+<p class="note">
+  Puedes arrastrar directamente los puntos de la gráfica. Sus coordenadas se
+  ajustan a valores enteros para facilitar la práctica.
+</p>
+
+</main>
+
+<script>
+const pointTable=document.getElementById("pointTable");
+const preview=document.getElementById("preview");
+const resultArea=document.getElementById("resultArea");
+const canvas=document.getElementById("graph");
+const ctx=canvas.getContext("2d");
+
+let pointId=0;
+let draggingIndex=null;
+let currentPractice=null;
+let attempts=0;
+let correct=0;
+
+function addPoint(x="",y="",type="closed"){
+  pointId++;
+  const row=document.createElement("div");
+  row.className="point-row";
+
+  row.innerHTML=`
+    <div class="point-number">${pointTable.children.length+1}</div>
+
+    <div class="field">
+      <label>Coordenada x</label>
+      <input class="x-input" type="number" step="1" value="${x}">
+    </div>
+
+    <div class="field">
+      <label>Coordenada y</label>
+      <input class="y-input" type="number" step="1" value="${y}">
+    </div>
+
+    <div class="field">
+      <label>Tipo de punto</label>
+      <select class="type-input">
+        <option value="closed" ${type==="closed"?"selected":""}>Cerrado</option>
+        <option value="open" ${type==="open"?"selected":""}>Abierto</option>
+      </select>
+    </div>
+
+    <button class="remove-btn">×</button>
+  `;
+
+  row.querySelectorAll("input,select").forEach(control=>{
+    control.addEventListener("input",()=>{
+      sortRows();
+      updatePreview();
+      drawGraph();
+    });
+  });
+
+  row.querySelector(".remove-btn").addEventListener("click",()=>{
+    if(pointTable.children.length<=2)return;
+    row.remove();
+    renumber();
+    updatePreview();
+    calculate();
+  });
+
+  pointTable.appendChild(row);
+  renumber();
+  updatePreview();
+}
+
+function renumber(){
+  [...pointTable.children].forEach((row,index)=>{
+    row.querySelector(".point-number").textContent=index+1;
+  });
+}
+
+function getPoints(){
+  const rows=[...pointTable.querySelectorAll(".point-row")];
+  const points=[];
+
+  for(const row of rows){
+    const x=Number(row.querySelector(".x-input").value);
+    const y=Number(row.querySelector(".y-input").value);
+    const type=row.querySelector(".type-input").value;
+
+    if(!Number.isFinite(x)||!Number.isFinite(y)){
+      throw new Error("Todos los puntos deben tener coordenadas válidas.");
+    }
+
+    points.push({x,y,type,row});
+  }
+
+  points.sort((a,b)=>a.x-b.x);
+  return points;
+}
+
+function sortRows(){
+  try{
+    const points=getPoints();
+    points.forEach(p=>pointTable.appendChild(p.row));
+    renumber();
+  }catch{}
+}
+
+function formatNumber(n){
+  return String(n).replace("-","−");
+}
+
+function updatePreview(){
+  try{
+    const points=getPoints();
+    preview.textContent=
+      "Puntos: "+points.map(p=>
+        `${p.type==="open"?"○":"●"}(${formatNumber(p.x)},${formatNumber(p.y)})`
+      ).join(", ");
+  }catch{
+    preview.textContent="Puntos de la gráfica";
+  }
+}
+
+function intervalText(min,max,minIncluded,maxIncluded){
+  if(min===max){
+    return minIncluded||maxIncluded?`{${formatNumber(min)}}`:"∅";
+  }
+
+  const left=minIncluded?"[":"(";
+  const right=maxIncluded?"]":")";
+  return `${left}${formatNumber(min)}, ${formatNumber(max)}${right}`;
+}
+
+function analyze(points){
+  const minX=points[0].x;
+  const maxX=points[points.length-1].x;
+
+  const minXPoints=points.filter(p=>p.x===minX);
+  const maxXPoints=points.filter(p=>p.x===maxX);
+
+  const minXIncluded=minXPoints.some(p=>p.type==="closed");
+  const maxXIncluded=maxXPoints.some(p=>p.type==="closed");
+
+  const ys=points.map(p=>p.y);
+  const minY=Math.min(...ys);
+  const maxY=Math.max(...ys);
+
+  const minYPoints=points.filter(p=>p.y===minY);
+  const maxYPoints=points.filter(p=>p.y===maxY);
+
+  const minYIncluded=minYPoints.some(p=>p.type==="closed");
+  const maxYIncluded=maxYPoints.some(p=>p.type==="closed");
+
+  return{
+    minX,maxX,minY,maxY,
+    domain:intervalText(minX,maxX,minXIncluded,maxXIncluded),
+    range:intervalText(minY,maxY,minYIncluded,maxYIncluded),
+    minXIncluded,maxXIncluded,minYIncluded,maxYIncluded
+  };
+}
+
+function calculate(){
+  try{
+    const points=getPoints();
+    const a=analyze(points);
+
+    resultArea.innerHTML=`
+      <div class="status">● Dominio y rango determinados</div>
+
+      <div class="answers">
+        <div class="answer-box">
+          <div class="answer-label">Dominio</div>
+          <div class="answer">Dom(f) = ${a.domain}</div>
+        </div>
+
+        <div class="answer-box">
+          <div class="answer-label">Rango</div>
+          <div class="answer">Ran(f) = ${a.range}</div>
+        </div>
+      </div>
+
+      <div class="steps">
+        <h3>Procedimiento</h3>
+
+        <div class="step">
+          <span class="step-number">1</span>
+          <div class="step-title">Proyección sobre el eje x</div>
+          <div class="math">
+            La gráfica comienza en x=${formatNumber(a.minX)} y termina en
+            x=${formatNumber(a.maxX)}.
+          </div>
+        </div>
+
+        <div class="step">
+          <span class="step-number">2</span>
+          <div class="step-title">Dominio</div>
+          <div class="math">
+            Dom(f)=${a.domain}.
+          </div>
+        </div>
+
+        <div class="step">
+          <span class="step-number">3</span>
+          <div class="step-title">Proyección sobre el eje y</div>
+          <div class="math">
+            El menor valor observado es y=${formatNumber(a.minY)} y el mayor es
+            y=${formatNumber(a.maxY)}.
+          </div>
+        </div>
+
+        <div class="step">
+          <span class="step-number">4</span>
+          <div class="step-title">Rango</div>
+          <div class="math">
+            Ran(f)=${a.range}.
+          </div>
+        </div>
+      </div>
+    `;
+
+    drawGraph();
+  }catch(error){
+    resultArea.innerHTML="";
+  }
+}
+
+function resizeCanvas(){
+  const rect=canvas.getBoundingClientRect();
+  const dpr=window.devicePixelRatio||1;
+  canvas.width=Math.round(rect.width*dpr);
+  canvas.height=Math.round(rect.height*dpr);
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  drawGraph();
+}
+
+function graphTransform(points){
+  const rect=canvas.getBoundingClientRect();
+  const w=rect.width;
+  const h=rect.height;
+
+  const maxAbs=Math.max(
+    5,
+    ...points.flatMap(p=>[Math.abs(p.x),Math.abs(p.y)])
+  );
+
+  const range=Math.ceil(maxAbs+1);
+  const scale=Math.min(w,h)/(2*range);
+  const ox=w/2;
+  const oy=h/2;
+
+  return{w,h,range,scale,ox,oy};
+}
+
+function drawGraph(){
+  const rect=canvas.getBoundingClientRect();
+  const w=rect.width;
+  const h=rect.height;
+
+  ctx.clearRect(0,0,w,h);
+  ctx.fillStyle="#f8fafc";
+  ctx.fillRect(0,0,w,h);
+
+  let points;
+  try{
+    points=getPoints();
+  }catch{
+    points=[];
+  }
+
+  const t=graphTransform(points);
+
+  ctx.strokeStyle="#dbe4ef";
+  ctx.lineWidth=1;
+
+  for(let i=-t.range;i<=t.range;i++){
+    const x=t.ox+i*t.scale;
+    const y=t.oy-i*t.scale;
+
+    ctx.beginPath();
+    ctx.moveTo(x,0);
+    ctx.lineTo(x,h);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(0,y);
+    ctx.lineTo(w,y);
+    ctx.stroke();
+  }
+
+  ctx.strokeStyle="#1e3a8a";
+  ctx.lineWidth=2;
+
+  ctx.beginPath();
+  ctx.moveTo(0,t.oy);
+  ctx.lineTo(w,t.oy);
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.moveTo(t.ox,0);
+  ctx.lineTo(t.ox,h);
+  ctx.stroke();
+
+  ctx.fillStyle="#1e3a8a";
+  ctx.font="12px Inter, sans-serif";
+
+  for(let i=-t.range;i<=t.range;i++){
+    if(i!==0){
+      ctx.textAlign="center";
+      ctx.textBaseline="top";
+      ctx.fillText(i,t.ox+i*t.scale,t.oy+5);
+
+      ctx.textAlign="right";
+      ctx.textBaseline="middle";
+      ctx.fillText(i,t.ox-6,t.oy-i*t.scale);
+    }
+  }
+
+  ctx.fillStyle="#1e40af";
+  ctx.font="italic bold 16px serif";
+  ctx.textAlign="left";
+  ctx.fillText("x",w-20,t.oy+23);
+  ctx.fillText("y",t.ox-20,20);
+
+  if(points.length>=2){
+    ctx.strokeStyle="#1d4ed8";
+    ctx.lineWidth=2.5;
+    ctx.beginPath();
+
+    points.forEach((p,index)=>{
+      const px=t.ox+p.x*t.scale;
+      const py=t.oy-p.y*t.scale;
+
+      if(index===0)ctx.moveTo(px,py);
+      else ctx.lineTo(px,py);
+    });
+
+    ctx.stroke();
+  }
+
+  points.forEach((p,index)=>{
+    const px=t.ox+p.x*t.scale;
+    const py=t.oy-p.y*t.scale;
+
+    ctx.lineWidth=3;
+    ctx.strokeStyle="#000";
+    ctx.fillStyle=p.type==="closed"?"#000":"#f8fafc";
+
+    ctx.beginPath();
+    ctx.arc(px,py,6.5,0,Math.PI*2);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle="#0f172a";
+    ctx.font="bold 12px Inter, sans-serif";
+    ctx.textAlign="left";
+    ctx.textBaseline="bottom";
+    ctx.fillText(`(${p.x}, ${p.y})`,px+8,py-7);
+  });
+}
+
+function canvasToGraph(clientX,clientY){
+  const rect=canvas.getBoundingClientRect();
+  const points=getPoints();
+  const t=graphTransform(points);
+
+  const px=clientX-rect.left;
+  const py=clientY-rect.top;
+
+  return{
+    x:Math.round((px-t.ox)/t.scale),
+    y:Math.round((t.oy-py)/t.scale)
+  };
+}
+
+function findPointAt(clientX,clientY){
+  const rect=canvas.getBoundingClientRect();
+  const points=getPoints();
+  const t=graphTransform(points);
+  const px=clientX-rect.left;
+  const py=clientY-rect.top;
+
+  let best=null;
+  let bestDist=Infinity;
+
+  points.forEach((p,index)=>{
+    const x=t.ox+p.x*t.scale;
+    const y=t.oy-p.y*t.scale;
+    const dist=Math.hypot(px-x,py-y);
+
+    if(dist<15&&dist<bestDist){
+      best=index;
+      bestDist=dist;
+    }
+  });
+
+  return best;
+}
+
+function updateDraggedPoint(index,x,y){
+  const points=getPoints();
+  const point=points[index];
+
+  point.row.querySelector(".x-input").value=x;
+  point.row.querySelector(".y-input").value=y;
+
+  sortRows();
+  updatePreview();
+  calculate();
+}
+
+canvas.addEventListener("pointerdown",event=>{
+  draggingIndex=findPointAt(event.clientX,event.clientY);
+  if(draggingIndex!==null){
+    canvas.setPointerCapture(event.pointerId);
+  }
+});
+
+canvas.addEventListener("pointermove",event=>{
+  if(draggingIndex===null)return;
+  const p=canvasToGraph(event.clientX,event.clientY);
+  updateDraggedPoint(draggingIndex,p.x,p.y);
+  draggingIndex=findPointAt(event.clientX,event.clientY);
+});
+
+canvas.addEventListener("pointerup",event=>{
+  draggingIndex=null;
+  canvas.releasePointerCapture(event.pointerId);
+});
+
+function loadExample(name){
+  const examples={
+    original:[
+      {x:1,y:2,type:"closed"},
+      {x:3,y:4,type:"closed"},
+      {x:5,y:3,type:"closed"}
+    ],
+    open:[
+      {x:-2,y:1,type:"open"},
+      {x:1,y:4,type:"closed"},
+      {x:4,y:2,type:"open"}
+    ],
+    decreasing:[
+      {x:-3,y:5,type:"closed"},
+      {x:0,y:2,type:"closed"},
+      {x:4,y:-1,type:"closed"}
+    ],
+    zigzag:[
+      {x:-4,y:0,type:"closed"},
+      {x:-1,y:4,type:"closed"},
+      {x:2,y:-2,type:"closed"},
+      {x:5,y:3,type:"closed"}
+    ]
+  };
+
+  pointTable.innerHTML="";
+  examples[name].forEach(p=>addPoint(p.x,p.y,p.type));
+  calculate();
+}
+
+function randomGraph(){
+  const count=3+Math.floor(Math.random()*2);
+  const xs=[];
+  let currentX=-4+Math.floor(Math.random()*3);
+
+  for(let i=0;i<count;i++){
+    xs.push(currentX);
+    currentX+=1+Math.floor(Math.random()*3);
+  }
+
+  const points=xs.map((x,index)=>({
+    x,
+    y:Math.floor(Math.random()*9)-4,
+    type:(index===0||index===xs.length-1)&&Math.random()>.55?"open":"closed"
+  }));
+
+  pointTable.innerHTML="";
+  points.forEach(p=>addPoint(p.x,p.y,p.type));
+  calculate();
+
+  const a=analyze(points);
+  const askDomain=Math.random()>.5;
+  const correctAnswer=askDomain?a.domain:a.range;
+
+  const min=askDomain?a.minX:a.minY;
+  const max=askDomain?a.maxX:a.maxY;
+
+  const distractors=[
+    `[${min}, ${max}]`,
+    `(${min}, ${max})`,
+    `[${min}, ${max})`,
+    `(${min}, ${max}]`
+  ].filter(v=>v!==correctAnswer);
+
+  currentPractice={
+    type:askDomain?"dominio":"rango",
+    correct:correctAnswer
+  };
+
+  document.getElementById("practiceQuestion").textContent=
+    `¿Cuál es el ${currentPractice.type} de la gráfica mostrada?`;
+
+  const options=[correctAnswer,...distractors.slice(0,3)]
+    .filter((v,i,a)=>a.indexOf(v)===i)
+    .sort(()=>Math.random()-.5);
+
+  const box=document.getElementById("practiceOptions");
+  box.innerHTML="";
+
+  options.forEach(value=>{
+    const btn=document.createElement("button");
+    btn.className="option";
+    btn.textContent=value;
+    btn.addEventListener("click",()=>checkPractice(value));
+    box.appendChild(btn);
+  });
+
+  const feedback=document.getElementById("feedback");
+  feedback.className="feedback";
+  feedback.textContent="";
+}
+
+function checkPractice(answer){
+  attempts++;
+  const feedback=document.getElementById("feedback");
+
+  if(answer===currentPractice.correct){
+    correct++;
+    feedback.className="feedback ok";
+    feedback.textContent="Correcto.";
+  }else{
+    feedback.className="feedback bad";
+    feedback.textContent=`Incorrecto. El ${currentPractice.type} correcto es ${currentPractice.correct}.`;
+  }
+
+  document.getElementById("score").textContent=
+    `Aciertos: ${correct} · Intentos: ${attempts}`;
+}
+
+document.getElementById("addPointBtn").addEventListener("click",()=>{
+  const points=getPoints();
+  const last=points[points.length-1];
+  addPoint(last.x+1,last.y,"closed");
+  calculate();
+});
+
+document.getElementById("calculateBtn").addEventListener("click",calculate);
+
+document.querySelectorAll(".chip").forEach(chip=>{
+  chip.addEventListener("click",()=>{
+    loadExample(chip.dataset.example);
+  });
+});
+
+document.getElementById("newPracticeBtn").addEventListener("click",randomGraph);
+window.addEventListener("resize",resizeCanvas);
+
+addPoint(1,2,"closed");
+addPoint(3,4,"closed");
+addPoint(5,3,"closed");
+
+requestAnimationFrame(()=>{
+  resizeCanvas();
+  calculate();
+  randomGraph();
+});
+</script>
+</body>
+</html>

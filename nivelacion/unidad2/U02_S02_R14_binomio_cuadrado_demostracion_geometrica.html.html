@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Demostración geométrica de (x + a)²</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #14172B;
+    --panel: #1E2240;
+    --panel-2: #242952;
+    --border: #313866;
+    --text: #F2EFE6;
+    --text-dim: #A8ACC8;
+    --gold: #E8B84B;
+    --coral: #F0665C;
+    --teal: #5FC9B8;
+    --grid: #2A2F55;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(circle at 15% 8%, #1c2145 0%, transparent 45%),
+      var(--bg);
+    color:var(--text);
+    font-family:'Inter', sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:36px 24px 64px;}
+
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12.5px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--gold);
+    margin-bottom:10px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .eyebrow::before{content:"";width:22px;height:1px;background:var(--gold);display:inline-block;}
+  h1{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:clamp(28px,4vw,42px);
+    line-height:1.08;
+    margin:0 0 14px;
+    letter-spacing:-.01em;
+  }
+  h1 em{color:var(--gold);font-style:italic;font-weight:500;}
+  .lede{
+    color:var(--text-dim);
+    font-size:15.5px;
+    line-height:1.6;
+    max-width:680px;
+    margin:0 0 28px;
+  }
+
+  .statement{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:20px 24px;
+    margin-bottom:32px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:28px;
+    align-items:center;
+  }
+  .statement-item{display:flex;flex-direction:column;gap:6px;}
+  .statement-label{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.1em;
+    color:var(--text-dim);
+  }
+  .statement-eq{
+    font-family:'JetBrains Mono',monospace;
+    font-size:18px;
+    font-weight:700;
+  }
+  .statement-eq.a-side{color:var(--coral);}
+  .statement-eq.x-side{color:var(--teal);}
+
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start;}
+  @media (max-width:920px){ .grid{grid-template-columns:1fr;} }
+
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:22px 24px 26px;
+  }
+  .panel h2{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:18px;
+    margin:0 0 4px;
+  }
+  .panel .sub{color:var(--text-dim);font-size:13px;margin:0 0 18px;}
+
+  .control-group{margin-bottom:20px;}
+  .control-group:last-child{margin-bottom:0;}
+  .control-title{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:var(--text-dim);
+    margin-bottom:10px;
+    display:flex;align-items:center;gap:8px;
+  }
+  .dot{width:9px;height:9px;border-radius:50%;display:inline-block;}
+  .dot.teal{background:var(--teal);}
+  .dot.coral{background:var(--coral);}
+
+  .slider-row{
+    display:grid;
+    grid-template-columns:22px 1fr 58px;
+    align-items:center;
+    gap:10px;
+    margin-bottom:10px;
+  }
+  .slider-row label{
+    font-family:'JetBrains Mono',monospace;
+    font-size:14px;
+    font-weight:700;
+    color:var(--text);
+  }
+  input[type=range]{
+    -webkit-appearance:none;
+    width:100%;
+    height:4px;
+    border-radius:2px;
+    background:var(--grid);
+    outline:none;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    width:16px;height:16px;border-radius:50%;
+    background:var(--gold);
+    cursor:pointer;
+    border:2px solid #14172B;
+    box-shadow:0 0 0 1px var(--gold);
+  }
+  input[type=range]::-moz-range-thumb{
+    width:16px;height:16px;border-radius:50%;
+    background:var(--gold);cursor:pointer;border:2px solid #14172B;
+  }
+  .slider-val{
+    font-family:'JetBrains Mono',monospace;
+    font-size:13px;
+    text-align:right;
+    background:var(--panel-2);
+    border:1px solid var(--border);
+    border-radius:6px;
+    padding:4px 6px;
+    color:var(--text);
+  }
+
+  .step{
+    display:grid;
+    grid-template-columns:26px 1fr;
+    gap:12px;
+    padding:14px 0;
+    border-top:1px solid var(--border);
+  }
+  .step:first-of-type{border-top:none;padding-top:0;}
+  .step-num{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:17px;
+    color:var(--gold);
+    line-height:1.3;
+  }
+  .step-body h3{
+    margin:0 0 6px;
+    font-size:14px;
+    font-weight:600;
+    color:var(--text);
+  }
+  .step-body p{
+    margin:0 0 8px;
+    font-size:13.5px;
+    color:var(--text-dim);
+    line-height:1.55;
+  }
+  .eqline{
+    font-family:'JetBrains Mono',monospace;
+    font-size:14px;
+    background:var(--panel-2);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:8px 12px;
+    display:inline-block;
+    margin:2px 6px 2px 0;
+  }
+  .eqline.result{border-color:var(--gold);color:var(--gold);font-weight:700;}
+
+  .result-card{
+    margin-top:18px;
+    background:linear-gradient(135deg, rgba(232,184,74,.12), rgba(232,184,74,.03));
+    border:1px solid var(--gold);
+    border-radius:12px;
+    padding:16px 18px;
+  }
+  .result-card .rc-label{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.1em;
+    color:var(--gold);
+    margin-bottom:6px;
+  }
+  .result-card .rc-eq{
+    font-family:'JetBrains Mono',monospace;
+    font-size:20px;
+    font-weight:700;
+    color:var(--text);
+  }
+
+  .graph-panel{position:sticky;top:20px;}
+  svg{width:100%;height:auto;display:block;}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:14px;}
+  .legend-item{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--text-dim);font-family:'JetBrains Mono',monospace;}
+  .legend-swatch{width:16px;height:16px;border-radius:4px;}
+
+  .verify-badge{
+    display:flex;align-items:center;justify-content:center;gap:10px;
+    margin-top:16px;
+    padding:12px 14px;
+    background:var(--panel-2);
+    border:1px solid var(--border);
+    border-radius:10px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:14.5px;
+    flex-wrap:wrap;
+  }
+  .verify-badge .val{color:var(--gold);font-weight:700;}
+  .eqmark{color:var(--text-dim);}
+
+  footer{
+    margin-top:40px;
+    text-align:center;
+    color:var(--text-dim);
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    letter-spacing:.04em;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow">Caso · Demostración geométrica de <span style="text-transform:lowercase;">(x + a)²</span></div>
+  <h1>Área del jardín</h1>
+  <p class="lede">El cuadrado grande de lado (x + a) se reparte en cuatro secciones: un cuadrado de lado a, un cuadrado de lado x en la esquina opuesta, y dos rectángulos de lados x y a. Ajusta x y a para ver cómo cada pieza forma la expresión algebraica total.</p>
+
+  <div class="statement">
+    <div class="statement-item">
+      <div class="statement-label">Lado del cuadrado</div>
+      <div class="statement-eq" style="color:var(--gold);">(x + a)</div>
+    </div>
+    <div class="statement-item">
+      <div class="statement-label">Valor de <span style="text-transform:lowercase;">x</span></div>
+      <div class="statement-eq x-side" id="disp-x">4</div>
+    </div>
+    <div class="statement-item">
+      <div class="statement-label">Valor de <span style="text-transform:lowercase;">a</span></div>
+      <div class="statement-eq a-side" id="disp-a">3</div>
+    </div>
+    <div class="statement-item">
+      <div class="statement-label">Pregunta</div>
+      <div class="statement-eq" style="color:var(--text);font-weight:600;font-size:14px;">(x + a)² = ?</div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div>
+      <div class="panel">
+        <h2>Dimensiones del jardín</h2>
+        <p class="sub">Cambia x y a para recalcular el área total y sus cuatro secciones.</p>
+
+        <div class="control-group">
+          <div class="slider-row">
+            <label><span class="dot teal"></span>x</label>
+            <input type="range" id="x" min="1" max="10" step="0.5" value="4">
+            <span class="slider-val" id="x-val">4</span>
+          </div>
+          <div class="slider-row">
+            <label><span class="dot coral"></span>a</label>
+            <input type="range" id="a" min="1" max="10" step="0.5" value="3">
+            <span class="slider-val" id="a-val">3</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top:20px;">
+        <h2>Solución paso a paso</h2>
+        <p class="sub">El razonamiento se recalcula en vivo con tus valores.</p>
+        <div id="steps"></div>
+        <div class="result-card">
+          <div class="rc-label">Área total del jardín</div>
+          <div class="rc-eq" id="final-answer">(x + a)² = x² + 2ax + a²</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel graph-panel">
+      <h2>Vista del jardín</h2>
+      <p class="sub">Cada sección es proporcional a x y a.</p>
+      <svg id="graph" viewBox="0 0 560 500" xmlns="http://www.w3.org/2000/svg"></svg>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-swatch" style="background:var(--teal);"></span>Cuadrado x²</div>
+        <div class="legend-item"><span class="legend-swatch" style="background:var(--coral);"></span>Cuadrado a²</div>
+        <div class="legend-item"><span class="legend-swatch" style="background:var(--panel-2);border:1px solid var(--gold);"></span>Rectángulos ax</div>
+      </div>
+      <div class="verify-badge">
+        <span>(x+a)² = <span class="val" id="badge-total1">49</span></span>
+        <span class="eqmark">=</span>
+        <span>x²+2ax+a² = <span class="val" id="badge-total2">49</span></span>
+      </div>
+    </div>
+  </div>
+
+  <footer>x² + ax + ax + a² = x² + 2ax + a² &nbsp;·&nbsp; área total = suma de las 4 secciones</footer>
+</div>
+
+<script>
+const ids = ['x','a'];
+const state = {};
+ids.forEach(id=>{
+  const el = document.getElementById(id);
+  state[id] = parseFloat(el.value);
+  el.addEventListener('input', ()=>{
+    state[id] = parseFloat(el.value);
+    document.getElementById(id+'-val').textContent = fmtNum(state[id]);
+    render();
+  });
+  document.getElementById(id+'-val').textContent = fmtNum(state[id]);
+});
+
+function fmtNum(n){
+  n = Math.round(n*100)/100;
+  return (n % 1 === 0) ? n.toString() : n.toFixed(2).replace(/0+$/,'').replace(/\.$/,'');
+}
+
+function render(){
+  const {x,a} = state;
+  document.getElementById('disp-x').textContent = fmtNum(x);
+  document.getElementById('disp-a').textContent = fmtNum(a);
+
+  const side = x + a;
+  const totalArea = side*side;
+  const x2 = x*x;
+  const a2 = a*a;
+  const xa = x*a;
+  const sumParts = x2 + xa + xa + a2;
+
+  const steps = document.getElementById('steps');
+  steps.innerHTML = `
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h3>Área del cuadrado grande</h3>
+        <p>El jardín completo es un cuadrado de lado (x + a) = ${fmtNum(side)}.</p>
+        <div class="eqline">Área = (x + a)² = (${fmtNum(side)})² = ${fmtNum(totalArea)}</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h3>Área de cada una de las 4 secciones</h3>
+        <p>Sumamos el cuadrado de lado x, el cuadrado de lado a y los dos rectángulos x·a.</p>
+        <div class="eqline">x² = ${fmtNum(x2)}</div>
+        <div class="eqline">a² = ${fmtNum(a2)}</div>
+        <div class="eqline">x·a = ${fmtNum(xa)}</div>
+        <div class="eqline">x·a = ${fmtNum(xa)}</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h3>Sumamos las 4 secciones</h3>
+        <p>El área total del jardín es igual a la suma de sus partes.</p>
+        <div class="eqline">x² + xa + xa + a² = ${fmtNum(x2)} + ${fmtNum(xa)} + ${fmtNum(xa)} + ${fmtNum(a2)}</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h3>Agrupamos términos semejantes</h3>
+        <p>Los dos rectángulos son iguales (xa), así que se combinan en 2ax.</p>
+        <div class="eqline result">x² + 2ax + a² = ${fmtNum(sumParts)}</div>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('final-answer').textContent = `(x + a)² = x² + 2ax + a² = ${fmtNum(totalArea)}`;
+  document.getElementById('badge-total1').textContent = fmtNum(totalArea);
+  document.getElementById('badge-total2').textContent = fmtNum(sumParts);
+
+  drawSquare(x,a);
+}
+
+function drawSquare(x,a){
+  const svg = document.getElementById('graph');
+  const W = 560, H = 500;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+
+  const side = x + a;
+  const maxPx = 340;
+  const scale = maxPx/side;
+  const sx = scale*x, sa = scale*a;
+
+  const originX = (W - (sx+sa))/2 + 20;
+  const originY = 60;
+
+  // cells
+  const cellX2 = `<rect x="${originX}" y="${originY}" width="${sx}" height="${sx}" fill="var(--teal)" fill-opacity="0.85" stroke="#0F3D38" stroke-width="1.5"/>`;
+  const cellA2 = `<rect x="${originX+sx}" y="${originY+sx}" width="${sa}" height="${sa}" fill="var(--coral)" fill-opacity="0.85" stroke="#7A2015" stroke-width="1.5"/>`;
+  const cellR1 = `<rect x="${originX+sx}" y="${originY}" width="${sa}" height="${sx}" fill="var(--panel-2)" stroke="var(--gold)" stroke-width="1.5"/>`;
+  const cellR2 = `<rect x="${originX}" y="${originY+sx}" width="${sx}" height="${sa}" fill="var(--panel-2)" stroke="var(--gold)" stroke-width="1.5"/>`;
+
+  function label(cx,cy,text,color,size){
+    return `<text x="${cx}" y="${cy}" text-anchor="middle" dominant-baseline="middle" font-family="JetBrains Mono, monospace" font-size="${size||15}" font-weight="700" fill="${color}">${text}</text>`;
+  }
+
+  const labelsFixed = `
+    ${label(originX+sx/2, originY+sx/2 - 8, 'x²', '#0F2E2A', 17)}
+    ${label(originX+sx/2, originY+sx/2 + 14, fmtNum(x*x), '#0F2E2A', 12)}
+    ${label(originX+sx+sa/2, originY+sx+sa/2 - 8, 'a²', '#F2EFE6', 17)}
+    ${label(originX+sx+sa/2, originY+sx+sa/2 + 14, fmtNum(a*a), '#F2EFE6', 12)}
+    ${label(originX+sx+sa/2, originY+sx/2 - 8, 'ax', 'var(--gold)', 16)}
+    ${label(originX+sx+sa/2, originY+sx/2 + 14, fmtNum(x*a), 'var(--text-dim)', 11)}
+    ${label(originX+sx/2, originY+sx+sa/2 - 8, 'ax', 'var(--gold)', 16)}
+    ${label(originX+sx/2, originY+sx+sa/2 + 14, fmtNum(x*a), 'var(--text-dim)', 11)}
+  `;
+
+  // outer dimension brackets (top: x then a, left: x then a)
+  const dimY = originY - 22;
+  const topDim = `
+    <line x1="${originX}" y1="${dimY}" x2="${originX+sx}" y2="${dimY}" stroke="var(--teal)" stroke-width="1.5"/>
+    <line x1="${originX}" y1="${dimY-5}" x2="${originX}" y2="${dimY+5}" stroke="var(--teal)" stroke-width="1.5"/>
+    <line x1="${originX+sx}" y1="${dimY-5}" x2="${originX+sx}" y2="${dimY+5}" stroke="var(--teal)" stroke-width="1.5"/>
+    ${label(originX+sx/2, dimY-10, 'x', 'var(--teal)', 14)}
+    <line x1="${originX+sx}" y1="${dimY}" x2="${originX+sx+sa}" y2="${dimY}" stroke="var(--coral)" stroke-width="1.5"/>
+    <line x1="${originX+sx+sa}" y1="${dimY-5}" x2="${originX+sx+sa}" y2="${dimY+5}" stroke="var(--coral)" stroke-width="1.5"/>
+    ${label(originX+sx+sa/2, dimY-10, 'a', 'var(--coral)', 14)}
+  `;
+
+  const dimX = originX + sx + sa + 22;
+  const leftDim = `
+    <line x1="${dimX}" y1="${originY}" x2="${dimX}" y2="${originY+sx}" stroke="var(--teal)" stroke-width="1.5"/>
+    <line x1="${dimX-5}" y1="${originY}" x2="${dimX+5}" y2="${originY}" stroke="var(--teal)" stroke-width="1.5"/>
+    <line x1="${dimX-5}" y1="${originY+sx}" x2="${dimX+5}" y2="${originY+sx}" stroke="var(--teal)" stroke-width="1.5"/>
+    ${label(dimX+22, originY+sx/2, 'x', 'var(--teal)', 14)}
+    <line x1="${dimX}" y1="${originY+sx}" x2="${dimX}" y2="${originY+sx+sa}" stroke="var(--coral)" stroke-width="1.5"/>
+    <line x1="${dimX-5}" y1="${originY+sx+sa}" x2="${dimX+5}" y2="${originY+sx+sa}" stroke="var(--coral)" stroke-width="1.5"/>
+    ${label(dimX+22, originY+sx+sa/2, 'a', 'var(--coral)', 14)}
+  `;
+
+  const outline = `<rect x="${originX}" y="${originY}" width="${sx+sa}" height="${sx+sa}" fill="none" stroke="var(--gold)" stroke-width="2.5" rx="2"/>`;
+  const midLines = `
+    <line x1="${originX+sx}" y1="${originY}" x2="${originX+sx}" y2="${originY+sx+sa}" stroke="var(--bg)" stroke-width="2"/>
+    <line x1="${originX}" y1="${originY+sx}" x2="${originX+sx+sa}" y2="${originY+sx}" stroke="var(--bg)" stroke-width="2"/>
+  `;
+
+  svg.innerHTML = `${cellX2}${cellR1}${cellR2}${cellA2}${midLines}${outline}${labelsFixed}${topDim}${leftDim}`;
+}
+
+render();
+</script>
+</body>
+</html>

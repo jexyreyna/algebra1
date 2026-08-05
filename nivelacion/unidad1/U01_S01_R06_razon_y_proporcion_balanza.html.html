@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Razón de pesos en una balanza</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #14172B;
+    --panel: #1E2240;
+    --panel-2: #242952;
+    --border: #313866;
+    --text: #F2EFE6;
+    --text-dim: #A8ACC8;
+    --gold: #E8B84B;
+    --coral: #F0665C;
+    --teal: #5FC9B8;
+    --grid: #2A2F55;
+    --dark-block: #6E8BFF;
+    --dark-block-2: #2A3FB8;
+    --light-block: #FFE9EF;
+    --light-block-2: #FF9EBB;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(circle at 15% 8%, #1c2145 0%, transparent 45%),
+      var(--bg);
+    color:var(--text);
+    font-family:'Inter', sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:36px 24px 64px;}
+
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12.5px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--gold);
+    margin-bottom:10px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .eyebrow::before{content:"";width:22px;height:1px;background:var(--gold);display:inline-block;}
+  h1{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:clamp(28px,4vw,42px);
+    line-height:1.08;
+    margin:0 0 14px;
+    letter-spacing:-.01em;
+  }
+  h1 em{color:var(--gold);font-style:italic;font-weight:500;}
+  .lede{
+    color:var(--text-dim);
+    font-size:15.5px;
+    line-height:1.6;
+    max-width:680px;
+    margin:0 0 28px;
+  }
+
+  .statement{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:20px 24px;
+    margin-bottom:32px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:28px;
+    align-items:center;
+  }
+  .statement-item{display:flex;flex-direction:column;gap:6px;}
+  .statement-label{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.1em;
+    color:var(--text-dim);
+  }
+  .statement-eq{
+    font-family:'JetBrains Mono',monospace;
+    font-size:17px;
+    font-weight:700;
+  }
+  .statement-eq.left{color:var(--teal);}
+  .statement-eq.right{color:var(--coral);}
+
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start;}
+  @media (max-width:920px){ .grid{grid-template-columns:1fr;} }
+
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:22px 24px 26px;
+  }
+  .panel h2{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:18px;
+    margin:0 0 4px;
+  }
+  .panel .sub{color:var(--text-dim);font-size:13px;margin:0 0 18px;}
+
+  .control-group{margin-bottom:20px;}
+  .control-group:last-child{margin-bottom:0;}
+  .control-title{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:var(--text-dim);
+    margin-bottom:10px;
+    display:flex;align-items:center;gap:8px;
+  }
+  .dot{width:9px;height:9px;border-radius:50%;display:inline-block;}
+  .dot.leftc{background:var(--teal);}
+  .dot.rightc{background:var(--coral);}
+  .swatch{width:12px;height:12px;border-radius:3px;display:inline-block;border:1px solid rgba(255,255,255,.25);}
+  .swatch.dark{background:linear-gradient(135deg,var(--dark-block),var(--dark-block-2));}
+  .swatch.light{background:linear-gradient(135deg,var(--light-block),var(--light-block-2));}
+
+  .slider-row{
+    display:grid;
+    grid-template-columns:80px 1fr 40px;
+    align-items:center;
+    gap:10px;
+    margin-bottom:10px;
+  }
+  .slider-row label{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12.5px;
+    font-weight:600;
+    color:var(--text);
+    display:flex;align-items:center;gap:6px;
+  }
+  input[type=range]{
+    -webkit-appearance:none;
+    width:100%;
+    height:4px;
+    border-radius:2px;
+    background:var(--grid);
+    outline:none;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    width:16px;height:16px;border-radius:50%;
+    background:var(--gold);
+    cursor:pointer;
+    border:2px solid #14172B;
+    box-shadow:0 0 0 1px var(--gold);
+  }
+  input[type=range]::-moz-range-thumb{
+    width:16px;height:16px;border-radius:50%;
+    background:var(--gold);cursor:pointer;border:2px solid #14172B;
+  }
+  .slider-val{
+    font-family:'JetBrains Mono',monospace;
+    font-size:13px;
+    text-align:right;
+    background:var(--panel-2);
+    border:1px solid var(--border);
+    border-radius:6px;
+    padding:4px 6px;
+    color:var(--text);
+  }
+
+  .error-box{
+    background:rgba(240,102,92,.1);
+    border:1px solid var(--coral);
+    color:var(--coral);
+    border-radius:10px;
+    padding:12px 14px;
+    font-size:13.5px;
+    line-height:1.5;
+    margin-top:6px;
+  }
+  .warn-box{
+    background:rgba(232,184,74,.1);
+    border:1px solid var(--gold);
+    color:var(--gold);
+    border-radius:10px;
+    padding:12px 14px;
+    font-size:13.5px;
+    line-height:1.5;
+    margin-top:14px;
+  }
+
+  .step{
+    display:grid;
+    grid-template-columns:26px 1fr;
+    gap:12px;
+    padding:14px 0;
+    border-top:1px solid var(--border);
+  }
+  .step:first-of-type{border-top:none;padding-top:0;}
+  .step-num{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:17px;
+    color:var(--gold);
+    line-height:1.3;
+  }
+  .step-body h3{
+    margin:0 0 6px;
+    font-size:14px;
+    font-weight:600;
+    color:var(--text);
+  }
+  .step-body p{
+    margin:0 0 8px;
+    font-size:13.5px;
+    color:var(--text-dim);
+    line-height:1.55;
+  }
+  .eqline{
+    font-family:'JetBrains Mono',monospace;
+    font-size:14px;
+    background:var(--panel-2);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:8px 12px;
+    display:inline-block;
+    margin:2px 6px 2px 0;
+  }
+  .eqline.result{border-color:var(--gold);color:var(--gold);font-weight:700;}
+
+  .result-card{
+    margin-top:18px;
+    background:linear-gradient(135deg, rgba(232,184,74,.12), rgba(232,184,74,.03));
+    border:1px solid var(--gold);
+    border-radius:12px;
+    padding:16px 18px;
+  }
+  .result-card .rc-label{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.1em;
+    color:var(--gold);
+    margin-bottom:6px;
+  }
+  .result-card .rc-eq{
+    font-family:'JetBrains Mono',monospace;
+    font-size:21px;
+    font-weight:700;
+    color:var(--text);
+  }
+
+  .graph-panel{position:sticky;top:20px;}
+  svg{width:100%;height:auto;display:block;}
+  .legend{display:flex;gap:18px;flex-wrap:wrap;margin-top:14px;}
+  .legend-item{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--text-dim);font-family:'JetBrains Mono',monospace;}
+  .legend-swatch{width:16px;height:16px;border-radius:4px;}
+
+  .ratio-badge{
+    display:flex;align-items:center;justify-content:center;gap:12px;
+    margin-top:16px;
+    padding:12px 14px;
+    background:var(--panel-2);
+    border:1px solid var(--border);
+    border-radius:10px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:15px;
+  }
+  .ratio-badge .m{color:var(--teal);font-weight:700;}
+  .ratio-badge .m2{color:var(--coral);font-weight:700;}
+  .eqmark{color:var(--text-dim);}
+
+  footer{
+    margin-top:40px;
+    text-align:center;
+    color:var(--text-dim);
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    letter-spacing:.04em;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow">Caso · Razón de pesos</div>
+  <h1>Razón entre un bloque <em>oscuro</em> y uno <em>claro</em></h1>
+  <p class="lede">Bloques del mismo color tienen el mismo peso y la balanza está en equilibrio. Ajusta cuántos bloques oscuros y claros hay en cada lado para ver cómo cambia la razón de pesos.</p>
+
+  <div class="statement">
+    <div class="statement-item">
+      <div class="statement-label">Lado izquierdo</div>
+      <div class="statement-eq left" id="eq-left">2 oscuros + 2 claros</div>
+    </div>
+    <div class="statement-item">
+      <div class="statement-label">Lado derecho</div>
+      <div class="statement-eq right" id="eq-right">4 oscuros + 1 claro</div>
+    </div>
+    <div class="statement-item">
+      <div class="statement-label">Pregunta</div>
+      <div class="statement-eq" style="color:var(--text);font-weight:600;font-size:14px;">Oscuro : Claro = ?</div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div>
+      <div class="panel">
+        <h2>Composición de la balanza</h2>
+        <p class="sub">Define cuántos bloques de cada color hay en cada plato.</p>
+
+        <div class="control-group">
+          <div class="control-title"><span class="dot leftc"></span>Lado izquierdo</div>
+          <div class="slider-row">
+            <label><span class="swatch dark"></span>Oscuros</label>
+            <input type="range" id="ld" min="0" max="8" step="1" value="2">
+            <span class="slider-val" id="ld-val">2</span>
+          </div>
+          <div class="slider-row">
+            <label><span class="swatch light"></span>Claros</label>
+            <input type="range" id="ll" min="0" max="8" step="1" value="2">
+            <span class="slider-val" id="ll-val">2</span>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <div class="control-title"><span class="dot rightc"></span>Lado derecho</div>
+          <div class="slider-row">
+            <label><span class="swatch dark"></span>Oscuros</label>
+            <input type="range" id="rd" min="0" max="8" step="1" value="4">
+            <span class="slider-val" id="rd-val">4</span>
+          </div>
+          <div class="slider-row">
+            <label><span class="swatch light"></span>Claros</label>
+            <input type="range" id="rl" min="0" max="8" step="1" value="1">
+            <span class="slider-val" id="rl-val">1</span>
+          </div>
+        </div>
+
+        <div id="error-slot"></div>
+      </div>
+
+      <div class="panel" id="steps-panel" style="margin-top:20px;">
+        <h2>Solución paso a paso</h2>
+        <p class="sub">El razonamiento se recalcula en vivo con tus valores.</p>
+        <div id="steps"></div>
+        <div class="result-card">
+          <div class="rc-label">Razón oscuro : claro</div>
+          <div class="rc-eq" id="final-answer">O : C = 1 : 2</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel graph-panel">
+      <h2>Vista de la balanza</h2>
+      <p class="sub">Cada columna representa la pila de bloques de un plato.</p>
+      <svg id="graph" viewBox="0 0 560 460" xmlns="http://www.w3.org/2000/svg"></svg>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-swatch" style="background:linear-gradient(135deg,var(--dark-block),var(--dark-block-2));"></span>Bloque oscuro</div>
+        <div class="legend-item"><span class="legend-swatch" style="background:linear-gradient(135deg,var(--light-block),var(--light-block-2));"></span>Bloque claro</div>
+      </div>
+      <div class="ratio-badge">
+        <span>peso oscuro <span class="m" id="badge-d">1</span></span>
+        <span class="eqmark">:</span>
+        <span>peso claro <span class="m2" id="badge-l">2</span></span>
+      </div>
+    </div>
+  </div>
+
+  <footer>izquierda·O + izquierda·C = derecha·O + derecha·C &nbsp;·&nbsp; equilibrio ⇒ pesos totales iguales</footer>
+</div>
+
+<script>
+const ids = ['ld','ll','rd','rl'];
+const state = {};
+ids.forEach(id=>{
+  const el = document.getElementById(id);
+  state[id] = parseInt(el.value);
+  el.addEventListener('input', ()=>{
+    state[id] = parseInt(el.value);
+    document.getElementById(id+'-val').textContent = state[id];
+    render();
+  });
+  document.getElementById(id+'-val').textContent = state[id];
+});
+
+function gcd(a,b){ a=Math.abs(a); b=Math.abs(b); while(b){ [a,b]=[b,a%b]; } return a || 1; }
+
+function plural(n, word){ return n + ' ' + word + (n===1 ? '' : (word==='claro'?'s':'s')); }
+
+function compLabel(dark, light){
+  const parts = [];
+  if(dark>0) parts.push(`${dark} oscuro${dark===1?'':'s'}`);
+  if(light>0) parts.push(`${light} claro${light===1?'':'s'}`);
+  if(parts.length===0) return 'sin bloques';
+  return parts.join(' + ');
+}
+
+function render(){
+  const {ld,ll,rd,rl} = state;
+  document.getElementById('eq-left').textContent = compLabel(ld,ll);
+  document.getElementById('eq-right').textContent = compLabel(rd,rl);
+
+  const errSlot = document.getElementById('error-slot');
+  const stepsPanel = document.getElementById('steps-panel');
+  errSlot.innerHTML = '';
+
+  if(ld+ll === 0 || rd+rl === 0){
+    errSlot.innerHTML = '<div class="error-box">Cada plato de la balanza debe tener al menos un bloque. Ajusta los valores.</div>';
+    stepsPanel.style.display = 'none';
+    document.getElementById('graph').innerHTML = '';
+    return;
+  }
+
+  const denom = ld - rd;   // coeficiente que acompaña a O tras agrupar
+  const numer = rl - ll;   // coeficiente que acompaña a C tras agrupar
+
+  const steps = document.getElementById('steps');
+
+  if(denom === 0){
+    stepsPanel.style.display = '';
+    if(numer === 0){
+      steps.innerHTML = `
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <h3>Planteamos el equilibrio de pesos</h3>
+            <p>Igualamos el peso total de la izquierda con el de la derecha.</p>
+            <div class="eqline">${ld}O + ${ll}C = ${rd}O + ${rl}C</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <h3>Agrupamos términos semejantes</h3>
+            <p>Al pasar todo a un lado, los términos se cancelan por completo.</p>
+            <div class="eqline">0·O = 0·C</div>
+          </div>
+        </div>`;
+      errSlot.innerHTML = '<div class="error-box">Con esta composición ambos lados quedan idénticos: la ecuación se cumple para cualquier peso O y C. No hay suficiente información para determinar una razón única. Cambia los valores para que las cantidades de oscuros u claros difieran entre los lados.</div>';
+    } else {
+      steps.innerHTML = `
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <h3>Planteamos el equilibrio de pesos</h3>
+            <p>Igualamos el peso total de la izquierda con el de la derecha.</p>
+            <div class="eqline">${ld}O + ${ll}C = ${rd}O + ${rl}C</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <h3>Agrupamos términos semejantes</h3>
+            <p>La cantidad de oscuros es igual en ambos lados, así que se cancelan.</p>
+            <div class="eqline">0 = ${numer}C</div>
+          </div>
+        </div>`;
+      errSlot.innerHTML = '<div class="error-box">Como la cantidad de bloques oscuros es igual en ambos lados pero la de claros no, la única forma de mantener el equilibrio sería que el bloque claro pesara 0, lo cual no es físicamente posible. Esta configuración no tiene solución válida.</div>';
+    }
+    document.getElementById('final-answer').textContent = 'Sin solución';
+    document.getElementById('graph').innerHTML = '';
+    return;
+  }
+
+  stepsPanel.style.display = '';
+
+  let ratio = numer/denom; // O/C
+  const g = gcd(numer, denom);
+  let simN = numer/g, simD = denom/g;
+  if(simD < 0){ simN = -simN; simD = -simD; }
+
+  steps.innerHTML = `
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h3>Planteamos el equilibrio de pesos</h3>
+        <p>Sea O el peso de un bloque oscuro y C el peso de un bloque claro. Como la balanza está en equilibrio, el peso total de la izquierda es igual al de la derecha.</p>
+        <div class="eqline">${ld}O + ${ll}C = ${rd}O + ${rl}C</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h3>Agrupamos términos semejantes</h3>
+        <p>Pasamos los términos con O a un lado y los términos con C al otro.</p>
+        <div class="eqline">${term(denom,'O',true)} = ${term(numer,'C',true)}</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h3>Despejamos la razón O/C</h3>
+        <p>Dividimos ambos lados entre C y entre ${fmtCoef(denom)} para aislar la razón.</p>
+        <div class="eqline">O/C = ${numer} / ${denom}</div>
+      </div>
+    </div>
+  `;
+
+  const badgeD = Math.abs(simN);
+  const badgeL = Math.abs(simD);
+
+  if(ratio <= 0){
+    errSlot.innerHTML = '<div class="warn-box">La razón resultante no es positiva, lo cual no es físicamente posible para pesos reales (O y C deben ser mayores que cero). Ajusta las cantidades para obtener una configuración válida.</div>';
+    document.getElementById('final-answer').textContent = `O : C = ${simN} : ${simD}`;
+  } else {
+    document.getElementById('final-answer').textContent = `O : C = ${badgeD} : ${badgeL}`;
+  }
+
+  document.getElementById('badge-d').textContent = badgeD;
+  document.getElementById('badge-l').textContent = badgeL;
+
+  drawScale(ld,ll,rd,rl);
+}
+
+function fmtCoef(n){ return n; }
+
+function term(coef, variable, isFirst){
+  if(coef === 0) return '0';
+  const sign = coef < 0 ? '−' : '';
+  const abs = Math.abs(coef);
+  return sign + abs + variable;
+}
+
+function drawScale(ld,ll,rd,rl){
+  const svg = document.getElementById('graph');
+  const W = 560, H = 460;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+
+  const beamY = 170;
+  const beamHalf = 190;
+  const cx = W/2;
+  const fulcrumTopY = beamY;
+  const fulcrumBaseY = 260;
+
+  const pillarX1 = cx - 60, pillarX2 = cx + 60;
+
+  let pillar = `
+    <line x1="${cx}" y1="${fulcrumTopY}" x2="${pillarX1}" y2="${fulcrumBaseY}" stroke="var(--gold)" stroke-width="3"/>
+    <line x1="${cx}" y1="${fulcrumTopY}" x2="${pillarX2}" y2="${fulcrumBaseY}" stroke="var(--gold)" stroke-width="3"/>
+    <line x1="${pillarX1}" y1="${fulcrumBaseY}" x2="${pillarX2}" y2="${fulcrumBaseY}" stroke="var(--gold)" stroke-width="3"/>
+    <circle cx="${cx}" cy="${fulcrumTopY}" r="5" fill="var(--gold)"/>
+  `;
+
+  const beam = `<line x1="${cx-beamHalf}" y1="${beamY}" x2="${cx+beamHalf}" y2="${beamY}" stroke="#8890C8" stroke-width="5" stroke-linecap="round"/>`;
+
+  const panLX = cx - beamHalf, panRX = cx + beamHalf;
+  const panW = 150, panH = 8;
+  const panY = beamY + 34;
+
+  const hangers = `
+    <line x1="${panLX}" y1="${beamY}" x2="${panLX-panW/2}" y2="${panY}" stroke="#5B62A0" stroke-width="2"/>
+    <line x1="${panLX}" y1="${beamY}" x2="${panLX+panW/2}" y2="${panY}" stroke="#5B62A0" stroke-width="2"/>
+    <line x1="${panRX}" y1="${beamY}" x2="${panRX-panW/2}" y2="${panY}" stroke="#5B62A0" stroke-width="2"/>
+    <line x1="${panRX}" y1="${beamY}" x2="${panRX+panW/2}" y2="${panY}" stroke="#5B62A0" stroke-width="2"/>
+  `;
+
+  const pans = `
+    <rect x="${panLX-panW/2}" y="${panY}" width="${panW}" height="${panH}" rx="4" fill="#3A4082" stroke="var(--border)"/>
+    <rect x="${panRX-panW/2}" y="${panY}" width="${panW}" height="${panH}" rx="4" fill="#3A4082" stroke="var(--border)"/>
+  `;
+
+  const stackHeightL = Math.ceil((ld+ll)/3) * 34 + 20;
+  const stackHeightR = Math.ceil((rd+rl)/3) * 34 + 20;
+  const backdropW = 130;
+  const backdropL = `<rect x="${panLX-backdropW/2}" y="${panY-stackHeightL}" width="${backdropW}" height="${stackHeightL}" rx="10" fill="#F2EFE6" opacity="0.08"/>`;
+  const backdropR = `<rect x="${panRX-backdropW/2}" y="${panY-stackHeightR}" width="${backdropW}" height="${stackHeightR}" rx="10" fill="#F2EFE6" opacity="0.08"/>`;
+
+  const stackL = drawStack(panLX, panY, ld, ll);
+  const stackR = drawStack(panRX, panY, rd, rl);
+
+  const base = `<rect x="${cx-90}" y="${fulcrumBaseY}" width="180" height="10" rx="3" fill="#2A2F55" stroke="var(--border)"/>`;
+
+  svg.innerHTML = `${pillar}${base}${beam}${hangers}${pans}${backdropL}${backdropR}${stackL}${stackR}`;
+}
+
+function drawStack(centerX, panTopY, darkCount, lightCount){
+  const blockSize = 30, gapPx = 4, perRow = 3;
+  const sequence = [];
+  for(let i=0;i<darkCount;i++) sequence.push('dark');
+  for(let i=0;i<lightCount;i++) sequence.push('light');
+
+  let svgOut = '';
+  sequence.forEach((color, idx)=>{
+    const row = Math.floor(idx/perRow);
+    const col = idx % perRow;
+    const rowCount = Math.min(perRow, sequence.length - row*perRow);
+    const rowWidth = rowCount*blockSize + (rowCount-1)*gapPx;
+    const startX = centerX - rowWidth/2;
+    const x = startX + col*(blockSize+gapPx);
+    const y = panTopY - blockSize - row*(blockSize+gapPx);
+
+    const grad = color === 'dark' ? 'gradDark' : 'gradLight';
+    const labelColor = color === 'dark' ? '#FFFFFF' : '#6B1E38';
+    const labelStroke = color === 'dark' ? '#1B2870' : '#FFFFFF';
+    const label = color === 'dark' ? 'O' : 'C';
+    svgOut += `<rect x="${x}" y="${y}" width="${blockSize}" height="${blockSize}" rx="4" fill="url(#${grad})" stroke="#F2EFE6" stroke-width="2.5" filter="url(#blockShadow)"/>
+    <text x="${x+blockSize/2}" y="${y+blockSize/2+5}" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="15" font-weight="700" fill="${labelColor}" stroke="${labelStroke}" stroke-width="3" paint-order="stroke" stroke-linejoin="round">${label}</text>`;
+  });
+
+  return svgOut;
+}
+
+// gradient defs, injected once
+(function addDefs(){
+  const svg = document.getElementById('graph');
+  const defs = document.createElementNS('http://www.w3.org/2000/svg','defs');
+  defs.innerHTML = `
+    <linearGradient id="gradDark" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#8AA0FF"/>
+      <stop offset="100%" stop-color="#3550D8"/>
+    </linearGradient>
+    <linearGradient id="gradLight" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#FF9EBB"/>
+    </linearGradient>
+    <filter id="blockShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#000000" flood-opacity="0.45"/>
+    </filter>
+  `;
+  svg.appendChild(defs);
+})();
+
+render();
+</script>
+</body>
+</html>

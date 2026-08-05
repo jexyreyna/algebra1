@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Solucionador de ecuaciones exponenciales</title>
+
+  <style>
+    :root {
+      --bg-1: #07111f;
+      --bg-2: #101a35;
+      --card: rgba(255,255,255,.085);
+      --line: rgba(255,255,255,.14);
+      --text: #f8fafc;
+      --muted: #cbd5e1;
+      --cyan: #22d3ee;
+      --violet: #8b5cf6;
+      --green: #34d399;
+      --yellow: #fbbf24;
+      --red: #fb7185;
+      --input: rgba(7,17,31,.78);
+      --shadow: 0 25px 70px rgba(0,0,0,.38);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 18%, rgba(34,211,238,.18), transparent 28%),
+        radial-gradient(circle at 86% 10%, rgba(139,92,246,.22), transparent 30%),
+        linear-gradient(135deg, var(--bg-1), var(--bg-2));
+      padding: 30px 16px;
+    }
+
+    .app {
+      width: min(1160px, 100%);
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(34,211,238,.28);
+      background: rgba(34,211,238,.09);
+      color: #a5f3fc;
+      font-size: .85rem;
+      font-weight: 800;
+      letter-spacing: .03em;
+    }
+
+    h1 {
+      margin: 16px 0 8px;
+      font-size: clamp(2rem, 5vw, 3.7rem);
+      line-height: 1.03;
+      letter-spacing: -.045em;
+    }
+
+    .subtitle {
+      max-width: 760px;
+      margin: 0 auto;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(330px,.9fr) minmax(380px,1.1fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: var(--card);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .content { padding: 24px; }
+
+    .title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 0 0 20px;
+      font-size: 1.12rem;
+    }
+
+    .icon {
+      width: 40px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      border-radius: 13px;
+      background: linear-gradient(135deg,var(--cyan),var(--violet));
+      font-weight: 900;
+      color: white;
+    }
+
+    .preview {
+      margin-bottom: 20px;
+      padding: 20px 12px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(7,17,31,.55);
+      text-align: center;
+      font-family: "Cambria Math","Times New Roman",serif;
+      font-size: clamp(1.35rem,4vw,2rem);
+      overflow-wrap: anywhere;
+    }
+
+    .inputs {
+      display: grid;
+      grid-template-columns: repeat(2,1fr);
+      gap: 13px;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: .87rem;
+      font-weight: 750;
+    }
+
+    .field input {
+      width: 100%;
+      min-height: 52px;
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 14px;
+      background: var(--input);
+      color: var(--text);
+      outline: none;
+      padding: 11px 12px;
+      text-align: center;
+      font-size: 1.04rem;
+      transition: .2s ease;
+    }
+
+    .field input:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 4px rgba(34,211,238,.12);
+      transform: translateY(-1px);
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 52px;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    button {
+      min-height: 50px;
+      border: 0;
+      border-radius: 14px;
+      cursor: pointer;
+      color: white;
+      font-size: .96rem;
+      font-weight: 850;
+      transition: .18s ease;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.08);
+    }
+
+    .primary {
+      background: linear-gradient(135deg,var(--cyan),var(--violet));
+      box-shadow: 0 12px 26px rgba(34,211,238,.18);
+    }
+
+    .secondary {
+      background: rgba(255,255,255,.10);
+      border: 1px solid rgba(255,255,255,.12);
+    }
+
+    .examples { margin-top: 18px; }
+
+    .examples p {
+      margin: 0 0 10px;
+      color: var(--muted);
+      font-size: .86rem;
+      font-weight: 750;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      min-height: 36px;
+      padding: 7px 11px;
+      border-radius: 999px;
+      background: rgba(139,92,246,.10);
+      border: 1px solid rgba(167,139,250,.20);
+      color: #ddd6fe;
+      font-size: .8rem;
+    }
+
+    .note {
+      margin-top: 17px;
+      color: #94a3b8;
+      font-size: .8rem;
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    .message {
+      display: none;
+      margin-bottom: 15px;
+      padding: 13px 14px;
+      border-radius: 14px;
+      line-height: 1.5;
+    }
+
+    .message.error {
+      display: block;
+      color: #fecdd3;
+      background: rgba(244,63,94,.12);
+      border: 1px solid rgba(251,113,133,.25);
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      margin-bottom: 16px;
+      border-radius: 999px;
+      font-size: .84rem;
+      font-weight: 850;
+    }
+
+    .status.exact {
+      color: #a7f3d0;
+      background: rgba(16,185,129,.12);
+      border: 1px solid rgba(52,211,153,.24);
+    }
+
+    .status.log {
+      color: #c4b5fd;
+      background: rgba(139,92,246,.12);
+      border: 1px solid rgba(167,139,250,.24);
+    }
+
+    .solution {
+      padding: 20px;
+      border-radius: 18px;
+      background: linear-gradient(135deg,rgba(34,211,238,.10),rgba(139,92,246,.10));
+      border: 1px solid rgba(125,211,252,.16);
+    }
+
+    .solution-label {
+      margin-bottom: 9px;
+      color: var(--muted);
+      font-size: .82rem;
+      font-weight: 850;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .answer {
+      padding: 15px;
+      border-radius: 14px;
+      background: rgba(7,17,31,.52);
+      text-align: center;
+      font-family: "Cambria Math","Times New Roman",serif;
+      font-size: clamp(1.25rem,4vw,1.8rem);
+      overflow-wrap: anywhere;
+    }
+
+    .steps { margin-top: 18px; }
+    .steps h3 { margin: 0 0 12px; font-size: 1rem; }
+
+    .step {
+      position: relative;
+      padding: 14px 14px 14px 48px;
+      border-radius: 15px;
+      background: rgba(7,17,31,.38);
+      border: 1px solid rgba(255,255,255,.08);
+    }
+
+    .step + .step { margin-top: 10px; }
+
+    .step-number {
+      position: absolute;
+      top: 13px;
+      left: 13px;
+      width: 25px;
+      height: 25px;
+      display: grid;
+      place-items: center;
+      border-radius: 9px;
+      background: linear-gradient(135deg,var(--cyan),var(--violet));
+      font-size: .78rem;
+      font-weight: 900;
+    }
+
+    .step-title {
+      margin-bottom: 5px;
+      color: #e0f2fe;
+      font-weight: 800;
+    }
+
+    .math {
+      font-family: "Cambria Math","Times New Roman",serif;
+      line-height: 1.7;
+      overflow-wrap: anywhere;
+    }
+
+    .decimal {
+      margin-top: 16px;
+      padding: 13px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.06);
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .empty {
+      padding: 34px 16px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    sup { font-size: .65em; }
+
+    @media (max-width: 850px) {
+      .layout { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 480px) {
+      body { padding: 18px 10px; }
+      .content { padding: 18px; }
+      .inputs { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="app">
+    <header>
+      <div class="badge">log Herramienta algebraica interactiva</div>
+      <h1>Ecuaciones exponenciales</h1>
+      <p class="subtitle">
+        Resuelve ecuaciones de la forma
+        <strong>P·a<sup>mx+n</sup> = Q</strong>.
+        La respuesta se expresa exactamente mediante fracciones y logaritmos,
+        y se simplifica a una fracción racional cuando es posible.
+      </p>
+    </header>
+
+    <section class="layout">
+      <article class="card">
+        <div class="content">
+          <h2 class="title"><span class="icon">eˣ</span> Datos de la ecuación</h2>
+
+          <div class="preview" id="preview">2·3<sup>2x−1</sup> = 18</div>
+
+          <div class="inputs">
+            <div class="field">
+              <label for="P">Factor P</label>
+              <input id="P" type="number" step="any" value="2" />
+            </div>
+
+            <div class="field">
+              <label for="a">Base a</label>
+              <input id="a" type="number" step="any" value="3" />
+            </div>
+
+            <div class="field">
+              <label for="m">Coeficiente m</label>
+              <input id="m" type="number" step="any" value="2" />
+            </div>
+
+            <div class="field">
+              <label for="n">Constante n</label>
+              <input id="n" type="number" step="any" value="-1" />
+            </div>
+
+            <div class="field" style="grid-column:1/-1;">
+              <label for="Q">Segundo miembro Q</label>
+              <input id="Q" type="number" step="any" value="18" />
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="primary" id="solveBtn">Resolver ecuación</button>
+            <button class="secondary" id="resetBtn" title="Restablecer">↻</button>
+          </div>
+
+          <div class="examples">
+            <p>Ejemplos rápidos</p>
+            <div class="chips">
+              <button class="chip" data-p="2" data-a="3" data-m="2" data-n="-1" data-q="18">Solución racional</button>
+              <button class="chip" data-p="1" data-a="2" data-m="1" data-n="0" data-q="7">log₂(7)</button>
+              <button class="chip" data-p="5" data-a="4" data-m="3" data-n="2" data-q="11">Fracción de logaritmos</button>
+              <button class="chip" data-p="3" data-a="0.5" data-m="-2" data-n="1" data-q="12">Base entre 0 y 1</button>
+            </div>
+          </div>
+
+          <p class="note">
+            Condiciones reales: a &gt; 0, a ≠ 1, P ≠ 0, m ≠ 0 y Q/P &gt; 0.
+          </p>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="content">
+          <h2 class="title"><span class="icon">✓</span> Solución exacta</h2>
+          <div id="errorMessage" class="message"></div>
+          <div id="resultArea">
+            <div class="empty">
+              Ingresa los valores y pulsa <strong>Resolver ecuación</strong>.
+            </div>
+          </div>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <script>
+    const ids = ["P","a","m","n","Q"];
+    const inputs = Object.fromEntries(ids.map(id => [id, document.getElementById(id)]));
+    const preview = document.getElementById("preview");
+    const resultArea = document.getElementById("resultArea");
+    const errorMessage = document.getElementById("errorMessage");
+
+    function gcd(a,b) {
+      a = Math.abs(Math.round(a));
+      b = Math.abs(Math.round(b));
+      while (b) [a,b] = [b,a%b];
+      return a || 1;
+    }
+
+    function normalizeFraction(num,den) {
+      if (den === 0) throw new Error("El denominador no puede ser cero.");
+      if (den < 0) { num = -num; den = -den; }
+      const g = gcd(num,den);
+      return {num:num/g, den:den/g};
+    }
+
+    function decimalToFraction(value) {
+      const s = String(value).trim();
+      if (!s || !Number.isFinite(Number(s))) {
+        throw new Error("Todos los datos deben ser números válidos.");
+      }
+
+      if (/^[+-]?\d+$/.test(s)) return {num:Number(s), den:1};
+
+      const fixed = Number(s).toFixed(12).replace(/0+$/,"").replace(/\.$/,"");
+      const sign = fixed.startsWith("-") ? -1 : 1;
+      const clean = fixed.replace("-","");
+      if (!clean.includes(".")) return {num:sign*Number(clean),den:1};
+
+      const [i,d] = clean.split(".");
+      return normalizeFraction(sign*(Number(i)*10**d.length+Number(d)),10**d.length);
+    }
+
+    function fractionText(frac) {
+      const f = normalizeFraction(frac.num, frac.den);
+      if (f.den === 1) return String(f.num).replace("-", "−");
+      return `${String(f.num).replace("-", "−")}/${f.den}`;
+    }
+
+    function signedTerm(value, variable) {
+      if (value === 0) return "";
+      const sign = value < 0 ? "−" : "+";
+      const abs = Math.abs(value);
+      const coeff = abs === 1 ? "" : abs;
+      return `${sign}${coeff}${variable}`;
+    }
+
+    function exponentText(m,n) {
+      let text = "";
+      if (m === 1) text = "x";
+      else if (m === -1) text = "−x";
+      else text = `${m}x`.replace("-", "−");
+
+      if (n > 0) text += `+${n}`;
+      if (n < 0) text += `−${Math.abs(n)}`;
+      return text;
+    }
+
+    function updatePreview() {
+      const P = Number(inputs.P.value);
+      const a = Number(inputs.a.value);
+      const m = Number(inputs.m.value);
+      const n = Number(inputs.n.value);
+      const Q = Number(inputs.Q.value);
+
+      if (![P,a,m,n,Q].every(Number.isFinite)) {
+        preview.innerHTML = "P·a<sup>mx+n</sup> = Q";
+        return;
+      }
+
+      const factor = P === 1 ? "" : P === -1 ? "−" : `${P}·`;
+      preview.innerHTML = `${factor}${a}<sup>${exponentText(m,n)}</sup> = ${Q}`;
+    }
+
+    function nearInteger(x, eps=1e-10) {
+      return Math.abs(x - Math.round(x)) < eps;
+    }
+
+    function detectPower(base, value) {
+      if (!(base > 0) || base === 1 || !(value > 0)) return null;
+      const k = Math.log(value) / Math.log(base);
+      if (nearInteger(k)) return Math.round(k);
+
+      for (let den=2; den<=12; den++) {
+        const num = Math.round(k*den);
+        if (Math.abs(k - num/den) < 1e-10) {
+          return normalizeFraction(num,den);
+        }
+      }
+      return null;
+    }
+
+    function solve() {
+      errorMessage.className = "message";
+      errorMessage.textContent = "";
+
+      try {
+        const P = Number(inputs.P.value);
+        const a = Number(inputs.a.value);
+        const m = Number(inputs.m.value);
+        const n = Number(inputs.n.value);
+        const Q = Number(inputs.Q.value);
+
+        if (![P,a,m,n,Q].every(Number.isFinite)) {
+          throw new Error("Todos los datos deben ser números reales válidos.");
+        }
+        if (a <= 0) throw new Error("La base a debe ser positiva.");
+        if (a === 1) throw new Error("La base a debe ser distinta de 1.");
+        if (P === 0) throw new Error("El factor P debe ser distinto de cero.");
+        if (m === 0) throw new Error("El coeficiente m debe ser distinto de cero.");
+
+        const ratio = Q/P;
+        if (ratio <= 0) {
+          throw new Error("No existe solución real porque Q/P debe ser positivo.");
+        }
+
+        const power = detectPower(a,ratio);
+        let exact;
+        let statusClass;
+        let statusText;
+        let simplification;
+
+        if (power !== null) {
+          let kFrac = typeof power === "number" ? {num:power,den:1} : power;
+          const nFrac = decimalToFraction(n);
+          const mFrac = decimalToFraction(m);
+
+          const num = kFrac.num*nFrac.den - nFrac.num*kFrac.den;
+          const den = kFrac.den*nFrac.den;
+          const numerator = normalizeFraction(num,den);
+
+          const finalNum = numerator.num * mFrac.den;
+          const finalDen = numerator.den * mFrac.num;
+          const xFrac = normalizeFraction(finalNum,finalDen);
+
+          exact = fractionText(xFrac);
+          statusClass = "exact";
+          statusText = "Solución simplificada a fracción";
+          simplification =
+            `Como ${ratio} = ${a}<sup>${fractionText(kFrac)}</sup>, se tiene ` +
+            `${exponentText(m,n)} = ${fractionText(kFrac)}.`;
+        } else {
+          const mText = String(m).replace("-", "−");
+          const nText = String(n).replace("-", "−");
+          const ratioText = Number.isInteger(ratio) ? ratio : ratio.toFixed(10).replace(/0+$/,"").replace(/\.$/,"");
+
+          if (n === 0) {
+            exact = `ln(${ratioText})/[${mText}·ln(${a})]`;
+          } else {
+            exact = `[ln(${ratioText}) − (${nText})ln(${a})]/[${mText}·ln(${a})]`;
+          }
+
+          statusClass = "log";
+          statusText = "Solución exacta con logaritmos";
+          simplification =
+            `El cociente ${ratioText} no es una potencia racional sencilla de ${a}; ` +
+            `por ello la forma exacta se conserva mediante logaritmos.`;
+        }
+
+        const decimal = (Math.log(ratio)/Math.log(a)-n)/m;
+
+        resultArea.innerHTML = `
+          <div class="status ${statusClass}">● ${statusText}</div>
+
+          <div class="solution">
+            <div class="solution-label">Resultado exacto</div>
+            <div class="answer">x = ${exact}</div>
+          </div>
+
+          <div class="steps">
+            <h3>Procedimiento</h3>
+
+            <div class="step">
+              <span class="step-number">1</span>
+              <div class="step-title">Aislar la potencia</div>
+              <div class="math">
+                ${P}·${a}<sup>${exponentText(m,n)}</sup> = ${Q}
+                &nbsp;⇒&nbsp;
+                ${a}<sup>${exponentText(m,n)}</sup> = ${ratio}
+              </div>
+            </div>
+
+            <div class="step">
+              <span class="step-number">2</span>
+              <div class="step-title">Aplicar logaritmos</div>
+              <div class="math">
+                (${exponentText(m,n)})ln(${a}) = ln(${ratio})
+              </div>
+            </div>
+
+            <div class="step">
+              <span class="step-number">3</span>
+              <div class="step-title">Despejar x</div>
+              <div class="math">
+                x = [ln(${ratio})/ln(${a}) − (${n})]/(${m})
+              </div>
+            </div>
+
+            <div class="step">
+              <span class="step-number">4</span>
+              <div class="step-title">Simplificación exacta</div>
+              <div class="math">${simplification}</div>
+            </div>
+          </div>
+
+          <div class="decimal">
+            Aproximación decimal: x ≈ ${decimal.toFixed(8)}
+          </div>
+        `;
+      } catch (err) {
+        errorMessage.textContent = err.message;
+        errorMessage.className = "message error";
+        resultArea.innerHTML = `
+          <div class="empty">Corrige los datos para obtener una solución real.</div>
+        `;
+      }
+    }
+
+    ids.forEach(id => {
+      inputs[id].addEventListener("input", updatePreview);
+      inputs[id].addEventListener("keydown", e => {
+        if (e.key === "Enter") solve();
+      });
+    });
+
+    document.getElementById("solveBtn").addEventListener("click", solve);
+
+    document.getElementById("resetBtn").addEventListener("click", () => {
+      inputs.P.value = 2;
+      inputs.a.value = 3;
+      inputs.m.value = 2;
+      inputs.n.value = -1;
+      inputs.Q.value = 18;
+      updatePreview();
+      solve();
+    });
+
+    document.querySelectorAll(".chip").forEach(chip => {
+      chip.addEventListener("click", () => {
+        inputs.P.value = chip.dataset.p;
+        inputs.a.value = chip.dataset.a;
+        inputs.m.value = chip.dataset.m;
+        inputs.n.value = chip.dataset.n;
+        inputs.Q.value = chip.dataset.q;
+        updatePreview();
+        solve();
+      });
+    });
+
+    updatePreview();
+    solve();
+  </script>
+</body>
+</html>

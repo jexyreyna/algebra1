@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pendiente y regla de correspondencia</title>
+<style>
+:root{
+  --bg1:#07111f;--bg2:#121a34;--card:rgba(255,255,255,.085);
+  --line:rgba(255,255,255,.14);--text:#f8fafc;--muted:#cbd5e1;
+  --cyan:#22d3ee;--violet:#8b5cf6;--green:#34d399;--red:#fb7185;
+  --yellow:#fbbf24;--input:rgba(7,17,31,.78);--shadow:0 25px 70px rgba(0,0,0,.38)
+}
+*{box-sizing:border-box}
+body{
+  margin:0;min-height:100vh;color:var(--text);
+  font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+  background:
+    radial-gradient(circle at 12% 18%,rgba(34,211,238,.18),transparent 28%),
+    radial-gradient(circle at 86% 10%,rgba(139,92,246,.22),transparent 30%),
+    linear-gradient(135deg,var(--bg1),var(--bg2));
+  padding:30px 16px
+}
+.app{width:min(1200px,100%);margin:auto}
+header{text-align:center;margin-bottom:26px}
+.badge{
+  display:inline-flex;padding:8px 14px;border-radius:999px;
+  border:1px solid rgba(34,211,238,.28);background:rgba(34,211,238,.09);
+  color:#a5f3fc;font-size:.85rem;font-weight:800
+}
+h1{margin:15px 0 8px;font-size:clamp(2rem,5vw,3.55rem);letter-spacing:-.045em;line-height:1.05}
+.subtitle{max-width:850px;margin:auto;color:var(--muted);line-height:1.65}
+.layout{display:grid;grid-template-columns:minmax(350px,.9fr) minmax(440px,1.1fr);gap:22px;align-items:start}
+.card{
+  border:1px solid var(--line);background:var(--card);backdrop-filter:blur(18px);
+  box-shadow:var(--shadow);border-radius:24px;overflow:hidden
+}
+.content{padding:24px}
+.title{display:flex;align-items:center;gap:12px;margin:0 0 20px;font-size:1.12rem}
+.icon{
+  width:40px;height:40px;display:grid;place-items:center;border-radius:13px;
+  background:linear-gradient(135deg,var(--cyan),var(--violet));font-weight:900
+}
+.preview{
+  margin-bottom:18px;padding:17px 12px;border-radius:17px;
+  border:1px solid rgba(255,255,255,.1);background:rgba(7,17,31,.52);
+  text-align:center;font-family:"Cambria Math","Times New Roman",serif;
+  font-size:clamp(1.1rem,3.5vw,1.5rem)
+}
+.point-group{
+  padding:15px;border-radius:17px;background:rgba(7,17,31,.34);
+  border:1px solid rgba(255,255,255,.08)
+}
+.point-group+.point-group{margin-top:13px}
+.point-name{margin:0 0 12px;color:#e0f2fe;font-size:.92rem;font-weight:850}
+.inputs{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field label{display:block;margin-bottom:7px;color:var(--muted);font-size:.84rem;font-weight:750}
+input{
+  width:100%;min-height:50px;padding:10px 12px;border-radius:13px;
+  border:1px solid rgba(255,255,255,.14);outline:none;background:var(--input);
+  color:var(--text);font-size:1rem;text-align:center
+}
+input:focus{border-color:var(--cyan);box-shadow:0 0 0 4px rgba(34,211,238,.12)}
+.actions{display:grid;grid-template-columns:1fr 52px;gap:12px;margin-top:18px}
+button{
+  min-height:49px;border:0;border-radius:13px;cursor:pointer;color:white;
+  font-size:.94rem;font-weight:850;transition:.18s
+}
+button:hover{transform:translateY(-2px);filter:brightness(1.08)}
+.primary{background:linear-gradient(135deg,var(--cyan),var(--violet))}
+.secondary{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.12)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:15px}
+.chip{
+  min-height:36px;padding:7px 11px;border-radius:999px;background:rgba(139,92,246,.1);
+  border:1px solid rgba(167,139,250,.2);color:#ddd6fe;font-size:.8rem
+}
+.note{margin-top:17px;text-align:center;color:#94a3b8;font-size:.8rem;line-height:1.5}
+.graph{
+  width:100%;aspect-ratio:1.38;min-height:340px;margin-bottom:18px;
+  border-radius:18px;overflow:hidden;background:#f8fafc
+}
+canvas{width:100%;height:100%;display:block}
+.status{
+  display:inline-flex;padding:8px 12px;margin-bottom:15px;border-radius:999px;
+  font-size:.84rem;font-weight:850
+}
+.status.ok{color:#a7f3d0;background:rgba(16,185,129,.12);border:1px solid rgba(52,211,153,.24)}
+.status.warn{color:#fde68a;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.22)}
+.results-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.result-box{
+  padding:18px;border-radius:17px;background:linear-gradient(135deg,rgba(34,211,238,.09),rgba(139,92,246,.09));
+  border:1px solid rgba(125,211,252,.15)
+}
+.result-box.full{grid-column:1/-1}
+.result-label{
+  color:var(--muted);font-size:.8rem;font-weight:850;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px
+}
+.answer{
+  padding:13px;border-radius:13px;background:rgba(7,17,31,.5);text-align:center;
+  font-family:"Cambria Math","Times New Roman",serif;font-size:1.2rem;overflow-wrap:anywhere
+}
+.steps{margin-top:18px}
+.steps h3{margin:0 0 12px;font-size:1rem}
+.step{
+  position:relative;padding:14px 14px 14px 48px;border-radius:15px;
+  background:rgba(7,17,31,.38);border:1px solid rgba(255,255,255,.08)
+}
+.step+.step{margin-top:10px}
+.step-number{
+  position:absolute;top:13px;left:13px;width:25px;height:25px;display:grid;place-items:center;
+  border-radius:9px;background:linear-gradient(135deg,var(--cyan),var(--violet));font-size:.78rem;font-weight:900
+}
+.step-title{margin-bottom:5px;color:#e0f2fe;font-weight:800}
+.math{font-family:"Cambria Math","Times New Roman",serif;line-height:1.7;overflow-wrap:anywhere}
+.error{
+  display:none;margin-bottom:14px;padding:12px;border-radius:12px;color:#fecdd3;
+  background:rgba(244,63,94,.12);border:1px solid rgba(251,113,133,.25)
+}
+.practice{
+  margin-top:22px;padding:21px;border:1px solid var(--line);border-radius:22px;
+  background:var(--card);box-shadow:var(--shadow)
+}
+.practice h2{margin:0 0 8px}
+.practice p{color:var(--muted);line-height:1.5}
+.practice-question{
+  margin:14px 0;padding:17px;border-radius:15px;background:rgba(7,17,31,.48);
+  text-align:center;font-family:"Cambria Math","Times New Roman",serif;font-size:1.2rem
+}
+.practice-options{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.option{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.12)}
+.feedback{display:none;margin-top:12px;padding:12px;border-radius:12px}
+.feedback.ok{display:block;color:#a7f3d0;background:rgba(16,185,129,.12);border:1px solid rgba(52,211,153,.24)}
+.feedback.bad{display:block;color:#fecdd3;background:rgba(244,63,94,.12);border:1px solid rgba(251,113,133,.25)}
+.score{margin-top:13px;text-align:center;color:var(--muted);font-size:.87rem}
+@media(max-width:920px){.layout{grid-template-columns:1fr}}
+@media(max-width:600px){
+  body{padding:18px 10px}.content{padding:18px}.inputs,.results-grid,.practice-options{grid-template-columns:1fr}
+  .result-box.full{grid-column:auto}.graph{min-height:290px}
+}
+</style>
+</head>
+<body>
+<main class="app">
+<header>
+  <div class="badge">Funciones afines</div>
+  <h1>Pendiente y regla de correspondencia</h1>
+  <p class="subtitle">
+    Ingresa dos puntos de una recta para obtener la pendiente, la función
+    \(f(x)=mx+b\), la forma punto-pendiente y la ecuación general.
+  </p>
+</header>
+
+<section class="layout">
+<article class="card">
+<div class="content">
+  <h2 class="title"><span class="icon">m</span> Datos de los puntos</h2>
+
+  <div class="preview" id="preview">P₁(1,2), P₂(3,6)</div>
+
+  <div class="point-group">
+    <p class="point-name">Punto P₁</p>
+    <div class="inputs">
+      <div class="field">
+        <label for="x1">x₁</label>
+        <input id="x1" type="number" step="any" value="1">
+      </div>
+      <div class="field">
+        <label for="y1">y₁</label>
+        <input id="y1" type="number" step="any" value="2">
+      </div>
+    </div>
+  </div>
+
+  <div class="point-group">
+    <p class="point-name">Punto P₂</p>
+    <div class="inputs">
+      <div class="field">
+        <label for="x2">x₂</label>
+        <input id="x2" type="number" step="any" value="3">
+      </div>
+      <div class="field">
+        <label for="y2">y₂</label>
+        <input id="y2" type="number" step="any" value="6">
+      </div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="primary" id="calculateBtn">Calcular función</button>
+    <button class="secondary" id="resetBtn">↻</button>
+  </div>
+
+  <div class="chips">
+    <button class="chip" data-x1="1" data-y1="2" data-x2="3" data-y2="6">Pendiente positiva</button>
+    <button class="chip" data-x1="-2" data-y1="5" data-x2="4" data-y2="-1">Pendiente negativa</button>
+    <button class="chip" data-x1="0" data-y1="3" data-x2="5" data-y2="3">Recta horizontal</button>
+    <button class="chip" data-x1="2" data-y1="-1" data-x2="2" data-y2="5">Recta vertical</button>
+  </div>
+
+  <p class="note">Los decimales finitos se convierten en fracciones exactas.</p>
+</div>
+</article>
+
+<article class="card">
+<div class="content">
+  <h2 class="title"><span class="icon">✓</span> Gráfica y resultados</h2>
+
+  <div class="graph"><canvas id="graph"></canvas></div>
+  <div id="error" class="error"></div>
+  <div id="results"></div>
+</div>
+</article>
+</section>
+
+<section class="practice">
+  <h2>Modo de práctica</h2>
+  <p>Observa los puntos y selecciona la pendiente correcta.</p>
+  <div class="practice-question" id="practiceQuestion"></div>
+  <div class="practice-options" id="practiceOptions"></div>
+  <div class="feedback" id="feedback"></div>
+  <button class="primary" id="newPracticeBtn" style="width:100%;margin-top:12px">Nuevo ejercicio</button>
+  <div class="score" id="score">Aciertos: 0 · Intentos: 0</div>
+</section>
+</main>
+
+<script>
+const ids=["x1","y1","x2","y2"];
+const inputs=Object.fromEntries(ids.map(id=>[id,document.getElementById(id)]));
+const preview=document.getElementById("preview");
+const results=document.getElementById("results");
+const errorBox=document.getElementById("error");
+const canvas=document.getElementById("graph");
+const ctx=canvas.getContext("2d");
+let currentPractice=null,attempts=0,correct=0;
+
+function gcd(a,b){
+  a=Math.abs(Math.round(a));b=Math.abs(Math.round(b));
+  while(b)[a,b]=[b,a%b];
+  return a||1;
+}
+function lcm(a,b){return Math.abs(a*b)/gcd(a,b)}
+function norm(num,den){
+  if(den===0)throw new Error("Denominador nulo.");
+  if(den<0){num=-num;den=-den}
+  const g=gcd(num,den);return{num:num/g,den:den/g};
+}
+function decFrac(value){
+  const s=String(value).trim();
+  if(!s||!Number.isFinite(Number(s)))throw new Error("Todos los datos deben ser números válidos.");
+  if(/^[+-]?\d+$/.test(s))return{num:Number(s),den:1};
+  const fixed=Number(s).toFixed(12).replace(/0+$/,"").replace(/\.$/,"");
+  const sign=fixed.startsWith("-")?-1:1,clean=fixed.replace("-","");
+  if(!clean.includes("."))return{num:sign*Number(clean),den:1};
+  const[i,d]=clean.split(".");
+  return norm(sign*(Number(i)*10**d.length+Number(d)),10**d.length);
+}
+function add(a,b){return norm(a.num*b.den+b.num*a.den,a.den*b.den)}
+function sub(a,b){return norm(a.num*b.den-b.num*a.den,a.den*b.den)}
+function mul(a,b){return norm(a.num*b.num,a.den*b.den)}
+function div(a,b){if(b.num===0)throw new Error("División entre cero.");return norm(a.num*b.den,a.den*b.num)}
+function neg(a){return{num:-a.num,den:a.den}}
+function fracText(f){
+  f=norm(f.num,f.den);
+  return f.den===1?String(f.num).replace("-","−"):`${String(f.num).replace("-","−")}/${f.den}`;
+}
+function coeffText(f,variable){
+  f=norm(f.num,f.den);
+  if(f.num===0)return"0";
+  if(f.den===1&&f.num===1)return variable;
+  if(f.den===1&&f.num===-1)return `−${variable}`;
+  return `${fracText(f)}${variable}`;
+}
+function signedConstant(f){
+  f=norm(f.num,f.den);
+  if(f.num===0)return"";
+  return f.num>0?` + ${fracText(f)}`:` − ${fracText({num:-f.num,den:f.den})}`;
+}
+function functionText(m,b){
+  if(m.num===0)return `f(x) = ${fracText(b)}`;
+  return `f(x) = ${coeffText(m,"x")}${signedConstant(b)}`;
+}
+function pointSlopeText(m,x1,y1){
+  const left=y1.num===0?"y":`y ${y1.num>0?"−":"+"} ${fracText({num:Math.abs(y1.num),den:y1.den})}`;
+  const inside=x1.num===0?"x":`x ${x1.num>0?"−":"+"} ${fracText({num:Math.abs(x1.num),den:x1.den})}`;
+  return `${left} = ${coeffText(m,`(${inside})`)}`;
+}
+function generalEquation(x1,y1,x2,y2){
+  const L=lcm(lcm(x1.den,x2.den),lcm(y1.den,y2.den));
+  const X1=x1.num*(L/x1.den),X2=x2.num*(L/x2.den);
+  const Y1=y1.num*(L/y1.den),Y2=y2.num*(L/y2.den);
+  let A=Y1-Y2;
+  let B=X2-X1;
+  let C=X1*Y2-X2*Y1;
+  const g=gcd(gcd(A,B),C);
+  A/=g;B/=g;C/=g;
+  if(A<0||(A===0&&B<0)){A=-A;B=-B;C=-C}
+  const term=(coef,varName,first=false)=>{
+    if(coef===0)return"";
+    const sign=coef<0?"−":"+";
+    const abs=Math.abs(coef);
+    const body=(abs===1&&varName)?varName:`${abs}${varName}`;
+    return first?(coef<0?`−${body}`:body):` ${sign} ${body}`;
+  };
+  let s=term(A,"x",true);
+  s+=term(B,"y",s==="");
+  s+=term(C,"",s==="");
+  return `${s} = 0`;
+}
+function getData(){
+  return{
+    x1:decFrac(inputs.x1.value),y1:decFrac(inputs.y1.value),
+    x2:decFrac(inputs.x2.value),y2:decFrac(inputs.y2.value)
+  };
+}
+function updatePreview(){
+  try{
+    const d=getData();
+    preview.textContent=`P₁(${fracText(d.x1)}, ${fracText(d.y1)}), P₂(${fracText(d.x2)}, ${fracText(d.y2)})`;
+  }catch{
+    preview.textContent="P₁(x₁,y₁), P₂(x₂,y₂)";
+  }
+  drawGraph();
+}
+function calculate(){
+  errorBox.style.display="none";
+  try{
+    const d=getData();
+    if(d.x1.num*d.x2.den===d.x2.num*d.x1.den){
+      const xconst=fracText(d.x1);
+      results.innerHTML=`
+        <div class="status warn">● Recta vertical</div>
+        <div class="results-grid">
+          <div class="result-box">
+            <div class="result-label">Pendiente</div>
+            <div class="answer">Indefinida</div>
+          </div>
+          <div class="result-box">
+            <div class="result-label">Ecuación</div>
+            <div class="answer">x = ${xconst}</div>
+          </div>
+          <div class="result-box full">
+            <div class="result-label">Observación</div>
+            <div class="answer">No puede escribirse como función y=f(x)</div>
+          </div>
+        </div>
+        <div class="steps">
+          <h3>Procedimiento</h3>
+          <div class="step">
+            <span class="step-number">1</span>
+            <div class="step-title">Diferencia horizontal</div>
+            <div class="math">x₂−x₁ = 0.</div>
+          </div>
+          <div class="step">
+            <span class="step-number">2</span>
+            <div class="step-title">Conclusión</div>
+            <div class="math">La pendiente m=(y₂−y₁)/(x₂−x₁) no está definida.</div>
+          </div>
+        </div>`;
+      drawGraph();return;
+    }
+
+    const dy=sub(d.y2,d.y1),dx=sub(d.x2,d.x1);
+    const m=div(dy,dx);
+    const b=sub(d.y1,mul(m,d.x1));
+    const fx=functionText(m,b);
+    const pp=pointSlopeText(m,d.x1,d.y1);
+    const gen=generalEquation(d.x1,d.y1,d.x2,d.y2);
+
+    results.innerHTML=`
+      <div class="status ok">● Función afín determinada</div>
+      <div class="results-grid">
+        <div class="result-box">
+          <div class="result-label">Pendiente</div>
+          <div class="answer">m = ${fracText(m)}</div>
+        </div>
+        <div class="result-box">
+          <div class="result-label">Intercepto</div>
+          <div class="answer">b = ${fracText(b)}</div>
+        </div>
+        <div class="result-box full">
+          <div class="result-label">Regla de correspondencia</div>
+          <div class="answer">${fx}</div>
+        </div>
+        <div class="result-box full">
+          <div class="result-label">Forma punto-pendiente</div>
+          <div class="answer">${pp}</div>
+        </div>
+        <div class="result-box full">
+          <div class="result-label">Forma general</div>
+          <div class="answer">${gen}</div>
+        </div>
+      </div>
+
+      <div class="steps">
+        <h3>Procedimiento</h3>
+        <div class="step">
+          <span class="step-number">1</span>
+          <div class="step-title">Calcular la pendiente</div>
+          <div class="math">
+            m = (y₂−y₁)/(x₂−x₁) = (${fracText(d.y2)}−${fracText(d.y1)})/(${fracText(d.x2)}−${fracText(d.x1)})
+            = ${fracText(dy)}/${fracText(dx)} = ${fracText(m)}.
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">2</span>
+          <div class="step-title">Calcular el intercepto</div>
+          <div class="math">
+            b = y₁−mx₁ = ${fracText(d.y1)}−(${fracText(m)})(${fracText(d.x1)}) = ${fracText(b)}.
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">3</span>
+          <div class="step-title">Construir la función</div>
+          <div class="math">${fx}</div>
+        </div>
+      </div>`;
+    drawGraph();
+  }catch(e){
+    errorBox.textContent=e.message;errorBox.style.display="block";results.innerHTML="";
+  }
+}
+function resizeCanvas(){
+  const rect=canvas.getBoundingClientRect(),dpr=window.devicePixelRatio||1;
+  canvas.width=Math.round(rect.width*dpr);canvas.height=Math.round(rect.height*dpr);
+  ctx.setTransform(dpr,0,0,dpr,0,0);drawGraph();
+}
+function drawGraph(){
+  const rect=canvas.getBoundingClientRect(),w=rect.width,h=rect.height;
+  ctx.clearRect(0,0,w,h);ctx.fillStyle="#f8fafc";ctx.fillRect(0,0,w,h);
+  let vals=ids.map(id=>Number(inputs[id].value));
+  if(!vals.every(Number.isFinite))return;
+  const [x1,y1,x2,y2]=vals;
+  const maxAbs=Math.max(5,...vals.map(Math.abs))+1;
+  const range=Math.ceil(maxAbs),scale=Math.min(w,h)/(2*range),ox=w/2,oy=h/2;
+  ctx.strokeStyle="#dbe4ef";ctx.lineWidth=1;
+  for(let i=-range;i<=range;i++){
+    const x=ox+i*scale,y=oy-i*scale;
+    ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke();
+  }
+  ctx.strokeStyle="#334155";ctx.lineWidth=1.6;
+  ctx.beginPath();ctx.moveTo(0,oy);ctx.lineTo(w,oy);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(ox,0);ctx.lineTo(ox,h);ctx.stroke();
+  ctx.fillStyle="#475569";ctx.font="12px Inter, sans-serif";
+  for(let i=-range;i<=range;i++)if(i!==0){
+    ctx.textAlign="center";ctx.textBaseline="top";ctx.fillText(i,ox+i*scale,oy+5);
+    ctx.textAlign="right";ctx.textBaseline="middle";ctx.fillText(i,ox-6,oy-i*scale);
+  }
+  const sx=x=>ox+x*scale,sy=y=>oy-y*scale;
+  ctx.strokeStyle="#7c3aed";ctx.lineWidth=3;
+  if(x1===x2){
+    ctx.beginPath();ctx.moveTo(sx(x1),0);ctx.lineTo(sx(x1),h);ctx.stroke();
+  }else{
+    const m=(y2-y1)/(x2-x1),b=y1-m*x1;
+    const xa=-range,xb=range,ya=m*xa+b,yb=m*xb+b;
+    ctx.beginPath();ctx.moveTo(sx(xa),sy(ya));ctx.lineTo(sx(xb),sy(yb));ctx.stroke();
+
+    ctx.setLineDash([6,5]);ctx.strokeStyle="#94a3b8";ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(sx(x1),sy(y1));ctx.lineTo(sx(x2),sy(y1));ctx.lineTo(sx(x2),sy(y2));ctx.stroke();
+    ctx.setLineDash([]);
+  }
+  function point(x,y,label,color){
+    ctx.fillStyle=color;ctx.beginPath();ctx.arc(sx(x),sy(y),6,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle="#0f172a";ctx.font="bold 12px Inter, sans-serif";ctx.textAlign="left";ctx.textBaseline="bottom";
+    ctx.fillText(`${label}(${x}, ${y})`,sx(x)+8,sy(y)-7);
+  }
+  point(x1,y1,"P₁","#0891b2");point(x2,y2,"P₂","#7c3aed");
+}
+function newPractice(){
+  let x1=Math.floor(Math.random()*7)-3;
+  let x2=x1;
+  while(x2===x1)x2=Math.floor(Math.random()*7)-3;
+  const y1=Math.floor(Math.random()*9)-4,y2=Math.floor(Math.random()*9)-4;
+  const m=norm(y2-y1,x2-x1);
+  currentPractice={m:fracText(m),x1,y1,x2,y2};
+  document.getElementById("practiceQuestion").textContent=
+    `P₁(${x1}, ${y1}) y P₂(${x2}, ${y2}). ¿Cuál es la pendiente?`;
+  const pool=[currentPractice.m,"0","1","−1","2","1/2","−1/2","3/2","−3/2"].filter((v,i,a)=>a.indexOf(v)===i);
+  const opts=[currentPractice.m,...pool.filter(v=>v!==currentPractice.m).sort(()=>Math.random()-.5).slice(0,3)]
+    .sort(()=>Math.random()-.5);
+  const box=document.getElementById("practiceOptions");box.innerHTML="";
+  opts.forEach(v=>{
+    const b=document.createElement("button");b.className="option";b.textContent=v;
+    b.addEventListener("click",()=>checkPractice(v));box.appendChild(b);
+  });
+  const f=document.getElementById("feedback");f.className="feedback";f.textContent="";
+}
+function checkPractice(v){
+  attempts++;const f=document.getElementById("feedback");
+  if(v===currentPractice.m){correct++;f.className="feedback ok";f.textContent="Correcto."}
+  else{f.className="feedback bad";f.textContent=`Incorrecto. La pendiente correcta es ${currentPractice.m}.`}
+  document.getElementById("score").textContent=`Aciertos: ${correct} · Intentos: ${attempts}`;
+}
+
+ids.forEach(id=>{
+  inputs[id].addEventListener("input",updatePreview);
+  inputs[id].addEventListener("keydown",e=>{if(e.key==="Enter")calculate()});
+});
+document.getElementById("calculateBtn").addEventListener("click",calculate);
+document.getElementById("resetBtn").addEventListener("click",()=>{
+  inputs.x1.value=1;inputs.y1.value=2;inputs.x2.value=3;inputs.y2.value=6;updatePreview();calculate();
+});
+document.querySelectorAll(".chip").forEach(chip=>{
+  chip.addEventListener("click",()=>{
+    inputs.x1.value=chip.dataset.x1;inputs.y1.value=chip.dataset.y1;
+    inputs.x2.value=chip.dataset.x2;inputs.y2.value=chip.dataset.y2;
+    updatePreview();calculate();
+  });
+});
+document.getElementById("newPracticeBtn").addEventListener("click",newPractice);
+window.addEventListener("resize",resizeCanvas);
+
+requestAnimationFrame(()=>{resizeCanvas();updatePreview();calculate();newPractice()});
+</script>
+</body>
+</html>

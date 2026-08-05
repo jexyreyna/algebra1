@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>Laboratorio de Exploración de los Conjuntos Numéricos</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+
+font-family:Arial,Helvetica,sans-serif;
+
+background:
+linear-gradient(135deg,#08131f,#1a2744);
+
+color:white;
+
+min-height:100vh;
+
+padding:25px;
+
+}
+
+.container{
+
+max-width:1400px;
+
+margin:auto;
+
+}
+
+header{
+
+text-align:center;
+
+margin-bottom:25px;
+
+}
+
+header h1{
+
+font-size:2.7rem;
+
+margin-bottom:10px;
+
+}
+
+header p{
+
+color:#cbd5e1;
+
+font-size:1.05rem;
+
+}
+
+.main{
+
+display:grid;
+
+grid-template-columns:420px 1fr;
+
+gap:20px;
+
+}
+
+.panel{
+
+background:rgba(255,255,255,.08);
+
+backdrop-filter:blur(15px);
+
+border-radius:20px;
+
+padding:25px;
+
+border:1px solid rgba(255,255,255,.08);
+
+}
+
+.sectionTitle{
+
+font-size:1.25rem;
+
+margin-bottom:20px;
+
+color:#67e8f9;
+
+}
+
+.numberCard{
+
+background:#0b1328;
+
+border-radius:18px;
+
+padding:35px;
+
+text-align:center;
+
+margin-bottom:25px;
+
+border:1px solid rgba(255,255,255,.08);
+
+}
+
+#number{
+
+font-size:3.2rem;
+
+font-family:"Cambria Math";
+
+font-weight:bold;
+
+}
+
+.description{
+
+text-align:center;
+
+color:#cbd5e1;
+
+margin-bottom:20px;
+
+line-height:1.6;
+
+}
+
+.options{
+
+display:grid;
+
+gap:12px;
+
+}
+
+.option{
+
+height:52px;
+
+border:none;
+
+border-radius:14px;
+
+cursor:pointer;
+
+background:#16223d;
+
+color:white;
+
+font-size:16px;
+
+transition:.25s;
+
+}
+
+.option:hover{
+
+background:#2563eb;
+
+transform:translateY(-2px);
+
+}
+
+.option.active{
+
+background:#14b8a6;
+
+}
+
+.buttons{
+
+display:grid;
+
+grid-template-columns:1fr 1fr;
+
+gap:12px;
+
+margin-top:25px;
+
+}
+
+.btn{
+
+height:50px;
+
+border:none;
+
+border-radius:14px;
+
+cursor:pointer;
+
+font-size:16px;
+
+font-weight:bold;
+
+color:white;
+
+transition:.25s;
+
+}
+
+#verify{
+
+background:#2563eb;
+
+}
+
+#verify:hover{
+
+background:#1d4ed8;
+
+}
+
+#next{
+
+background:#16a34a;
+
+}
+
+#next:hover{
+
+background:#15803d;
+
+}
+
+.rightPanel{
+
+display:grid;
+
+grid-template-rows:auto auto 1fr auto;
+
+gap:18px;
+
+}
+
+.infoGrid{
+
+display:grid;
+
+grid-template-columns:1fr 1fr;
+
+gap:15px;
+
+}
+
+.infoCard{
+
+background:rgba(255,255,255,.08);
+
+padding:18px;
+
+border-radius:16px;
+
+text-align:center;
+
+}
+
+.infoValue{
+
+font-size:2rem;
+
+font-weight:bold;
+
+color:#67e8f9;
+
+margin-top:8px;
+
+}
+
+.progress{
+
+height:18px;
+
+background:#1e293b;
+
+border-radius:15px;
+
+overflow:hidden;
+
+margin-top:12px;
+
+}
+
+.progressBar{
+
+height:100%;
+
+width:0%;
+
+background:linear-gradient(90deg,#06b6d4,#22c55e);
+
+transition:.4s;
+
+}
+
+.diagram{
+
+background:#0b1328;
+
+border-radius:18px;
+
+padding:25px;
+
+border:1px solid rgba(255,255,255,.08);
+
+min-height:360px;
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+position:relative;
+
+}
+
+.real{
+
+width:90%;
+
+height:300px;
+
+border:3px solid white;
+
+border-radius:12px;
+
+position:relative;
+
+}
+
+.rational{
+
+position:absolute;
+
+left:40px;
+
+top:35px;
+
+width:55%;
+
+height:220px;
+
+border:3px solid #60a5fa;
+
+border-radius:12px;
+
+}
+
+.integer{
+
+position:absolute;
+
+left:70px;
+
+top:65px;
+
+width:40%;
+
+height:160px;
+
+border:3px solid #22c55e;
+
+border-radius:12px;
+
+}
+
+.natural{
+
+position:absolute;
+
+left:95px;
+
+top:90px;
+
+width:26%;
+
+height:100px;
+
+border:3px solid #facc15;
+
+border-radius:12px;
+
+}
+
+.irrational{
+
+position:absolute;
+
+right:35px;
+
+top:40px;
+
+width:28%;
+
+height:220px;
+
+border:3px dashed #ec4899;
+
+border-radius:12px;
+
+}
+
+.label{
+
+position:absolute;
+
+padding:4px 10px;
+
+background:#111827;
+
+border-radius:10px;
+
+font-weight:bold;
+
+}
+
+.lR{top:-15px;left:10px;}
+.lQ{top:-15px;left:10px;}
+.lZ{top:-15px;left:10px;}
+.lN{top:-15px;left:10px;}
+.lI{top:-15px;left:10px;}
+
+.highlight{
+
+box-shadow:0 0 25px #22d3ee;
+
+background:rgba(34,211,238,.15);
+
+}
+
+.feedback{
+
+background:#0b1328;
+
+border-radius:18px;
+
+padding:20px;
+
+border:1px solid rgba(255,255,255,.08);
+
+min-height:180px;
+
+line-height:1.7;
+
+font-size:17px;
+
+}
+
+.success{
+
+color:#22c55e;
+
+}
+
+.error{
+
+color:#ef4444;
+
+@media(max-width:1000px){
+
+.main{
+
+grid-template-columns:1fr;
+
+}
+
+.infoGrid{
+
+grid-template-columns:1fr;
+
+}
+
+header h1{
+
+font-size:2rem;
+
+}
+
+#number{
+
+font-size:2.5rem;
+
+}
+
+}
+
+.fade{
+
+animation:fade .5s ease;
+
+}
+
+@keyframes fade{
+
+from{
+
+opacity:0;
+
+transform:translateY(15px);
+
+}
+
+to{
+
+opacity:1;
+
+transform:translateY(0);
+
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<header>
+
+<h1>🧮 Laboratorio de Exploración de los Conjuntos Numéricos</h1>
+
+<p>
+
+Explora, clasifica y descubre a qué conjuntos numéricos pertenece cada número.
+
+</p>
+
+</header>
+
+<div class="main">
+
+<!-- PANEL IZQUIERDO -->
+
+<div class="panel">
+
+<h2 class="sectionTitle">
+
+Número a clasificar
+
+</h2>
+
+<div class="numberCard">
+
+<div id="number">
+
+√49
+
+</div>
+
+</div>
+
+<div class="description">
+
+Selecciona TODOS los conjuntos numéricos a los que pertenece el número mostrado.
+
+</div>
+
+<div class="options">
+
+<button class="option" data-id="N">
+
+Naturales (N)
+
+</button>
+
+<button class="option" data-id="Z">
+
+Enteros (Z)
+
+</button>
+
+<button class="option" data-id="Q">
+
+Racionales (Q)
+
+</button>
+
+<button class="option" data-id="I">
+
+Irracionales (I)
+
+</button>
+
+<button class="option" data-id="R">
+
+Reales (R)
+
+</button>
+
+</div>
+
+<div class="buttons">
+
+<button class="btn" id="verify">
+
+Verificar
+
+</button>
+
+<button class="btn" id="next">
+
+Siguiente
+
+</button>
+
+</div>
+
+</div>
+
+<!-- PANEL DERECHO -->
+
+<div class="rightPanel">
+
+<div class="infoGrid">
+
+<div class="infoCard">
+
+<div>
+
+Puntaje
+
+</div>
+
+<div class="infoValue" id="score">
+
+0
+
+</div>
+
+</div>
+
+<div class="infoCard">
+
+<div>
+
+Pregunta
+
+</div>
+
+<div class="infoValue">
+
+<span id="current">
+
+1
+
+</span>
+
+/<span id="total">
+
+20
+
+</span>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="panel">
+
+<b>Progreso</b>
+
+<div class="progress">
+
+<div class="progressBar" id="progress">
+
+</div>
+
+</div>
+
+</div>
+
+<div class="diagram">
+
+<div class="real" id="boxR">
+
+<div class="label lR">
+
+R
+
+</div>
+
+<div class="rational" id="boxQ">
+
+<div class="label lQ">
+
+Q
+
+</div>
+
+<div class="integer" id="boxZ">
+
+<div class="label lZ">
+
+Z
+
+</div>
+
+<div class="natural" id="boxN">
+
+<div class="label lN">
+
+N
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="irrational" id="boxI">
+
+<div class="label lI">
+
+I
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="feedback fade" id="feedback">
+
+<h3>
+
+Bienvenido 👋
+
+</h3>
+
+<br>
+
+Presiona <b>Verificar</b> para comprobar tu respuesta.
+
+Aquí aparecerá una explicación detallada del número seleccionado.
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+//==============================
+// VARIABLES GLOBALES
+//==============================
+
+const banco = [
+
+{
+numero:"7",
+correctas:["N","Z","Q","R"],
+explicacion:"7 es un número natural. Todo número natural también pertenece a los enteros, racionales y reales."
+},
+
+{
+numero:"-8",
+correctas:["Z","Q","R"],
+explicacion:"−8 no es natural, pero sí es un número entero. Todo entero es racional y todo racional es real."
+},
+
+{
+numero:"0",
+correctas:["Z","Q","R"],
+explicacion:"En este laboratorio los naturales comienzan en 1. Por ello 0 pertenece únicamente a Z, Q y R."
+},
+
+{
+numero:"3/5",
+correctas:["Q","R"],
+explicacion:"Toda fracción de enteros con denominador distinto de cero es un número racional."
+},
+
+{
+numero:"-9/4",
+correctas:["Q","R"],
+explicacion:"−9/4 es una fracción. Por ello pertenece a los racionales y a los reales."
+},
+
+{
+numero:"0.25",
+correctas:["Q","R"],
+explicacion:"0.25 es un decimal exacto. Todo decimal exacto es racional."
+},
+
+{
+numero:"0.333...",
+correctas:["Q","R"],
+explicacion:"0.333... es un decimal periódico infinito. Todo decimal periódico es racional."
+},
+
+{
+numero:"√49",
+correctas:["N","Z","Q","R"],
+explicacion:"49 es un cuadrado perfecto. √49=7."
+},
+
+{
+numero:"√81",
+correctas:["N","Z","Q","R"],
+explicacion:"√81=9."
+},
+
+{
+numero:"−√16",
+correctas:["Z","Q","R"],
+explicacion:"√16=4. Entonces −√16=−4."
+},
+
+{
+numero:"π",
+correctas:["I","R"],
+explicacion:"π posee infinitas cifras decimales no periódicas. Es irracional."
+},
+
+{
+numero:"√2",
+correctas:["I","R"],
+explicacion:"√2 no puede expresarse como fracción."
+},
+
+{
+numero:"√3",
+correctas:["I","R"],
+explicacion:"√3 es irracional."
+},
+
+{
+numero:"√5",
+correctas:["I","R"],
+explicacion:"√5 no es un cuadrado perfecto."
+},
+
+{
+numero:"22/7",
+correctas:["Q","R"],
+explicacion:"22/7 es una fracción."
+},
+
+{
+numero:"-25",
+correctas:["Z","Q","R"],
+explicacion:"−25 pertenece a los enteros."
+},
+
+{
+numero:"15",
+correctas:["N","Z","Q","R"],
+explicacion:"15 es natural."
+},
+
+{
+numero:"2.125",
+correctas:["Q","R"],
+explicacion:"2.125 es decimal exacto."
+},
+
+{
+numero:"√50",
+correctas:["I","R"],
+explicacion:"50 no es cuadrado perfecto."
+},
+
+{
+numero:"∛8",
+correctas:["N","Z","Q","R"],
+explicacion:"∛8=2."
+}
+
+];
+
+let indice=0;
+
+let puntaje=0;
+
+let seleccion=[];
+
+const opciones=document.querySelectorAll(".option");
+
+const numero=document.getElementById("number");
+
+const feedback=document.getElementById("feedback");
+
+const score=document.getElementById("score");
+
+const current=document.getElementById("current");
+
+const progress=document.getElementById("progress");
+
+const verify=document.getElementById("verify");
+
+const next=document.getElementById("next");
+
+const cajas={
+
+N:document.getElementById("boxN"),
+
+Z:document.getElementById("boxZ"),
+
+Q:document.getElementById("boxQ"),
+
+I:document.getElementById("boxI"),
+
+R:document.getElementById("boxR")
+
+};
+
+mostrarPregunta();
+
+opciones.forEach(boton=>{
+
+boton.onclick=()=>{
+
+const id=boton.dataset.id;
+
+if(seleccion.includes(id)){
+
+seleccion=seleccion.filter(x=>x!=id);
+
+boton.classList.remove("active");
+
+}else{
+
+seleccion.push(id);
+
+boton.classList.add("active");
+
+}
+
+};
+
+});
+
+function mostrarPregunta(){
+
+const item=banco[indice];
+
+numero.innerHTML=item.numero;
+
+feedback.innerHTML="<h3>Selecciona los conjuntos y presiona <b>Verificar</b>.</h3>";
+
+opciones.forEach(x=>x.classList.remove("active"));
+
+seleccion=[];
+
+limpiarDiagrama();
+
+current.innerHTML=indice+1;
+
+progress.style.width=((indice)/banco.length*100)+"%";
+
+}
+
+function limpiarDiagrama(){
+
+for(let k in cajas)
+
+cajas[k].classList.remove("highlight");
+
+}
+//==============================
+// VERIFICAR RESPUESTA
+//==============================
+
+verify.onclick=function(){
+
+const correcta=banco[indice].correctas;
+
+const usuario=[...seleccion].sort().join(",");
+
+const real=[...correcta].sort().join(",");
+
+limpiarDiagrama();
+
+correcta.forEach(c=>{
+
+cajas[c].classList.add("highlight");
+
+});
+
+if(usuario===real){
+
+puntaje++;
+
+score.innerHTML=puntaje;
+
+feedback.innerHTML=
+
+"<h2 class='success'>✔ ¡Correcto!</h2><br>"+
+
+"<b>"+banco[indice].numero+"</b><br><br>"+
+
+banco[indice].explicacion;
+
+}else{
+
+feedback.innerHTML=
+
+"<h2 class='error'>✘ Respuesta incorrecta</h2><br>"+
+
+"<b>"+banco[indice].numero+"</b><br><br>"+
+
+banco[indice].explicacion+
+
+"<br><br><b>Respuesta correcta:</b> "+correcta.join(", ");
+
+}
+
+progress.style.width=((indice+1)/banco.length*100)+"%";
+
+}
+
+//==============================
+// SIGUIENTE PREGUNTA
+//==============================
+
+next.onclick=function(){
+
+indice++;
+
+if(indice>=banco.length){
+
+numero.innerHTML="🏆";
+
+feedback.innerHTML=
+
+"<h2 class='success'>Laboratorio terminado</h2>"+
+
+"<br><br>"+
+
+"<h3>Puntaje obtenido:</h3>"+
+
+"<h1>"+puntaje+" / "+banco.length+"</h1>"+
+
+"<br>Excelente trabajo.";
+
+verify.disabled=true;
+
+next.disabled=true;
+
+return;
+
+}
+
+mostrarPregunta();
+
+}
+
+//==============================
+// INICIO
+//==============================
+
+mostrarPregunta();
+
+</script>
+
+</body>
+
+</html>

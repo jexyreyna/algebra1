@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Porcentaje de Ganancia sobre el Costo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#14172B;
+    --panel:#1E2240;
+    --panel-2:#242952;
+    --ink:#F2EFE6;
+    --sub:#A8ACC8;
+    --gold:#E8B84B;
+    --teal:#5FC9B8;
+    --coral:#F0665C;
+    --line:#313866;
+    --grid:#2A2F55;
+    --err:#F0665C;
+    --ok:#5FC9B8;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(circle at 15% 8%, #1c2145 0%, transparent 45%),
+      var(--bg);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    padding:24px;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1{
+    font-family:'Fraunces',serif;
+    font-weight:700;
+    font-size:26px;
+    margin:0 0 4px 0;
+  }
+  .subtitle{
+    color:var(--sub);
+    font-size:14px;
+    margin-bottom:20px;
+  }
+  .wrap{
+    max-width:1180px;
+    margin:0 auto;
+  }
+  .grid{
+    display:grid;
+    grid-template-columns:1fr 1.05fr;
+    gap:20px;
+  }
+  @media (max-width:900px){ .grid{grid-template-columns:1fr;} }
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:20px 22px;
+  }
+  h2{
+    font-family:'Fraunces',serif;
+    font-size:17px;
+    font-weight:600;
+    margin:0 0 12px 0;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  h2 .dot{width:8px;height:8px;border-radius:50%;background:var(--gold);display:inline-block;}
+  .statement{
+    font-size:14.5px;
+    line-height:1.55;
+    background:var(--panel-2);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:12px 14px;
+    margin-bottom:18px;
+  }
+  .controls{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px 18px;
+    margin-bottom:8px;
+  }
+  .ctrl-group{
+    border:1px dashed var(--line);
+    border-radius:10px;
+    padding:10px 12px;
+  }
+  .ctrl-group .label-row{
+    display:flex;
+    justify-content:space-between;
+    font-size:12.5px;
+    color:var(--sub);
+    margin-bottom:4px;
+  }
+  .ctrl-group .val{
+    font-family:'JetBrains Mono',monospace;
+    color:var(--ink);
+    font-weight:600;
+  }
+  input[type=range]{
+    -webkit-appearance:none;
+    width:100%;
+    height:4px;
+    border-radius:2px;
+    background:var(--grid);
+    outline:none;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    width:16px;height:16px;border-radius:50%;
+    background:var(--gold);
+    cursor:pointer;
+    border:2px solid var(--bg);
+    box-shadow:0 0 0 1px var(--gold);
+  }
+  input[type=range]::-moz-range-thumb{
+    width:16px;height:16px;border-radius:50%;
+    background:var(--gold);cursor:pointer;border:2px solid var(--bg);
+  }
+  .shuffle-btn{
+    background:var(--gold);
+    color:#fff;
+    border:none;
+    border-radius:8px;
+    padding:8px 14px;
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:13px;
+    cursor:pointer;
+    margin:6px 0 4px 0;
+  }
+  .shuffle-btn:hover{opacity:0.9;}
+
+  .steps{ margin-top:16px; }
+  .step{
+    border-left:3px solid var(--teal);
+    padding:6px 0 6px 14px;
+    margin-bottom:12px;
+    font-size:14px;
+  }
+  .step .step-title{
+    font-weight:600;
+    color:var(--teal);
+    font-size:13px;
+    text-transform:uppercase;
+    letter-spacing:0.03em;
+    margin-bottom:4px;
+  }
+  .step .eqline{
+    font-family:'JetBrains Mono',monospace;
+    font-size:14.5px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    flex-wrap:wrap;
+  }
+  .frac{
+    display:inline-flex;
+    flex-direction:column;
+    align-items:center;
+    vertical-align:middle;
+    margin:0 3px;
+    line-height:1.1;
+  }
+  .frac .num, .frac .den{ padding:0 4px; }
+  .frac .num{ border-bottom:1.5px solid var(--ink); }
+  .step .eqline{
+    background:var(--panel-2);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:6px 10px;
+  }
+
+  .svg-wrap{
+    background:var(--panel-2);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:14px;
+  }
+
+  .legend{
+    display:flex;
+    gap:16px;
+    flex-wrap:wrap;
+    font-size:12.5px;
+    color:var(--sub);
+    margin-top:10px;
+  }
+  .legend span{display:flex; align-items:center; gap:5px;}
+  .legend .swatch{width:14px;height:14px;border-radius:3px;display:inline-block;}
+
+  .mc-title{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:15px;
+    margin:20px 0 10px 0;
+  }
+  .option{
+    border:1.5px solid var(--line);
+    border-radius:10px;
+    padding:10px 14px;
+    margin-bottom:8px;
+    cursor:pointer;
+    font-family:'JetBrains Mono',monospace;
+    font-size:14px;
+    transition:0.15s;
+    background:var(--panel-2);
+    color:var(--ink);
+  }
+  .option:hover{border-color:var(--gold);}
+  .option.correct{ border-color:var(--ok); background:rgba(95,201,184,.12); }
+  .option.incorrect{ border-color:var(--err); background:rgba(240,102,92,.12); }
+  .explain{
+    font-family:'Inter',sans-serif;
+    font-size:12.5px;
+    color:var(--sub);
+    margin-top:6px;
+    display:none;
+  }
+  .option.revealed .explain{display:block;}
+  .tag{
+    display:inline-block;
+    font-size:10.5px;
+    font-weight:700;
+    padding:1px 7px;
+    border-radius:20px;
+    margin-right:8px;
+    vertical-align:middle;
+  }
+  .tag.ok{background:var(--ok); color:#fff;}
+  .tag.err{background:var(--err); color:#fff;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Porcentaje de ganancia sobre el costo</h1>
+  <div class="subtitle">Ajusta el precio de costo y el precio de venta; el porcentaje de ganancia y la derivación se recalculan al instante.</div>
+
+  <div class="grid">
+    <!-- LEFT PANEL -->
+    <div class="panel">
+      <h2><span class="dot"></span> Datos del problema</h2>
+
+      <div class="statement" id="statementBox">
+        Una empresa compra un artículo a <b id="s-costo">120</b> soles. Si decide venderlo a un precio de venta de <b id="s-venta">150</b> soles,
+        ¿qué porcentaje del precio de costo corresponde a la ganancia?
+      </div>
+
+      <div class="controls">
+        <div class="ctrl-group">
+          <div class="label-row">Precio de costo (S/) <span class="val" id="val-costo">120</span></div>
+          <input type="range" id="costo" min="20" max="300" step="5" value="120">
+        </div>
+        <div class="ctrl-group">
+          <div class="label-row">Precio de venta (S/) <span class="val" id="val-venta">150</span></div>
+          <input type="range" id="venta" min="20" max="400" step="5" value="150">
+        </div>
+      </div>
+
+      <button class="shuffle-btn" id="shuffleBtn">🔀 Nuevo caso aleatorio</button>
+
+      <div class="steps" id="stepsContainer"></div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="panel">
+      <h2><span class="dot" style="background:var(--teal)"></span> Verificación gráfica</h2>
+      <div class="svg-wrap">
+        <svg id="plot" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 340"></svg>
+      </div>
+      <div class="legend">
+        <span><span class="swatch" style="background:var(--teal)"></span> Precio de costo</span>
+        <span><span class="swatch" style="background:var(--coral)"></span> Ganancia</span>
+      </div>
+
+      <div class="mc-title">¿Qué porcentaje del precio de costo corresponde a la ganancia?</div>
+      <div id="optionsContainer"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+let state = { costo:120, venta:150 };
+
+document.getElementById('costo').addEventListener('input', e=>{
+  state.costo = parseFloat(e.target.value);
+  document.getElementById('val-costo').textContent = state.costo;
+  update();
+});
+document.getElementById('venta').addEventListener('input', e=>{
+  state.venta = parseFloat(e.target.value);
+  document.getElementById('val-venta').textContent = state.venta;
+  update();
+});
+
+document.getElementById('shuffleBtn').addEventListener('click', ()=>{
+  state.costo = randMultiple(40, 280, 5);
+  // ensure venta > costo for a genuine profit case
+  state.venta = state.costo + randMultiple(10, 200, 5);
+  document.getElementById('costo').value = state.costo;
+  document.getElementById('venta').value = state.venta;
+  document.getElementById('val-costo').textContent = state.costo;
+  document.getElementById('val-venta').textContent = state.venta;
+  update();
+});
+
+function randMultiple(min,max,step){
+  const n = Math.floor((max-min)/step);
+  return min + step*Math.floor(Math.random()*(n+1));
+}
+
+function gcd(a,b){ return b===0? a : gcd(b, a%b); }
+
+function fracHTML(numStr, denStr){
+  return `<span class="frac"><span class="num">${numStr}</span><span class="den">${denStr}</span></span>`;
+}
+
+function num(n){
+  let r = Math.round(n*100)/100;
+  if(Object.is(r,-0)) r = 0;
+  return r;
+}
+
+function compute(){
+  const costo = state.costo, venta = state.venta;
+  const ganancia = num(venta - costo);
+  const pct = costo===0 ? 0 : num((ganancia/costo)*100);
+
+  const g = gcd(Math.abs(ganancia), costo) || 1;
+  const simpNum = ganancia/g;
+  const simpDen = costo/g;
+
+  // distractor 1: ganancia / venta * 100 (wrong base: uses venta instead of costo)
+  const pct1 = venta===0 ? 0 : num((ganancia/venta)*100);
+
+  // distractor 2: venta / costo * 100 (forgot to subtract costo -> ratio of full prices)
+  const pct2 = costo===0 ? 0 : num((venta/costo)*100);
+
+  // distractor 3: costo / ganancia * 100 (inverted fraction)
+  const pct3 = ganancia===0 ? 0 : num((costo/ganancia)*100);
+
+  return {costo, venta, ganancia, pct, simpNum, simpDen, pct1, pct2, pct3};
+}
+
+function update(){
+  const r = compute();
+  document.getElementById('s-costo').textContent = r.costo;
+  document.getElementById('s-venta').textContent = r.venta;
+
+  renderSteps(r);
+  renderPlot(r);
+  renderOptions(r);
+}
+
+function renderSteps(r){
+  const c = document.getElementById('stepsContainer');
+  c.innerHTML = `
+    <div class="step">
+      <div class="step-title">Paso 1 · Identificar costo y precio de venta</div>
+      <div class="eqline">Precio de costo = S/ ${r.costo} &nbsp;|&nbsp; Precio de venta = S/ ${r.venta}</div>
+    </div>
+    <div class="step">
+      <div class="step-title">Paso 2 · Calcular la ganancia</div>
+      <div class="eqline">Ganancia = venta - costo = ${r.venta} - ${r.costo} = ${r.ganancia}</div>
+    </div>
+    <div class="step">
+      <div class="step-title">Paso 3 · Formar la fracción ganancia / costo</div>
+      <div class="eqline">
+        Fracción = ${fracHTML(r.ganancia, r.costo)}
+        ${ (r.simpDen !== r.costo) ? '&nbsp;=&nbsp;' + fracHTML(r.simpNum, r.simpDen) : '' }
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-title">Paso 4 · Convertir a porcentaje</div>
+      <div class="eqline">${fracHTML(r.ganancia, r.costo)} &times; 100% = ${r.pct}%</div>
+    </div>
+    <div class="step">
+      <div class="step-title">Paso 5 · Resultado</div>
+      <div class="eqline"><b>La ganancia representa el ${r.pct}% del precio de costo.</b></div>
+    </div>
+  `;
+}
+
+function renderOptions(r){
+  const opts = [
+    {label: r.pct + '%', correct:true,
+     explain:'Correcto: la ganancia (venta - costo) se dividió entre el precio de costo y se multiplicó por 100%.'},
+    {label: r.pct1 + '%', correct:false,
+     explain:'Error: se dividió la ganancia entre el precio de venta en vez de entre el precio de costo (base incorrecta).'},
+    {label: r.pct2 + '%', correct:false,
+     explain:'Error: se olvidó restar el costo; se calculó directamente venta/costo × 100%, sin obtener primero la ganancia.'},
+    {label: r.pct3 + '%', correct:false,
+     explain:'Error: se invirtió la fracción, dividiendo el costo entre la ganancia en vez de la ganancia entre el costo.'}
+  ];
+  for(let i=opts.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [opts[i],opts[j]] = [opts[j],opts[i]];
+  }
+  const cont = document.getElementById('optionsContainer');
+  cont.innerHTML = '';
+  opts.forEach(o=>{
+    const div = document.createElement('div');
+    div.className = 'option';
+    div.innerHTML = `${o.label}<div class="explain">${o.explain}</div>`;
+    div.addEventListener('click', ()=>{
+      [...cont.children].forEach((el, idx)=>{
+        el.classList.add('revealed');
+        if(opts[idx].correct){
+          el.classList.add('correct');
+          el.querySelector('.explain').innerHTML = '<span class="tag ok">✓ CORRECTA</span>' + opts[idx].explain;
+        } else {
+          el.classList.add('incorrect');
+          el.querySelector('.explain').innerHTML = '<span class="tag err">✗ ERROR</span>' + opts[idx].explain;
+        }
+      });
+    });
+    cont.appendChild(div);
+  });
+}
+
+function renderPlot(r){
+  const svg = document.getElementById('plot');
+  const W=560, H=340;
+  const marginL=70, marginR=30, marginT=30, marginB=50;
+  const plotW = W-marginL-marginR, plotH = H-marginT-marginB;
+  const maxVal = Math.max(r.costo, r.venta) * 1.15;
+  const sy = v => marginT + plotH - (v/maxVal)*plotH;
+  const barW = 110;
+
+  const xCosto = marginL + 40;
+  const xVenta = xCosto + barW + 90;
+
+  let parts = [];
+  parts.push(`<rect x="0" y="0" width="${W}" height="${H}" fill="#1E2240"/>`);
+  // baseline
+  parts.push(`<line x1="${marginL}" y1="${marginT+plotH}" x2="${W-marginR}" y2="${marginT+plotH}" stroke="#4A5090" stroke-width="1.3"/>`);
+
+  // costo bar
+  const yCostoTop = sy(r.costo);
+  parts.push(`<rect x="${xCosto}" y="${yCostoTop}" width="${barW}" height="${marginT+plotH-yCostoTop}" fill="#5FC9B8" rx="4"/>`);
+  parts.push(`<text x="${xCosto+barW/2}" y="${yCostoTop-10}" text-anchor="middle" font-size="14" font-family="JetBrains Mono, monospace" fill="#F2EFE6">S/ ${r.costo}</text>`);
+  parts.push(`<text x="${xCosto+barW/2}" y="${marginT+plotH+22}" text-anchor="middle" font-size="12.5" font-family="Inter, sans-serif" fill="#A8ACC8">Costo</text>`);
+
+  // venta bar = costo (teal) stacked + ganancia (coral) on top
+  const yVentaTop = sy(r.venta);
+  const yCostoPartTop = sy(r.costo);
+  parts.push(`<rect x="${xVenta}" y="${marginT+plotH - (marginT+plotH-yCostoPartTop)}" width="${barW}" height="${marginT+plotH-yCostoPartTop}" fill="#5FC9B8" rx="4"/>`);
+  if(r.ganancia>0){
+    parts.push(`<rect x="${xVenta}" y="${yVentaTop}" width="${barW}" height="${yCostoPartTop-yVentaTop}" fill="#F0665C" rx="4"/>`);
+  } else if(r.ganancia<0){
+    parts.push(`<rect x="${xVenta}" y="${yCostoPartTop}" width="${barW}" height="${yVentaTop-yCostoPartTop}" fill="#F0665C" rx="4" opacity="0.85"/>`);
+  }
+  parts.push(`<text x="${xVenta+barW/2}" y="${Math.min(yVentaTop,yCostoPartTop)-10}" text-anchor="middle" font-size="14" font-family="JetBrains Mono, monospace" fill="#F2EFE6">S/ ${r.venta}</text>`);
+  parts.push(`<text x="${xVenta+barW/2}" y="${marginT+plotH+22}" text-anchor="middle" font-size="12.5" font-family="Inter, sans-serif" fill="#A8ACC8">Venta</text>`);
+
+  // ganancia label
+  if(r.ganancia !== 0){
+    const midY = (yVentaTop+yCostoPartTop)/2;
+    parts.push(`<text x="${xVenta+barW+8}" y="${midY+4}" font-size="12.5" font-family="JetBrains Mono, monospace" fill="#F0665C">Ganancia: S/ ${r.ganancia}</text>`);
+  }
+
+  svg.innerHTML = parts.join('');
+}
+
+update();
+</script>
+</body>
+</html>

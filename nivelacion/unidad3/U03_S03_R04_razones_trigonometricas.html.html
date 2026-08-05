@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Práctica de razones trigonométricas</title>
+<style>
+:root{
+  --bg1:#07111f;--bg2:#121a34;--card:rgba(255,255,255,.085);
+  --line:rgba(255,255,255,.14);--text:#f8fafc;--muted:#cbd5e1;
+  --cyan:#22d3ee;--violet:#8b5cf6;--green:#34d399;--red:#fb7185;
+  --yellow:#fbbf24;--input:rgba(7,17,31,.78);--shadow:0 25px 70px rgba(0,0,0,.38)
+}
+*{box-sizing:border-box}
+body{
+  margin:0;min-height:100vh;color:var(--text);
+  font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+  background:
+    radial-gradient(circle at 12% 18%,rgba(34,211,238,.18),transparent 28%),
+    radial-gradient(circle at 86% 10%,rgba(139,92,246,.22),transparent 30%),
+    linear-gradient(135deg,var(--bg1),var(--bg2));
+  padding:30px 16px
+}
+.app{width:min(1180px,100%);margin:auto}
+header{text-align:center;margin-bottom:26px}
+.badge{
+  display:inline-flex;padding:8px 14px;border-radius:999px;
+  border:1px solid rgba(34,211,238,.28);background:rgba(34,211,238,.09);
+  color:#a5f3fc;font-size:.85rem;font-weight:800
+}
+h1{margin:15px 0 8px;font-size:clamp(2rem,5vw,3.55rem);letter-spacing:-.045em}
+.subtitle{max-width:830px;margin:auto;color:var(--muted);line-height:1.65}
+.layout{display:grid;grid-template-columns:minmax(350px,.9fr) minmax(430px,1.1fr);gap:22px}
+.card{
+  border:1px solid var(--line);background:var(--card);backdrop-filter:blur(18px);
+  box-shadow:var(--shadow);border-radius:24px;overflow:hidden
+}
+.content{padding:24px}
+.title{display:flex;align-items:center;gap:12px;margin:0 0 20px;font-size:1.12rem}
+.icon{
+  width:40px;height:40px;display:grid;place-items:center;border-radius:13px;
+  background:linear-gradient(135deg,var(--cyan),var(--violet));font-weight:900
+}
+.preview{
+  margin-bottom:18px;padding:17px 12px;border-radius:17px;
+  border:1px solid rgba(255,255,255,.1);background:rgba(7,17,31,.52);
+  text-align:center;font-family:"Cambria Math","Times New Roman",serif;
+  font-size:clamp(1.15rem,3.5vw,1.55rem)
+}
+.inputs{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.field label{display:block;margin-bottom:7px;color:var(--muted);font-size:.85rem;font-weight:750}
+input,select{
+  width:100%;min-height:50px;padding:10px 12px;border-radius:13px;
+  border:1px solid rgba(255,255,255,.14);outline:none;background:var(--input);
+  color:var(--text);font-size:1rem;text-align:center
+}
+input:focus,select:focus{border-color:var(--cyan);box-shadow:0 0 0 4px rgba(34,211,238,.12)}
+.actions{display:grid;grid-template-columns:1fr 52px;gap:12px;margin-top:18px}
+button{
+  min-height:49px;border:0;border-radius:13px;cursor:pointer;color:#fff;
+  font-size:.94rem;font-weight:850;transition:.18s
+}
+button:hover{transform:translateY(-2px);filter:brightness(1.08)}
+.primary{background:linear-gradient(135deg,var(--cyan),var(--violet))}
+.secondary{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.12)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:15px}
+.chip{
+  min-height:36px;padding:7px 11px;border-radius:999px;background:rgba(139,92,246,.1);
+  border:1px solid rgba(167,139,250,.2);color:#ddd6fe;font-size:.8rem
+}
+.diagram{
+  width:100%;aspect-ratio:1.45;min-height:320px;margin-bottom:18px;
+  border-radius:18px;overflow:hidden;background:#f8fafc
+}
+canvas{width:100%;height:100%;display:block}
+.status{
+  display:inline-flex;padding:8px 12px;margin-bottom:15px;border-radius:999px;
+  color:#a7f3d0;background:rgba(16,185,129,.12);border:1px solid rgba(52,211,153,.24);
+  font-size:.84rem;font-weight:850
+}
+.ratios{display:grid;grid-template-columns:repeat(3,1fr);gap:11px}
+.ratio{
+  padding:15px;border-radius:16px;background:rgba(7,17,31,.48);
+  border:1px solid rgba(255,255,255,.08);text-align:center
+}
+.ratio-name{color:#a5f3fc;font-weight:900;margin-bottom:6px}
+.ratio-value{font-family:"Cambria Math","Times New Roman",serif;font-size:1.22rem}
+.steps{margin-top:18px}
+.step{
+  position:relative;padding:14px 14px 14px 48px;border-radius:15px;
+  background:rgba(7,17,31,.38);border:1px solid rgba(255,255,255,.08)
+}
+.step+.step{margin-top:10px}
+.step-number{
+  position:absolute;left:13px;top:13px;width:25px;height:25px;display:grid;place-items:center;
+  border-radius:9px;background:linear-gradient(135deg,var(--cyan),var(--violet));font-weight:900;font-size:.78rem
+}
+.step-title{color:#e0f2fe;font-weight:800;margin-bottom:5px}
+.math{font-family:"Cambria Math","Times New Roman",serif;line-height:1.7}
+.quiz{
+  margin-top:20px;padding:20px;border-radius:19px;background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.1)
+}
+.quiz h3{margin:0 0 8px}
+.quiz p{color:var(--muted);line-height:1.5}
+.quiz-options{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.option{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.12)}
+.feedback{display:none;margin-top:12px;padding:12px;border-radius:12px}
+.feedback.ok{display:block;color:#a7f3d0;background:rgba(16,185,129,.12);border:1px solid rgba(52,211,153,.24)}
+.feedback.bad{display:block;color:#fecdd3;background:rgba(244,63,94,.12);border:1px solid rgba(251,113,133,.25)}
+.error{
+  display:none;margin-bottom:14px;padding:12px;border-radius:12px;color:#fecdd3;
+  background:rgba(244,63,94,.12);border:1px solid rgba(251,113,133,.25)
+}
+.note{margin-top:17px;text-align:center;color:#94a3b8;font-size:.8rem}
+@media(max-width:900px){.layout{grid-template-columns:1fr}}
+@media(max-width:560px){
+  body{padding:18px 10px}.content{padding:18px}.inputs,.ratios,.quiz-options{grid-template-columns:1fr}
+  .diagram{min-height:280px}
+}
+</style>
+</head>
+<body>
+<main class="app">
+<header>
+  <div class="badge">SOH · CAH · TOA</div>
+  <h1>Práctica de razones trigonométricas</h1>
+  <p class="subtitle">
+    Ingresa los dos catetos de un triángulo rectángulo, selecciona un ángulo agudo
+    y practica \(\sen\), \(\cos\) y \(\tan\) con resultados exactos simplificados.
+  </p>
+</header>
+
+<section class="layout">
+<article class="card">
+<div class="content">
+  <h2 class="title"><span class="icon">△</span> Datos del triángulo</h2>
+
+  <div class="preview" id="preview">Catetos: 3 y 4 · Hipotenusa: 5</div>
+
+  <div class="inputs">
+    <div class="field">
+      <label for="horizontal">Cateto horizontal</label>
+      <input id="horizontal" type="number" min="0.01" step="any" value="4">
+    </div>
+    <div class="field">
+      <label for="vertical">Cateto vertical</label>
+      <input id="vertical" type="number" min="0.01" step="any" value="3">
+    </div>
+  </div>
+
+  <div class="field" style="margin-top:13px">
+    <label for="angle">Ángulo agudo de referencia</label>
+    <select id="angle">
+      <option value="left">Ángulo inferior izquierdo α</option>
+      <option value="top">Ángulo superior β</option>
+    </select>
+  </div>
+
+  <div class="actions">
+    <button class="primary" id="calculateBtn">Calcular razones</button>
+    <button class="secondary" id="resetBtn">↻</button>
+  </div>
+
+  <div class="chips">
+    <button class="chip" data-h="4" data-v="3">3–4–5</button>
+    <button class="chip" data-h="1" data-v="1">45°–45°–90°</button>
+    <button class="chip" data-h="3" data-v="1.7320508075688772">30°–60°–90°</button>
+    <button class="chip" data-h="5" data-v="12">5–12–13</button>
+  </div>
+
+  <p class="note">Los decimales finitos se convierten en fracciones exactas cuando es posible.</p>
+</div>
+</article>
+
+<article class="card">
+<div class="content">
+  <h2 class="title"><span class="icon">✓</span> Representación y resultados</h2>
+
+  <div class="diagram"><canvas id="triangle"></canvas></div>
+  <div id="error" class="error"></div>
+  <div id="results"></div>
+
+  <section class="quiz">
+    <h3>Modo de práctica</h3>
+    <p id="quizPrompt">Identifica la razón trigonométrica solicitada.</p>
+    <div class="quiz-options" id="quizOptions"></div>
+    <div id="feedback" class="feedback"></div>
+    <button class="primary" id="newQuestionBtn" style="width:100%;margin-top:12px">Nueva pregunta</button>
+  </section>
+</div>
+</article>
+</section>
+</main>
+
+<script>
+const horizontalInput=document.getElementById("horizontal");
+const verticalInput=document.getElementById("vertical");
+const angleSelect=document.getElementById("angle");
+const preview=document.getElementById("preview");
+const results=document.getElementById("results");
+const errorBox=document.getElementById("error");
+const canvas=document.getElementById("triangle");
+const ctx=canvas.getContext("2d");
+let currentQuiz=null;
+
+function gcd(a,b){
+  a=Math.abs(Math.round(a));b=Math.abs(Math.round(b));
+  while(b)[a,b]=[b,a%b];
+  return a||1;
+}
+function normalizeFraction(num,den){
+  if(den===0)throw new Error("El denominador no puede ser cero.");
+  if(den<0){num=-num;den=-den}
+  const g=gcd(num,den);return{num:num/g,den:den/g};
+}
+function decimalToFraction(value){
+  const s=String(value).trim();
+  if(!s||!Number.isFinite(Number(s)))throw new Error("Los catetos deben ser números válidos.");
+  if(/^[+-]?\d+$/.test(s))return{num:Number(s),den:1};
+  const fixed=Number(s).toFixed(12).replace(/0+$/,"").replace(/\.$/,"");
+  const sign=fixed.startsWith("-")?-1:1,clean=fixed.replace("-","");
+  if(!clean.includes("."))return{num:sign*Number(clean),den:1};
+  const[i,d]=clean.split(".");
+  return normalizeFraction(sign*(Number(i)*10**d.length+Number(d)),10**d.length);
+}
+function fractionText(f){
+  f=normalizeFraction(f.num,f.den);
+  return f.den===1?String(f.num).replace("-","−"):`${String(f.num).replace("-","−")}/${f.den}`;
+}
+function simplifySqrt(n){
+  n=Math.abs(n);if(n===0)return{outside:0,inside:1};
+  let outside=1,inside=n;
+  for(let p=2;p*p<=inside;p++){
+    const sq=p*p;
+    while(inside%sq===0){outside*=p;inside/=sq}
+  }
+  return{outside,inside};
+}
+function sqrtFractionText(f){
+  f=normalizeFraction(f.num,f.den);
+  const sn=simplifySqrt(f.num),sd=simplifySqrt(f.den);
+  let coeff=sn.outside,rad=sn.inside*sd.inside,den=sd.outside*sd.inside;
+  const sr=simplifySqrt(rad);coeff*=sr.outside;rad=sr.inside;
+  const g=gcd(coeff,den);coeff/=g;den/=g;
+  if(rad===1)return den===1?String(coeff):`${coeff}/${den}`;
+  const core=coeff===1?`√${rad}`:`${coeff}√${rad}`;
+  return den===1?core:`${core}/${den}`;
+}
+function add(a,b){return normalizeFraction(a.num*b.den+b.num*a.den,a.den*b.den)}
+function square(a){return normalizeFraction(a.num*a.num,a.den*a.den)}
+
+function reciprocalRadicalRatio(numFrac,hypSq){
+  // num / sqrt(hypSq) = num*sqrt(hypSq)/hypSq
+  const numText=fractionText(numFrac);
+  const hypText=sqrtFractionText(hypSq);
+  const value=(numFrac.num/numFrac.den)/Math.sqrt(hypSq.num/hypSq.den);
+  return {display:`${numText}/${hypText}`,decimal:value};
+}
+
+function getData(){
+  const h=decimalToFraction(horizontalInput.value);
+  const v=decimalToFraction(verticalInput.value);
+  if(h.num<=0||v.num<=0)throw new Error("Los dos catetos deben ser estrictamente positivos.");
+  const hypSq=add(square(h),square(v));
+  const angle=angleSelect.value;
+  const opposite=angle==="left"?v:h;
+  const adjacent=angle==="left"?h:v;
+  return{h,v,hypSq,opposite,adjacent,angle};
+}
+
+function calculate(){
+  errorBox.style.display="none";
+  try{
+    const d=getData();
+    const hyp=sqrtFractionText(d.hypSq);
+    const sin=reciprocalRadicalRatio(d.opposite,d.hypSq);
+    const cos=reciprocalRadicalRatio(d.adjacent,d.hypSq);
+    const tan=normalizeFraction(d.opposite.num*d.adjacent.den,d.opposite.den*d.adjacent.num);
+    const symbol=d.angle==="left"?"α":"β";
+
+    preview.textContent=`Catetos: ${fractionText(d.h)} y ${fractionText(d.v)} · Hipotenusa: ${hyp}`;
+
+    results.innerHTML=`
+      <div class="status">● Razones exactas para el ángulo ${symbol}</div>
+      <div class="ratios">
+        <div class="ratio"><div class="ratio-name">sen ${symbol}</div><div class="ratio-value">${sin.display}</div></div>
+        <div class="ratio"><div class="ratio-name">cos ${symbol}</div><div class="ratio-value">${cos.display}</div></div>
+        <div class="ratio"><div class="ratio-name">tan ${symbol}</div><div class="ratio-value">${fractionText(tan)}</div></div>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <span class="step-number">1</span>
+          <div class="step-title">Hipotenusa</div>
+          <div class="math">c=√[(${fractionText(d.h)})²+(${fractionText(d.v)})²]=${hyp}</div>
+        </div>
+        <div class="step">
+          <span class="step-number">2</span>
+          <div class="step-title">Identificar los lados respecto de ${symbol}</div>
+          <div class="math">
+            Opuesto=${fractionText(d.opposite)}, adyacente=${fractionText(d.adjacent)}, hipotenusa=${hyp}
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">3</span>
+          <div class="step-title">Aplicar SOH–CAH–TOA</div>
+          <div class="math">
+            sen ${symbol}=opuesto/hipotenusa, cos ${symbol}=adyacente/hipotenusa,
+            tan ${symbol}=opuesto/adyacente
+          </div>
+        </div>
+      </div>`;
+    drawTriangle();
+    newQuestion();
+  }catch(e){
+    errorBox.textContent=e.message;errorBox.style.display="block";results.innerHTML="";
+  }
+}
+
+function resizeCanvas(){
+  const rect=canvas.getBoundingClientRect(),dpr=window.devicePixelRatio||1;
+  canvas.width=Math.round(rect.width*dpr);canvas.height=Math.round(rect.height*dpr);
+  ctx.setTransform(dpr,0,0,dpr,0,0);drawTriangle();
+}
+function drawTriangle(){
+  const rect=canvas.getBoundingClientRect(),w=rect.width,h=rect.height;
+  ctx.clearRect(0,0,w,h);ctx.fillStyle="#f8fafc";ctx.fillRect(0,0,w,h);
+  let hv=Number(horizontalInput.value),vv=Number(verticalInput.value);
+  if(![hv,vv].every(Number.isFinite)||hv<=0||vv<=0)return;
+  const scale=Math.min((w-110)/hv,(h-90)/vv);
+  const x0=55,y0=h-45,x1=x0+hv*scale,y1=y0,x2=x0,y2=y0-vv*scale;
+
+  ctx.fillStyle="rgba(34,211,238,.12)";
+  ctx.beginPath();ctx.moveTo(x0,y0);ctx.lineTo(x1,y1);ctx.lineTo(x2,y2);ctx.closePath();ctx.fill();
+  ctx.strokeStyle="#334155";ctx.lineWidth=3;
+  ctx.beginPath();ctx.moveTo(x0,y0);ctx.lineTo(x1,y1);ctx.lineTo(x2,y2);ctx.closePath();ctx.stroke();
+  ctx.strokeStyle="#7c3aed";ctx.lineWidth=2;ctx.strokeRect(x0,y0-17,17,17);
+
+  const selected=angleSelect.value;
+  ctx.fillStyle="#0891b2";ctx.font="bold 14px Inter, sans-serif";
+  ctx.textAlign="center";
+  ctx.fillText("α",x1-25,y1-12);
+  ctx.fillText("β",x2+24,y2+22);
+  ctx.fillStyle="#7c3aed";
+  if(selected==="left"){
+    ctx.beginPath();ctx.arc(x1,y1,18,Math.PI,Math.PI+Math.atan2(vv,hv));ctx.stroke();
+  }else{
+    ctx.beginPath();ctx.arc(x2,y2,18,Math.atan2(vv,hv),Math.PI/2);ctx.stroke();
+  }
+
+  ctx.fillStyle="#0f172a";ctx.font="bold 12px Inter, sans-serif";
+  ctx.fillText(String(hv),(x0+x1)/2,y0+22);
+  ctx.save();ctx.translate(x0-18,(y0+y2)/2);ctx.rotate(-Math.PI/2);ctx.fillText(String(vv),0,0);ctx.restore();
+  ctx.fillText("hipotenusa",(x1+x2)/2+20,(y1+y2)/2-8);
+}
+
+function newQuestion(){
+  try{
+    const d=getData();
+    const symbol=d.angle==="left"?"α":"β";
+    const types=["sen","cos","tan"];
+    const type=types[Math.floor(Math.random()*types.length)];
+    const correct=type==="sen"?"opuesto / hipotenusa":type==="cos"?"adyacente / hipotenusa":"opuesto / adyacente";
+    currentQuiz={correct};
+    document.getElementById("quizPrompt").textContent=`Para el ángulo ${symbol}, ¿cómo se define ${type} ${symbol}?`;
+    const options=["opuesto / hipotenusa","adyacente / hipotenusa","opuesto / adyacente","adyacente / opuesto"];
+    const box=document.getElementById("quizOptions");box.innerHTML="";
+    [...options].sort(()=>Math.random()-.5).forEach(text=>{
+      const b=document.createElement("button");b.className="option";b.textContent=text;
+      b.onclick=()=>checkAnswer(text);box.appendChild(b);
+    });
+    const f=document.getElementById("feedback");f.className="feedback";f.textContent="";
+  }catch{}
+}
+function checkAnswer(value){
+  const f=document.getElementById("feedback");
+  if(value===currentQuiz.correct){
+    f.className="feedback ok";f.textContent="Correcto.";
+  }else{
+    f.className="feedback bad";f.textContent=`Incorrecto. La respuesta es ${currentQuiz.correct}.`;
+  }
+}
+
+[horizontalInput,verticalInput].forEach(el=>el.addEventListener("input",()=>{drawTriangle();}));
+angleSelect.addEventListener("change",()=>{drawTriangle();calculate();});
+document.getElementById("calculateBtn").addEventListener("click",calculate);
+document.getElementById("newQuestionBtn").addEventListener("click",newQuestion);
+document.getElementById("resetBtn").addEventListener("click",()=>{
+  horizontalInput.value=4;verticalInput.value=3;angleSelect.value="left";calculate();
+});
+document.querySelectorAll(".chip").forEach(chip=>{
+  chip.addEventListener("click",()=>{
+    horizontalInput.value=chip.dataset.h;verticalInput.value=chip.dataset.v;calculate();
+  });
+});
+window.addEventListener("resize",resizeCanvas);
+requestAnimationFrame(()=>{resizeCanvas();calculate();});
+</script>
+</body>
+</html>
