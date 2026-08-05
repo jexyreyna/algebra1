@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recursos Interactivos de Matemática</title>
+  <style>
+    :root{
+      --azul:#0f2a66;
+      --azul2:#173f91;
+      --dorado:#c99a3c;
+      --fondo:#f4f6fb;
+      --texto:#1f2937;
+      --blanco:#ffffff;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Arial,Helvetica,sans-serif;
+      color:var(--texto);
+      background:linear-gradient(135deg,#eef2f9,#ffffff);
+    }
+    header{
+      background:linear-gradient(135deg,var(--azul),var(--azul2));
+      color:white;
+      padding:42px 20px;
+      text-align:center;
+    }
+    header h1{margin:0 0 10px;font-size:clamp(30px,5vw,48px)}
+    header p{margin:0;color:#dbe7ff;font-size:18px}
+    main{max-width:1100px;margin:auto;padding:35px 20px 60px}
+    .intro{
+      background:white;
+      border-left:5px solid var(--dorado);
+      padding:18px 22px;
+      border-radius:12px;
+      box-shadow:0 8px 25px rgba(0,0,0,.07);
+      margin-bottom:28px;
+    }
+    h2{color:var(--azul);margin:32px 0 15px}
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+      gap:18px;
+    }
+    .card{
+      display:block;
+      text-decoration:none;
+      color:var(--texto);
+      background:var(--blanco);
+      border:1px solid #dfe5ef;
+      border-radius:16px;
+      padding:22px;
+      box-shadow:0 8px 24px rgba(15,42,102,.08);
+      transition:.2s ease;
+    }
+    .card:hover{
+      transform:translateY(-4px);
+      border-color:var(--dorado);
+      box-shadow:0 12px 30px rgba(15,42,102,.14);
+    }
+    .tag{
+      display:inline-block;
+      background:#edf2ff;
+      color:var(--azul);
+      font-weight:bold;
+      font-size:12px;
+      padding:6px 10px;
+      border-radius:999px;
+      margin-bottom:12px;
+    }
+    .card h3{margin:0 0 8px;color:var(--azul)}
+    .card p{margin:0;color:#5f6b7a;line-height:1.45}
+    footer{
+      text-align:center;
+      padding:25px;
+      color:#6b7280;
+      border-top:1px solid #e5e7eb;
+      background:white;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Recursos Interactivos de Matemática</h1>
+  <p>Material educativo elaborado para el aprendizaje y la práctica matemática</p>
+</header>
+
+<main>
+  <div class="intro">
+    <strong>Bienvenidos.</strong> Selecciona uno de los recursos interactivos para iniciar la actividad.
+  </div>
+
+  <h2>Nivelación en Matemática</h2>
+  <div class="grid">
+    <a class="card" href="math_shop_center.html">
+      <span class="tag">Porcentajes</span>
+      <h3>Math Shop</h3>
+      <p>Aplicación interactiva de porcentajes, compras y descuentos.</p>
+    </a>
+
+    <a class="card" href="variacion-porcentual.html">
+      <span class="tag">Porcentajes</span>
+      <h3>Variación porcentual</h3>
+      <p>Compara valores iniciales y finales e interpreta el cambio porcentual.</p>
+    </a>
+
+    <a class="card" href="pendiente.html">
+      <span class="tag">Funciones</span>
+      <h3>Pendiente de una recta</h3>
+      <p>Explora la pendiente a partir de dos puntos del plano cartesiano.</p>
+    </a>
+
+    <a class="card" href="ecuacion_recta_usil.html">
+      <span class="tag">Funciones lineales</span>
+      <h3>Ecuación de la recta</h3>
+      <p>Trabaja la expresión y = mx + b mediante una representación interactiva.</p>
+    </a>
+  </div>
+
+  <h2>Matemática II</h2>
+  <div class="grid">
+    <a class="card" href="M2_Elasticidad.html">
+      <span class="tag">Aplicaciones</span>
+      <h3>Elasticidad</h3>
+      <p>Recurso interactivo relacionado con aplicaciones económicas.</p>
+    </a>
+
+    <a class="card" href="M2_RCP.html">
+      <span class="tag">Razón de cambio</span>
+      <h3>Razón de cambio promedio</h3>
+      <p>Explora el cambio promedio entre dos valores.</p>
+    </a>
+
+    <a class="card" href="M2_RCP1.html">
+      <span class="tag">Razón de cambio</span>
+      <h3>Razón de cambio: práctica</h3>
+      <p>Actividad complementaria para analizar variaciones.</p>
+    </a>
+
+    <a class="card" href="M2_Tangente_Parabola.html">
+      <span class="tag">Derivadas</span>
+      <h3>Tangente a una parábola</h3>
+      <p>Visualiza la recta tangente y su relación con la pendiente.</p>
+    </a>
+  </div>
+
+  <h2>Matemática financiera</h2>
+  <div class="grid">
+    <a class="card" href="matefinusilVF.html">
+      <span class="tag">Interés compuesto</span>
+      <h3>Simulador financiero</h3>
+      <p>Analiza el crecimiento de un capital mediante interés compuesto.</p>
+    </a>
+  </div>
+</main>
+
+<footer>
+  © 2026 Jexy Arturo Reyna Medina · Recursos de Matemática
+</footer>
+
+</body>
+</html>
