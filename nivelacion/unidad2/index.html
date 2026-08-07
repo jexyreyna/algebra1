@@ -2,72 +2,120 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Unidad 2 - Recursos Interactivos</title>
-
 <style>
-body{font-family:Arial;background:#f4f7fb;margin:0}
-header{background:#0b3b8c;color:white;padding:25px;text-align:center}
-main{max-width:900px;margin:auto;padding:20px}
-.card{
-display:block;
-background:white;
-padding:15px;
-margin:12px 0;
-border-radius:10px;
-text-decoration:none;
-color:#123;
-box-shadow:0 2px 8px rgba(0,0,0,.15);
-}
-.card:hover{
-background:#eef5ff;
-}
+:root{--azul:#0f2a66;--azul2:#173f91;--dorado:#c99a3c;--fondo:#f4f6fb;--texto:#1f2937;--blanco:#fff}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;color:var(--texto);background:linear-gradient(135deg,#eef2f9,#fff)}
+header{background:linear-gradient(135deg,var(--azul),var(--azul2));color:#fff;padding:38px 20px;text-align:center}
+header h1{margin:0 0 8px;font-size:clamp(28px,5vw,44px)}
+header p{margin:0;color:#dbe7ff;font-size:17px}
+main{max-width:1100px;margin:auto;padding:32px 20px 60px}
+.intro{background:#fff;border-left:5px solid var(--dorado);padding:17px 20px;border-radius:12px;
+box-shadow:0 8px 24px rgba(0,0,0,.07);margin-bottom:24px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
+.card{display:block;text-decoration:none;color:var(--texto);background:var(--blanco);border:1px solid #dfe5ef;
+border-radius:15px;padding:20px;box-shadow:0 7px 22px rgba(15,42,102,.08);transition:.2s ease}
+.card:hover{transform:translateY(-3px);border-color:var(--dorado);box-shadow:0 11px 28px rgba(15,42,102,.14)}
+.tag{display:inline-block;background:#edf2ff;color:var(--azul);font-weight:bold;font-size:12px;padding:5px 9px;
+border-radius:999px;margin-bottom:10px}
+.card h3{margin:0 0 7px;color:var(--azul);font-size:18px}
+.card p{margin:0;color:#5f6b7a;line-height:1.45;font-size:14px}
+.new{outline:2px solid var(--dorado)}
+footer{text-align:center;padding:22px;color:#6b7280;border-top:1px solid #e5e7eb;background:#fff}
 </style>
-
 </head>
-
 <body>
-
 <header>
 <h1>Unidad 2</h1>
-<h3>Ecuaciones y Funciones</h3>
+<p>Álgebra, ecuaciones y funciones · Nivelación en Matemática</p>
 </header>
-
 <main>
-
-<a class="card" href="U02_S02_R01_ecuacion_lineal_problema_edades.html">Ecuaciones lineales</a>
-
-<a class="card" href="U02_S02_R02_ecuacion_cuadratica_elemental.html">Ecuaciones cuadráticas</a>
-
-<a class="card" href="U02_S02_R03_ecuacion_cuadratica_contextualizada.html">Problemas con ecuaciones cuadráticas</a>
-
-<a class="card" href="U02_S02_R04_ecuacion_exponencial_elemental.html">Ecuaciones exponenciales</a>
-
-<a class="card" href="U02_S02_R05_laboratorio_ecuaciones_exponenciales.html">Laboratorio exponencial</a>
-
-<a class="card" href="U02_S02_R06_logaritmos_calculo_propiedades.html">Propiedades de logaritmos</a>
-
-<a class="card" href="U02_S02_R07_solucionador_ecuaciones_logaritmicas.html">Ecuaciones logarítmicas</a>
-
-<a class="card" href="U02_S02_R08_reconocimiento_de_funciones.html">Reconocimiento de funciones</a>
-
-<a class="card" href="U02_S02_R09_dominio_y_rango.html">Dominio y rango</a>
-
-<a class="card" href="U02_S02_R10_pendiente_regla_de_correspondencia.html">Pendiente y regla de correspondencia</a>
-
-<a class="card" href="U02_S02_R11_ecuacion_fraccionaria.html">Ecuaciones fraccionarias</a>
-
-<a class="card" href="U02_S02_R12_completar_el_cuadrado.html">Completar el cuadrado</a>
-
-<a class="card" href="U02_S02_R13_completar_el_cuadrado_practica.html">Práctica: completar el cuadrado</a>
-
-<a class="card" href="U02_S02_R14_binomio_cuadrado_demostracion_geometrica.html">Binomio cuadrado</a>
-
-<a class="card" href="U02_S02_R15_pendiente_entre_dos_puntos.html">Pendiente entre dos puntos</a>
-
-<a class="card" href="U02_S02_R16_ecuacion_de_la_recta.html">Ecuación de la recta</a>
-
+<div class="intro"><strong>16 recursos interactivos.</strong> Selecciona una tarjeta para iniciar la actividad.</div>
+<div class="grid">
+<a class="card" href="U02_S02_R01_ecuacion_lineal_problema_edades.html">
+  <span class="tag">Ecuaciones</span>
+  <h3>R01 · Ecuación lineal: problema de edades</h3>
+  <p>Abrir recurso interactivo</p>
+</a>
+<a class="card" href="U02_S02_R02_ecuacion_cuadratica_elemental.html">
+  <span class="tag">Ecuaciones</span>
+  <h3>R02 · Ecuación cuadrática elemental</h3>
+  <p>Abrir recurso interactivo</p>
+</a>
+<a class="card" href="U02_S02_R03_ecuacion_cuadratica_problema_contextualizado.html">
+  <span class="tag">Ecuaciones</span>
+  <h3>R03 · Ecuación cuadrática contextualizada</h3>
+  <p>Abrir recurso interactivo</p>
+</a>
+<a class="card" href="U02_S02_R04_ecuacion_exponencial_elemental.html">
+  <span class="tag">Exponenciales</span>
+  <h3>R04 · Ecuación exponencial elemental</h3>
+  <p>Abrir recurso interactivo</p>
+</a>
+<a class="card" href="U02_S02_R05_laboratorio_ecuaciones_exponenciales.html">
+  <span class="tag">Exponenciales</span>
+  <h3>R05 · Laboratorio de ecuaciones exponenciales</h3>
+  <p>Abrir recurso interactivo</p>
+</a>
+<a class="card" href="U02_S02_R06_logaritmos_calculo_propiedades.html">
+  <span class="tag">Logaritmos</span>
+  <h3>R06 · Cálculo y propiedades de logaritmos</h3>
+  <p>Abrir recurso interactivo</p>
+</a>
+<a class="card" href="U02_S02_R07_solucionador_ecuaciones_logaritmicas.html">
+  <span class="tag">Logaritmos</span>
+  <h3>R07 · Solucionador de ecuaciones logarítmicas</h3>
+  <p>Abrir recurso interactivo</p>
+</a>
+<a class="card" href="U02_S02_R08_reconocimiento_de_funciones.html">
+  <span class="tag">Funciones</span>
+  <h3>R08 · Reconocimiento de funciones</h3>
+  <p>Abrir recurso interactivo</p>
+</a>
+<a class="card" href="U02_S02_R09_dominio_y_rango_desde_grafica.html">
+  <span class="tag">Funciones</span>
+  <h3>R09 · Dominio y rango desde una gráfica</h3>
+  <p>Abrir recurso interactivo</p>
+</a>
+<a class="card" href="U02_S02_R10_pendiente_y_regla_correspondencia.html">
+  <span class="tag">Funciones</span>
+  <h3>R10 · Pendiente y regla de correspondencia</h3>
+  <p>Abrir recurso interactivo</p>
+</a>
+<a class="card" href="U02_S02_R11_ecuacion_fraccionaria.html">
+  <span class="tag">Ecuaciones</span>
+  <h3>R11 · Ecuación fraccionaria</h3>
+  <p>Abrir recurso interactivo</p>
+</a>
+<a class="card" href="U02_S02_R12_completar_el_cuadrado.html">
+  <span class="tag">Álgebra</span>
+  <h3>R12 · Completar el cuadrado</h3>
+  <p>Abrir recurso interactivo</p>
+</a>
+<a class="card" href="U02_S02_R13_operaciones_con_polinomios.html">
+  <span class="tag">Polinomios</span>
+  <h3>R13 · Operaciones con polinomios</h3>
+  <p>Abrir recurso interactivo</p>
+</a>
+<a class="card" href="U02_S02_R14_binomio_cuadrado_demostracion_geometrica.html">
+  <span class="tag">Productos notables</span>
+  <h3>R14 · Binomio cuadrado: demostración geométrica</h3>
+  <p>Abrir recurso interactivo</p>
+</a>
+<a class="card" href="U02_S02_R15_pendiente_entre_dos_puntos.html">
+  <span class="tag">Funciones</span>
+  <h3>R15 · Pendiente entre dos puntos</h3>
+  <p>Abrir recurso interactivo</p>
+</a>
+<a class="card" href="U02_S02_R16_ecuacion_de_la_recta.html">
+  <span class="tag">Funciones</span>
+  <h3>R16 · Ecuación de la recta</h3>
+  <p>Abrir recurso interactivo</p>
+</a>
+</div>
 </main>
-
+<footer>© 2026 Jexy Arturo Reyna Medina · Recursos de Matemática</footer>
 </body>
 </html>
