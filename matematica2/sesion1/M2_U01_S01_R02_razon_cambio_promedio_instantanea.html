@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Razones de Cambio</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            font-size: 16px;
+            color: #6b7280;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .panel {
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .panel h2 {
+            font-size: 18px;
+            color: #1f2937;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            color: #6b7280;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        button:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .graph-section {
+            grid-column: 1 / -1;
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .graph-section h2 {
+            font-size: 18px;
+            color: #1f2937;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        svg {
+            width: 100%;
+            height: auto;
+        }
+
+        .results {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border: 2px solid #ddd6fe;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .result-card h3 {
+            font-size: 16px;
+            color: #667eea;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .calculation-step {
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: #374151;
+            line-height: 1.6;
+            border-left: 3px solid #667eea;
+        }
+
+        .result-value {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 20px;
+            color: #667eea;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .interpretation {
+            font-size: 13px;
+            color: #4b5563;
+            line-height: 1.6;
+            background: rgba(16, 185, 129, 0.1);
+            padding: 10px;
+            border-radius: 6px;
+            border-left: 3px solid #10b981;
+        }
+
+        @media (max-width: 768px) {
+            .content, .results {
+                grid-template-columns: 1fr;
+            }
+
+            .graph-section {
+                grid-column: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Razones de Cambio</h1>
+            <p>Calcula la razón de cambio promedio e instantánea</p>
+        </div>
+
+        <div class="content">
+            <!-- Panel de Entrada Promedio -->
+            <div class="panel">
+                <h2>Razón Promedio</h2>
+                
+                <div class="input-group">
+                    <label>Año 1 (t₁):</label>
+                    <input type="number" id="year1" value="2018">
+                </div>
+
+                <div class="input-group">
+                    <label>Valor en Año 1 (P₁):</label>
+                    <input type="number" id="value1" value="28.5" step="0.1">
+                </div>
+
+                <div class="input-group">
+                    <label>Año 2 (t₂):</label>
+                    <input type="number" id="year2" value="2024">
+                </div>
+
+                <div class="input-group">
+                    <label>Valor en Año 2 (P₂):</label>
+                    <input type="number" id="value2" value="24.6" step="0.1">
+                </div>
+
+                <button onclick="calcular()">Calcular Razón Promedio</button>
+            </div>
+
+            <!-- Panel de Entrada Instantánea -->
+            <div class="panel">
+                <h2>Razón Instantánea</h2>
+
+                <div class="input-group">
+                    <label>Año (t):</label>
+                    <input type="number" id="instantYear" value="2021" step="0.1">
+                </div>
+
+                <div class="input-group">
+                    <label>Valor en ese año (P):</label>
+                    <input type="number" id="instantValue" value="29.4" step="0.1">
+                </div>
+
+                <div class="input-group">
+                    <label>Intervalo h:</label>
+                    <select id="hValue">
+                        <option value="1">h = 1.0</option>
+                        <option value="0.5">h = 0.5</option>
+                        <option value="0.1">h = 0.1</option>
+                        <option value="0.01">h = 0.01</option>
+                    </select>
+                </div>
+
+                <button onclick="calcularInstantaneo()">Calcular Razón Instantánea</button>
+            </div>
+        </div>
+
+        <!-- Gráfica -->
+        <div class="graph-section">
+            <h2>Visualización</h2>
+            <svg id="graph" viewBox="0 0 900 400" style="min-height: 400px;">
+                <defs>
+                    <pattern id="grid" width="40" height="30" patternUnits="userSpaceOnUse">
+                        <path d="M 40 0 L 0 0 0 30" fill="none" stroke="#e5e7eb" stroke-width="0.5"/>
+                    </pattern>
+                </defs>
+
+                <rect width="900" height="400" fill="#fafbfc"/>
+                <rect width="900" height="400" fill="url(#grid)"/>
+
+                <!-- Ejes -->
+                <line x1="60" y1="350" x2="850" y2="350" stroke="#1f2937" stroke-width="2"/>
+                <line x1="60" y1="50" x2="60" y2="350" stroke="#1f2937" stroke-width="2"/>
+
+                <!-- Etiquetas -->
+                <text x="870" y="365" font-size="14" font-weight="600" fill="#1f2937">Año</text>
+                <text x="20" y="30" font-size="14" font-weight="600" fill="#1f2937">Valor</text>
+
+                <!-- Línea de tendencia -->
+                <line id="trendLine" x1="100" y1="300" x2="800" y2="200" stroke="#667eea" stroke-width="3" opacity="0.8"/>
+
+                <!-- Recta secante (naranja) -->
+                <line id="secantLine" x1="100" y1="300" x2="800" y2="200" stroke="#f59e0b" stroke-width="2" stroke-dasharray="5,5"/>
+
+                <!-- Recta tangente (verde) -->
+                <line id="tangentLine" x1="100" y1="300" x2="800" y2="200" stroke="#10b981" stroke-width="2" stroke-dasharray="5,5" display="none"/>
+
+                <!-- Puntos -->
+                <circle id="point1" cx="100" cy="300" r="6" fill="#667eea" stroke="white" stroke-width="2"/>
+                <circle id="point2" cx="800" cy="200" r="6" fill="#667eea" stroke="white" stroke-width="2"/>
+                <circle id="instantPoint" cx="400" cy="250" r="6" fill="#764ba2" stroke="white" stroke-width="2" display="none"/>
+
+                <!-- Leyenda -->
+                <g transform="translate(550, 60)">
+                    <circle cx="10" cy="10" r="4" fill="#667eea"/>
+                    <text x="20" y="14" font-size="12" fill="#1f2937">Datos</text>
+                    
+                    <line x1="10" y1="35" x2="20" y2="35" stroke="#f59e0b" stroke-width="2" stroke-dasharray="3,3"/>
+                    <text x="30" y="39" font-size="12" fill="#1f2937">Secante (promedio)</text>
+                    
+                    <line x1="10" y1="60" x2="20" y2="60" stroke="#10b981" stroke-width="2" stroke-dasharray="3,3"/>
+                    <text x="30" y="64" font-size="12" fill="#1f2937">Tangente (instantánea)</text>
+                </g>
+            </svg>
+        </div>
+
+        <!-- Resultados -->
+        <div class="results">
+            <!-- Razón Promedio -->
+            <div class="result-card">
+                <h3>📊 Razón de Cambio Promedio</h3>
+
+                <div class="calculation-step">
+                    <strong>Fórmula:</strong><br>
+                    RCP = [P(t₂) - P(t₁)] / (t₂ - t₁)
+                </div>
+
+                <div class="calculation-step">
+                    <strong>Sustitución:</strong><br>
+                    RCP = [<span id="p2Display">24.6</span> - <span id="p1Display">28.5</span>] / (<span id="t2Display">2024</span> - <span id="t1Display">2018</span>)
+                </div>
+
+                <div class="calculation-step">
+                    <strong>Cálculo:</strong><br>
+                    RCP = <span id="numerador">-3.9</span> / <span id="denominador">6</span>
+                </div>
+
+                <div class="result-value">
+                    <span id="resultPromedio">-0.65</span> unidades/año
+                </div>
+
+                <div class="interpretation">
+                    <strong>📌 Significado:</strong><br>
+                    <span id="interpretPromedio">En promedio, el valor cambió -0.65 unidades por año</span>
+                </div>
+            </div>
+
+            <!-- Razón Instantánea -->
+            <div class="result-card">
+                <h3>🎯 Razón de Cambio Instantánea</h3>
+
+                <div class="calculation-step">
+                    <strong>Fórmula (Aproximación):</strong><br>
+                    RCI ≈ [P(t+h) - P(t)] / h
+                </div>
+
+                <div class="calculation-step">
+                    <strong>Valores:</strong><br>
+                    RCI ≈ [<span id="pthDisplay">-</span> - <span id="ptDisplay">-</span>] / <span id="hDisplay">1</span>
+                </div>
+
+                <div class="calculation-step">
+                    <strong>Cálculo:</strong><br>
+                    RCI ≈ <span id="instNumerador">-</span> / <span id="hDisplay2">1</span>
+                </div>
+
+                <div class="result-value">
+                    <span id="resultInstantaneo">-</span> unidades/año
+                </div>
+
+                <div class="interpretation">
+                    <strong>📌 Significado:</strong><br>
+                    <span id="interpretInstantaneo">En ese momento, el valor cambia a esta velocidad instantánea</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function calcular() {
+            const year1 = parseFloat(document.getElementById('year1').value);
+            const value1 = parseFloat(document.getElementById('value1').value);
+            const year2 = parseFloat(document.getElementById('year2').value);
+            const value2 = parseFloat(document.getElementById('value2').value);
+
+            if (year2 <= year1) {
+                alert('El año 2 debe ser mayor al año 1');
+                return;
+            }
+
+            const numerador = value2 - value1;
+            const denominador = year2 - year1;
+            const rcp = numerador / denominador;
+
+            document.getElementById('p1Display').textContent = value1.toFixed(1);
+            document.getElementById('p2Display').textContent = value2.toFixed(1);
+            document.getElementById('t1Display').textContent = Math.round(year1);
+            document.getElementById('t2Display').textContent = Math.round(year2);
+            document.getElementById('numerador').textContent = numerador.toFixed(2);
+            document.getElementById('denominador').textContent = denominador;
+            document.getElementById('resultPromedio').textContent = rcp.toFixed(2);
+
+            const signo = rcp < 0 ? 'disminuyó' : 'aumentó';
+            document.getElementById('interpretPromedio').textContent = 
+                `En promedio, el valor ${signo} ${Math.abs(rcp).toFixed(2)} unidades por año.`;
+
+            dibujarGrafica(year1, value1, year2, value2, rcp);
+        }
+
+        function calcularInstantaneo() {
+            const instantYear = parseFloat(document.getElementById('instantYear').value);
+            const instantValue = parseFloat(document.getElementById('instantValue').value);
+            const h = parseFloat(document.getElementById('hValue').value);
+
+            // Usar pendiente promedio como aproximación
+            const year1 = parseFloat(document.getElementById('year1').value);
+            const value1 = parseFloat(document.getElementById('value1').value);
+            const year2 = parseFloat(document.getElementById('year2').value);
+            const value2 = parseFloat(document.getElementById('value2').value);
+            
+            const pendientaPromedio = (value2 - value1) / (year2 - year1);
+            const valueTh = instantValue + (pendientaPromedio * h);
+
+            const numeradorInst = valueTh - instantValue;
+            const rci = numeradorInst / h;
+
+            document.getElementById('ptDisplay').textContent = instantValue.toFixed(2);
+            document.getElementById('pthDisplay').textContent = valueTh.toFixed(2);
+            document.getElementById('hDisplay').textContent = h;
+            document.getElementById('hDisplay2').textContent = h;
+            document.getElementById('instNumerador').textContent = numeradorInst.toFixed(2);
+            document.getElementById('resultInstantaneo').textContent = rci.toFixed(2);
+
+            const signo = rci < 0 ? 'disminuye' : 'aumenta';
+            const magnitud = Math.abs(rci) < 0.1 ? 'lentamente' : 'rápidamente';
+            document.getElementById('interpretInstantaneo').textContent = 
+                `En el año ${instantYear.toFixed(1)}, el valor ${signo} ${magnitud} (${Math.abs(rci).toFixed(2)} unidades/año).`;
+
+            document.getElementById('instantPoint').removeAttribute('display');
+        }
+
+        function dibujarGrafica(year1, value1, year2, value2, rcp) {
+            const minYear = Math.min(year1, year2) - 1;
+            const maxYear = Math.max(year1, year2) + 1;
+            const minValue = Math.min(value1, value2) - 5;
+            const maxValue = Math.max(value1, value2) + 5;
+
+            const rangeYear = maxYear - minYear;
+            const rangeValue = maxValue - minValue;
+
+            const toSvgX = (year) => 60 + ((year - minYear) / rangeYear) * 750;
+            const toSvgY = (value) => 350 - ((value - minValue) / rangeValue) * 280;
+
+            const x1 = toSvgX(year1);
+            const y1 = toSvgY(value1);
+            const x2 = toSvgX(year2);
+            const y2 = toSvgY(value2);
+
+            document.getElementById('point1').setAttribute('cx', x1);
+            document.getElementById('point1').setAttribute('cy', y1);
+            document.getElementById('point2').setAttribute('cx', x2);
+            document.getElementById('point2').setAttribute('cy', y2);
+
+            document.getElementById('secantLine').setAttribute('x1', x1);
+            document.getElementById('secantLine').setAttribute('y1', y1);
+            document.getElementById('secantLine').setAttribute('x2', x2);
+            document.getElementById('secantLine').setAttribute('y2', y2);
+
+            const m = (y2 - y1) / (x2 - x1);
+            const xStart = 60;
+            const yStart = y1 + m * (xStart - x1);
+            const xEnd = 810;
+            const yEnd = y1 + m * (xEnd - x1);
+
+            document.getElementById('trendLine').setAttribute('x1', xStart);
+            document.getElementById('trendLine').setAttribute('y1', yStart);
+            document.getElementById('trendLine').setAttribute('x2', xEnd);
+            document.getElementById('trendLine').setAttribute('y2', yEnd);
+        }
+
+        calcular();
+    </script>
+</body>
+</html>

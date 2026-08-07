@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego de Derivadas - Didáctico</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f3e7ff 0%, #e0f7ff 50%, #f0f4ff 100%);
+            min-height: 100vh;
+            padding: 30px 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 20% 50%, rgba(255, 179, 230, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(179, 230, 255, 0.1) 0%, transparent 50%);
+            animation: shimmer 8s ease-in-out infinite;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(50px, 50px); }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #b896ff 0%, #93c5fd 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            font-size: 16px;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .tabs-container {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .tab-button {
+            padding: 12px 28px;
+            border: 2px solid #c4b5fd;
+            background: rgba(255, 255, 255, 0.7);
+            color: #8b5cf6;
+            font-weight: 700;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            font-size: 13px;
+        }
+
+        .tab-button:hover {
+            background: rgba(255, 255, 255, 0.9);
+            border-color: #d8b4ff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(200, 150, 255, 0.15);
+        }
+
+        .tab-button.active {
+            background: linear-gradient(135deg, #c4b5fd 0%, #bfdbfe 100%);
+            color: white;
+            border-color: #8b5cf6;
+            box-shadow: 0 8px 20px rgba(200, 150, 255, 0.3);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.4s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* ===== SECCIÓN TUTORIAL ===== */
+        .tutorial-container {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(20px);
+            border: 1.5px solid rgba(200, 180, 255, 0.3);
+            border-radius: 20px;
+            padding: 40px;
+        }
+
+        .tutorial-card {
+            background: linear-gradient(135deg, rgba(216, 180, 255, 0.15) 0%, rgba(179, 230, 255, 0.15) 100%);
+            border-left: 4px solid #c4b5fd;
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+
+        .tutorial-card h3 {
+            font-size: 16px;
+            color: #8b5cf6;
+            margin-bottom: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .tutorial-card p {
+            color: #4b5563;
+            line-height: 1.8;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .formula-box {
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid #e9d5ff;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 1.1em;
+            margin-top: 12px;
+        }
+
+        .step-list {
+            background: rgba(255, 255, 255, 0.6);
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 12px;
+        }
+
+        .step-item {
+            padding: 8px 0;
+            color: #4b5563;
+            font-size: 13px;
+            line-height: 1.6;
+            border-bottom: 1px solid #e9d5ff;
+        }
+
+        .step-item:last-child {
+            border-bottom: none;
+        }
+
+        /* ===== SECCIÓN JUEGO ===== */
+        .game-container {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(20px);
+            border: 1.5px solid rgba(200, 180, 255, 0.3);
+            border-radius: 20px;
+            padding: 40px;
+        }
+
+        .game-header {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, rgba(216, 180, 255, 0.2) 0%, rgba(179, 230, 255, 0.2) 100%);
+            border: 2px solid #c4b5fd;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #7c3aed;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #b896ff 0%, #93c5fd 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .difficulty-selector {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .difficulty-btn {
+            padding: 10px 20px;
+            border: 2px solid #e9d5ff;
+            background: rgba(255, 255, 255, 0.7);
+            color: #6b7280;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .difficulty-btn:hover {
+            border-color: #d8b4ff;
+            background: rgba(255, 255, 255, 0.9);
+            transform: translateY(-2px);
+        }
+
+        .difficulty-btn.active {
+            background: linear-gradient(135deg, #d8b4ff 0%, #a78bfa 100%);
+            color: white;
+            border-color: #8b5cf6;
+            box-shadow: 0 6px 15px rgba(200, 150, 255, 0.2);
+        }
+
+        .question-card {
+            background: linear-gradient(135deg, rgba(216, 180, 255, 0.1) 0%, rgba(179, 230, 255, 0.1) 100%);
+            border-left: 4px solid #d8b4ff;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .question-number {
+            font-size: 12px;
+            color: #7c3aed;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .question-text {
+            font-size: 14px;
+            color: #4b5563;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .question-formula {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #e9d5ff;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 1.15em;
+            margin-bottom: 25px;
+        }
+
+        .answers-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .answer-btn {
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.7);
+            border: 2px solid #e9d5ff;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 12px;
+            text-align: center;
+            color: #4b5563;
+            font-weight: 600;
+        }
+
+        .answer-btn:hover {
+            border-color: #d8b4ff;
+            background: rgba(255, 255, 255, 0.9);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(200, 150, 255, 0.1);
+        }
+
+        .answer-btn.selected {
+            background: linear-gradient(135deg, #bfdbfe 0%, #c4b5fd 100%);
+            border-color: #8b5cf6;
+            color: white;
+            box-shadow: 0 8px 20px rgba(200, 150, 255, 0.2);
+        }
+
+        .answer-btn.correct {
+            background: linear-gradient(135deg, #dcfce7 0%, #c6f6d5 100%);
+            border-color: #22c55e;
+            color: #15803d;
+        }
+
+        .answer-btn.incorrect {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #c4b5fd 0%, #bfdbfe 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 13px;
+            box-shadow: 0 8px 20px rgba(200, 150, 255, 0.2);
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(200, 150, 255, 0.3);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .result-message {
+            padding: 16px 20px;
+            border-radius: 12px;
+            font-weight: 700;
+            text-align: center;
+            margin-top: 20px;
+            display: none;
+            border: 2px solid;
+            animation: slideIn 0.3s ease-out;
+            font-size: 14px;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-message.correct {
+            background: linear-gradient(135deg, #dcfce7 0%, #c6f6d5 100%);
+            border-color: #22c55e;
+            color: #15803d;
+            display: block;
+        }
+
+        .result-message.incorrect {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            border-color: #ef4444;
+            color: #991b1b;
+            display: block;
+        }
+
+        .game-end-screen {
+            background: linear-gradient(135deg, rgba(216, 180, 255, 0.2) 0%, rgba(179, 230, 255, 0.2) 100%);
+            border: 2px solid #c4b5fd;
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            display: none;
+        }
+
+        .game-end-screen.show {
+            display: block;
+            animation: fadeIn 0.4s ease-in;
+        }
+
+        .final-score {
+            font-size: 48px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #b896ff 0%, #93c5fd 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+        }
+
+        .final-message {
+            font-size: 18px;
+            color: #4b5563;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .start-btn, .restart-btn {
+            padding: 14px 32px;
+            background: linear-gradient(135deg, #c4b5fd 0%, #bfdbfe 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 14px;
+            box-shadow: 0 8px 20px rgba(200, 150, 255, 0.2);
+            margin-top: 20px;
+        }
+
+        .start-btn:hover, .restart-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(200, 150, 255, 0.3);
+        }
+
+        .timer {
+            font-size: 24px;
+            font-weight: 800;
+            color: #ef4444;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 32px;
+            }
+
+            .game-container, .tutorial-container {
+                padding: 25px;
+            }
+
+            .answers-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .game-header {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎮 Juego de Derivadas</h1>
+            <p>Aprende y practica derivadas de funciones elementales</p>
+        </div>
+
+        <div class="tabs-container">
+            <button class="tab-button active" onclick="switchTab('tutorial')">📚 Tutorial</button>
+            <button class="tab-button" onclick="switchTab('game')">🎯 Juego</button>
+        </div>
+
+        <!-- ===== TAB TUTORIAL ===== -->
+        <div id="tutorial" class="tab-content active">
+            <div class="tutorial-container">
+                <div class="tutorial-card">
+                    <h3>¿Qué es una Derivada?</h3>
+                    <p>La derivada de una función es una medida de cómo cambia el valor de la función conforme cambia el valor de su variable independiente.</p>
+                    <div class="formula-box">
+                        $$f'(x) = \lim_{h \to 0} \frac{f(x+h) - f(x)}{h}$$
+                    </div>
+                </div>
+
+                <div class="tutorial-card">
+                    <h3>Regla de Potencia</h3>
+                    <p>Una de las reglas más importantes. Si $f(x) = x^n$, entonces:</p>
+                    <div class="formula-box">
+                        $$\frac{d}{dx}[x^n] = nx^{n-1}$$
+                    </div>
+                    <div class="step-list">
+                        <div class="step-item">📌 Ejemplo: $f(x) = x^3 \Rightarrow f'(x) = 3x^2$</div>
+                        <div class="step-item">📌 Ejemplo: $f(x) = 5x^4 \Rightarrow f'(x) = 20x^3$</div>
+                    </div>
+                </div>
+
+                <div class="tutorial-card">
+                    <h3>Regla de la Exponencial</h3>
+                    <p>La derivada de la función exponencial natural es ella misma:</p>
+                    <div class="formula-box">
+                        $$\frac{d}{dx}[e^x] = e^x$$
+                    </div>
+                    <div class="step-list">
+                        <div class="step-item">📌 Ejemplo: $f(x) = 3e^x \Rightarrow f'(x) = 3e^x$</div>
+                    </div>
+                </div>
+
+                <div class="tutorial-card">
+                    <h3>Regla del Logaritmo Natural</h3>
+                    <p>La derivada del logaritmo natural de x es uno dividido por x:</p>
+                    <div class="formula-box">
+                        $$\frac{d}{dx}[\ln(x)] = \frac{1}{x}$$
+                    </div>
+                    <div class="step-list">
+                        <div class="step-item">📌 Ejemplo: $f(x) = 2\ln(x) \Rightarrow f'(x) = \frac{2}{x}$</div>
+                    </div>
+                </div>
+
+                <div class="tutorial-card">
+                    <h3>Reglas Trigonométricas</h3>
+                    <p>Las funciones trigonométricas tienen reglas específicas:</p>
+                    <div class="formula-box">
+                        $$\frac{d}{dx}[\sin(x)] = \cos(x)$$
+                        $$\frac{d}{dx}[\cos(x)] = -\sin(x)$$
+                    </div>
+                    <div class="step-list">
+                        <div class="step-item">📌 Ejemplo: $f(x) = 4\sin(x) \Rightarrow f'(x) = 4\cos(x)$</div>
+                        <div class="step-item">📌 Ejemplo: $f(x) = 2\cos(x) \Rightarrow f'(x) = -2\sin(x)$</div>
+                    </div>
+                </div>
+
+                <div class="tutorial-card">
+                    <h3>Pasos para Derivar</h3>
+                    <div class="step-list">
+                        <div class="step-item">1️⃣ Identifica el tipo de función (potencia, exponencial, logaritmo, etc.)</div>
+                        <div class="step-item">2️⃣ Aplica la regla de derivación correspondiente</div>
+                        <div class="step-item">3️⃣ Simplifica el resultado</div>
+                        <div class="step-item">4️⃣ Verifica tu respuesta</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== TAB GAME ===== -->
+        <div id="game" class="tab-content">
+            <div class="game-container">
+                <!-- Game Stats -->
+                <div class="game-header">
+                    <div class="stat-card">
+                        <div class="stat-label">Puntuación</div>
+                        <div class="stat-value" id="score">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Pregunta</div>
+                        <div class="stat-value" id="question-count">0/10</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Aciertos</div>
+                        <div class="stat-value" id="correct-count">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Tiempo</div>
+                        <div class="stat-value timer" id="timer">60s</div>
+                    </div>
+                </div>
+
+                <!-- Game Content -->
+                <div id="game-content" style="display: none;">
+                    <div class="question-card">
+                        <div class="question-number" id="question-label">Pregunta 1</div>
+                        <div class="question-text">Calcula la derivada de:</div>
+                        <div class="question-formula" id="question-formula">$$f(x) = x^2$$</div>
+                    </div>
+
+                    <div class="answers-grid" id="answers-container"></div>
+
+                    <button class="submit-btn" id="submit-btn" onclick="submitAnswer()">Verificar Respuesta</button>
+                    <div class="result-message" id="result-message"></div>
+                </div>
+
+                <!-- Game End Screen -->
+                <div class="game-end-screen" id="game-end-screen">
+                    <div class="final-score" id="final-score">100</div>
+                    <div class="final-message" id="final-message">¡Buen trabajo!</div>
+                    <button class="restart-btn" onclick="resetGame()">Jugar de Nuevo</button>
+                </div>
+
+                <!-- Start Screen -->
+                <div id="start-screen">
+                    <div style="text-align: center;">
+                        <h2 style="font-size: 24px; color: #8b5cf6; margin-bottom: 20px; font-weight: 700;">¡Bienvenido al Juego de Derivadas!</h2>
+                        <p style="color: #4b5563; margin-bottom: 30px; font-size: 14px; line-height: 1.8;">
+                            Responde 10 preguntas sobre derivadas en el menor tiempo posible. <br>
+                            Cada respuesta correcta te suma puntos. ¿Cuántos puntos puedes conseguir?
+                        </p>
+                        <div class="difficulty-selector">
+                            <button class="difficulty-btn active" onclick="startGame('easy')">⭐ Fácil (10s)</button>
+                            <button class="difficulty-btn" onclick="startGame('medium')">⭐⭐ Medio (8s)</button>
+                            <button class="difficulty-btn" onclick="startGame('hard')">⭐⭐⭐ Difícil (5s)</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Banco de preguntas
+        const questionBank = [
+            {
+                question: "$$f(x) = x^3$$",
+                answers: ["$$3x^2$$", "$$3x^4$$", "$$x^2$$", "$$3x$$"],
+                correct: 0
+            },
+            {
+                question: "$$f(x) = 5x^2$$",
+                answers: ["$$10x$$", "$$5x$$", "$$10x^2$$", "$$5x^2$$"],
+                correct: 0
+            },
+            {
+                question: "$$f(x) = e^x$$",
+                answers: ["$$e^x$$", "$$1$$", "$$x$$", "$$e$$"],
+                correct: 0
+            },
+            {
+                question: "$$f(x) = 3e^x$$",
+                answers: ["$$3e^x$$", "$$e^x$$", "$$3$$", "$$3x$$"],
+                correct: 0
+            },
+            {
+                question: "$$f(x) = \\ln(x)$$",
+                answers: ["$$\\frac{1}{x}$$", "$$x$$", "$$\\ln(x)$$", "$$1$$"],
+                correct: 0
+            },
+            {
+                question: "$$f(x) = 2\\ln(x)$$",
+                answers: ["$$\\frac{2}{x}$$", "$$\\frac{1}{x}$$", "$$2$$", "$$2x$$"],
+                correct: 0
+            },
+            {
+                question: "$$f(x) = \\sin(x)$$",
+                answers: ["$$\\cos(x)$$", "$$-\\cos(x)$$", "$$\\sin(x)$$", "$$1$$"],
+                correct: 0
+            },
+            {
+                question: "$$f(x) = \\cos(x)$$",
+                answers: ["$$-\\sin(x)$$", "$$\\sin(x)$$", "$$-\\cos(x)$$", "$$1$$"],
+                correct: 0
+            },
+            {
+                question: "$$f(x) = 4\\sin(x)$$",
+                answers: ["$$4\\cos(x)$$", "$$\\cos(x)$$", "$$4x$$", "$$\\sin(x)$$"],
+                correct: 0
+            },
+            {
+                question: "$$f(x) = x^4$$",
+                answers: ["$$4x^3$$", "$$4x^4$$", "$$x^3$$", "$$4x$$"],
+                correct: 0
+            }
+        ];
+
+        // Variables del juego
+        let gameState = {
+            currentQuestion: 0,
+            score: 0,
+            correct: 0,
+            timeRemaining: 60,
+            gameActive: false,
+            selectedAnswer: null,
+            questions: [],
+            timePerQuestion: 10
+        };
+
+        let timerInterval = null;
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('active'));
+            document.getElementById(tab).classList.add('active');
+            document.querySelector(`button[onclick="switchTab('${tab}')"]`).classList.add('active');
+        }
+
+        function startGame(difficulty) {
+            gameState.questions = [...questionBank].sort(() => Math.random() - 0.5).slice(0, 10);
+            gameState.currentQuestion = 0;
+            gameState.score = 0;
+            gameState.correct = 0;
+            gameState.selectedAnswer = null;
+
+            if (difficulty === 'easy') {
+                gameState.timePerQuestion = 10;
+            } else if (difficulty === 'medium') {
+                gameState.timePerQuestion = 8;
+            } else {
+                gameState.timePerQuestion = 5;
+            }
+
+            gameState.timeRemaining = gameState.timePerQuestion;
+            gameState.gameActive = true;
+
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('game-content').style.display = 'block';
+            document.getElementById('game-end-screen').classList.remove('show');
+
+            loadQuestion();
+            startTimer();
+        }
+
+        function loadQuestion() {
+            const q = gameState.questions[gameState.currentQuestion];
+            document.getElementById('question-label').textContent = `Pregunta ${gameState.currentQuestion + 1}`;
+            document.getElementById('question-formula').innerHTML = q.question;
+            
+            const answersContainer = document.getElementById('answers-container');
+            answersContainer.innerHTML = '';
+            
+            q.answers.forEach((answer, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'answer-btn';
+                btn.innerHTML = answer;
+                btn.onclick = () => selectAnswer(index);
+                answersContainer.appendChild(btn);
+            });
+
+            document.getElementById('question-count').textContent = `${gameState.currentQuestion + 1}/10`;
+            document.getElementById('result-message').style.display = 'none';
+            gameState.selectedAnswer = null;
+            gameState.timeRemaining = gameState.timePerQuestion;
+            document.getElementById('submit-btn').disabled = false;
+
+            MathJax.typesetPromise().catch(err => console.log(err));
+        }
+
+        function selectAnswer(index) {
+            gameState.selectedAnswer = index;
+            document.querySelectorAll('.answer-btn').forEach(btn => btn.classList.remove('selected'));
+            document.querySelectorAll('.answer-btn')[index].classList.add('selected');
+        }
+
+        function submitAnswer() {
+            if (gameState.selectedAnswer === null) return;
+
+            const q = gameState.questions[gameState.currentQuestion];
+            const correct = gameState.selectedAnswer === q.correct;
+
+            const buttons = document.querySelectorAll('.answer-btn');
+            buttons.forEach((btn, index) => {
+                if (index === q.correct) {
+                    btn.classList.add('correct');
+                } else if (index === gameState.selectedAnswer && !correct) {
+                    btn.classList.add('incorrect');
+                }
+                btn.disabled = true;
+            });
+
+            const resultMsg = document.getElementById('result-message');
+            if (correct) {
+                gameState.score += 10;
+                gameState.correct++;
+                resultMsg.textContent = '✅ ¡Correcto!';
+                resultMsg.className = 'result-message correct';
+            } else {
+                resultMsg.textContent = '❌ Incorrecto';
+                resultMsg.className = 'result-message incorrect';
+            }
+
+            document.getElementById('score').textContent = gameState.score;
+            document.getElementById('correct-count').textContent = gameState.correct;
+            document.getElementById('submit-btn').disabled = true;
+
+            setTimeout(() => {
+                gameState.currentQuestion++;
+                if (gameState.currentQuestion < 10) {
+                    loadQuestion();
+                } else {
+                    endGame();
+                }
+            }, 1500);
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                gameState.timeRemaining--;
+                document.getElementById('timer').textContent = gameState.timeRemaining + 's';
+
+                if (gameState.timeRemaining <= 0) {
+                    if (gameState.gameActive) {
+                        gameState.currentQuestion++;
+                        if (gameState.currentQuestion < 10) {
+                            loadQuestion();
+                        } else {
+                            endGame();
+                        }
+                    }
+                }
+            }, 1000);
+        }
+
+        function endGame() {
+            clearInterval(timerInterval);
+            gameState.gameActive = false;
+            document.getElementById('game-content').style.display = 'none';
+            document.getElementById('game-end-screen').classList.add('show');
+            document.getElementById('final-score').textContent = gameState.score;
+
+            const percentage = (gameState.correct / 10) * 100;
+            let message = '';
+            if (percentage === 100) {
+                message = '🏆 ¡Perfecto! Eres un experto en derivadas.';
+            } else if (percentage >= 80) {
+                message = '🌟 ¡Excelente trabajo! Muy buenas respuestas.';
+            } else if (percentage >= 60) {
+                message = '👍 ¡Buen trabajo! Sigue practicando.';
+            } else {
+                message = '💪 Sigue intentando. ¡Lo lograrás!';
+            }
+            document.getElementById('final-message').textContent = message;
+        }
+
+        function resetGame() {
+            document.getElementById('game-end-screen').classList.remove('show');
+            document.getElementById('start-screen').style.display = 'block';
+            gameState.score = 0;
+            gameState.correct = 0;
+            gameState.currentQuestion = 0;
+            gameState.selectedAnswer = null;
+            document.getElementById('score').textContent = '0';
+            document.getElementById('correct-count').textContent = '0';
+            clearInterval(timerInterval);
+        }
+
+        // Inicializar
+        window.addEventListener('load', () => {
+            MathJax.typesetPromise().catch(err => console.log(err));
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Derivadas - Interfaz Futurista Pastel</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f3e7ff 0%, #e0f7ff 50%, #f0f4ff 100%);
+            min-height: 100vh;
+            padding: 50px 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Fondo animado */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 20% 50%, rgba(255, 179, 230, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(179, 230, 255, 0.1) 0%, transparent 50%);
+            animation: shimmer 8s ease-in-out infinite;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(50px, 50px); }
+        }
+
+        .container {
+            max-width: 1500px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+            position: relative;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(200, 150, 255, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            blur: 50px;
+        }
+
+        .header h1 {
+            font-size: 52px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #b896ff 0%, #a78bfa 50%, #93c5fd 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -1px;
+        }
+
+        .header p {
+            font-size: 16px;
+            color: #6b7280;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+
+        .rules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(520px, 1fr));
+            gap: 28px;
+            margin-bottom: 60px;
+        }
+
+        .rule-card {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(20px);
+            border: 1.5px solid rgba(200, 180, 255, 0.3);
+            border-radius: 20px;
+            padding: 40px;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .rule-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(255, 255, 255, 0.3), 
+                transparent);
+            transition: left 0.6s ease;
+        }
+
+        .rule-card:hover::before {
+            left: 100%;
+        }
+
+        .rule-card:hover {
+            transform: translateY(-12px);
+            border-color: rgba(200, 150, 255, 0.5);
+            box-shadow: 0 25px 50px rgba(200, 150, 255, 0.15);
+            background: rgba(255, 255, 255, 0.75);
+        }
+
+        .rule-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #d8b4ff 0%, #b4a7ff 100%);
+            color: white;
+            font-weight: 800;
+            font-size: 22px;
+            border-radius: 14px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 20px rgba(200, 150, 255, 0.2);
+        }
+
+        .rule-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: #8b5cf6;
+            margin-bottom: 18px;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+        }
+
+        .rule-formula {
+            background: linear-gradient(135deg, rgba(216, 180, 255, 0.15) 0%, rgba(179, 230, 255, 0.15) 100%);
+            border-left: 4px solid #c4b5fd;
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            min-height: 85px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+        }
+
+        .rule-description {
+            color: #4b5563;
+            font-size: 14px;
+            line-height: 1.8;
+            margin-bottom: 28px;
+            font-weight: 500;
+        }
+
+        .example-section {
+            background: linear-gradient(135deg, rgba(216, 180, 255, 0.1) 0%, rgba(179, 230, 255, 0.1) 100%);
+            border-left: 4px solid #d8b4ff;
+            padding: 24px;
+            border-radius: 12px;
+        }
+
+        .example-title {
+            font-size: 13px;
+            font-weight: 800;
+            color: #a78bfa;
+            margin-bottom: 18px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .function-display {
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid #e9d5ff;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.15em;
+            color: #6b7280;
+            line-height: 1.8;
+        }
+
+        .function-display .mjx-chtml {
+            font-size: 1.1em !important;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+
+        .option {
+            background: rgba(255, 255, 255, 0.7);
+            border: 2px solid #f3e8ff;
+            padding: 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            font-size: 14px;
+        }
+
+        .option:hover {
+            border-color: #d8b4ff;
+            background: rgba(255, 255, 255, 0.9);
+            transform: translateX(6px);
+            box-shadow: 0 8px 20px rgba(200, 150, 255, 0.1);
+        }
+
+        .option input[type="radio"] {
+            cursor: pointer;
+            width: 20px;
+            height: 20px;
+            accent-color: #c4b5fd;
+        }
+
+        .option-label {
+            flex: 1;
+            font-size: 1.05em;
+            color: #4b5563;
+        }
+
+        .option-label .mjx-chtml {
+            font-size: 1.05em !important;
+        }
+
+        .check-button {
+            background: linear-gradient(135deg, #c4b5fd 0%, #bfdbfe 100%);
+            color: white;
+            border: none;
+            padding: 13px 28px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 13px;
+            width: 100%;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 8px 20px rgba(200, 150, 255, 0.2);
+        }
+
+        .check-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(200, 150, 255, 0.3);
+        }
+
+        .check-button:active {
+            transform: translateY(0);
+        }
+
+        .feedback-container {
+            margin-top: 20px;
+            min-height: 60px;
+        }
+
+        .feedback {
+            padding: 16px 20px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            text-align: center;
+            display: none;
+            border: 2px solid;
+            animation: slideIn 0.4s ease-out;
+            line-height: 1.6;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .feedback.correct {
+            background: linear-gradient(135deg, #dcfce7 0%, #c6f6d5 100%);
+            border-color: #22c55e;
+            color: #15803d;
+            display: block;
+            box-shadow: 0 8px 20px rgba(34, 197, 94, 0.2);
+        }
+
+        .feedback.incorrect {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            border-color: #ef4444;
+            color: #991b1b;
+            display: block;
+            box-shadow: 0 8px 20px rgba(239, 68, 68, 0.2);
+        }
+
+        .feedback.info {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            border-color: #3b82f6;
+            color: #1e40af;
+            display: block;
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.2);
+        }
+
+        .feedback::before {
+            content: '';
+            display: inline-block;
+            margin-right: 8px;
+            font-size: 18px;
+        }
+
+        .feedback.correct::before {
+            content: '✅';
+        }
+
+        .feedback.incorrect::before {
+            content: '❌';
+        }
+
+        .feedback.info::before {
+            content: '⚠️';
+        }
+
+        .correct-answer {
+            margin-top: 12px;
+            padding: 12px;
+            background: rgba(34, 197, 94, 0.1);
+            border-left: 4px solid #22c55e;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #166534;
+        }
+
+        .correct-answer-label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 700;
+        }
+
+        .correct-answer-value {
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 36px;
+            }
+
+            .rules-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .rule-card {
+                padding: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>✨ Derivadas de Funciones Elementales</h1>
+            <p>Descubre las reglas fundamentales en una interfaz futurista y elegante</p>
+        </div>
+
+        <!-- Grid de Reglas -->
+        <div class="rules-grid">
+            <!-- Regla 1: Potencia -->
+            <div class="rule-card">
+                <div class="rule-number">1</div>
+                <div class="rule-title">Regla de Potencia</div>
+                
+                <div class="rule-formula">
+                    $$\frac{d}{dx}[x^n] = nx^{n-1}$$
+                </div>
+
+                <div class="rule-description">
+                    Se aplica a cualquier potencia de x. El exponente se baja como coeficiente y se reduce en 1.
+                </div>
+
+                <div class="example-section">
+                    <div class="example-title">¿Cuál es la derivada?</div>
+                    
+                    <div class="function-display">
+                        $$f(x) = 5x^3$$
+                    </div>
+
+                    <div class="options-grid" id="quiz1"></div>
+
+                    <button class="check-button" onclick="checkAnswer(1)">Verificar Respuesta</button>
+                    <div class="feedback-container">
+                        <div class="feedback" id="feedback1"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Regla 2: Exponencial e -->
+            <div class="rule-card">
+                <div class="rule-number">2</div>
+                <div class="rule-title">Exponencial e</div>
+                
+                <div class="rule-formula">
+                    $$\frac{d}{dx}[e^x] = e^x$$
+                </div>
+
+                <div class="rule-description">
+                    La derivada de e^x es e^x misma. Es la única función que es igual a su derivada.
+                </div>
+
+                <div class="example-section">
+                    <div class="example-title">¿Cuál es la derivada?</div>
+                    
+                    <div class="function-display">
+                        $$f(x) = 3e^x$$
+                    </div>
+
+                    <div class="options-grid" id="quiz2"></div>
+
+                    <button class="check-button" onclick="checkAnswer(2)">Verificar Respuesta</button>
+                    <div class="feedback-container">
+                        <div class="feedback" id="feedback2"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Regla 3: Logaritmo Natural -->
+            <div class="rule-card">
+                <div class="rule-number">3</div>
+                <div class="rule-title">Logaritmo Natural</div>
+                
+                <div class="rule-formula">
+                    $$\frac{d}{dx}[\ln(x)] = \frac{1}{x}$$
+                </div>
+
+                <div class="rule-description">
+                    La derivada del logaritmo natural es el inverso de x. Solo definida para x > 0.
+                </div>
+
+                <div class="example-section">
+                    <div class="example-title">¿Cuál es la derivada?</div>
+                    
+                    <div class="function-display">
+                        $$f(x) = 2\ln(x)$$
+                    </div>
+
+                    <div class="options-grid" id="quiz3"></div>
+
+                    <button class="check-button" onclick="checkAnswer(3)">Verificar Respuesta</button>
+                    <div class="feedback-container">
+                        <div class="feedback" id="feedback3"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Regla 4: Seno -->
+            <div class="rule-card">
+                <div class="rule-number">4</div>
+                <div class="rule-title">Función Seno</div>
+                
+                <div class="rule-formula">
+                    $$\frac{d}{dx}[\sin(x)] = \cos(x)$$
+                </div>
+
+                <div class="rule-description">
+                    La derivada de seno es coseno. Las funciones trigonométricas se derivan entre ellas.
+                </div>
+
+                <div class="example-section">
+                    <div class="example-title">¿Cuál es la derivada?</div>
+                    
+                    <div class="function-display">
+                        $$f(x) = 4\sin(x)$$
+                    </div>
+
+                    <div class="options-grid" id="quiz4"></div>
+
+                    <button class="check-button" onclick="checkAnswer(4)">Verificar Respuesta</button>
+                    <div class="feedback-container">
+                        <div class="feedback" id="feedback4"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Regla 5: Coseno -->
+            <div class="rule-card">
+                <div class="rule-number">5</div>
+                <div class="rule-title">Función Coseno</div>
+                
+                <div class="rule-formula">
+                    $$\frac{d}{dx}[\cos(x)] = -\sin(x)$$
+                </div>
+
+                <div class="rule-description">
+                    La derivada de coseno es menos seno. Nótese el signo negativo importante.
+                </div>
+
+                <div class="example-section">
+                    <div class="example-title">¿Cuál es la derivada?</div>
+                    
+                    <div class="function-display">
+                        $$f(x) = 2\cos(x)$$
+                    </div>
+
+                    <div class="options-grid" id="quiz5"></div>
+
+                    <button class="check-button" onclick="checkAnswer(5)">Verificar Respuesta</button>
+                    <div class="feedback-container">
+                        <div class="feedback" id="feedback5"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Regla 6: Exponencial General -->
+            <div class="rule-card">
+                <div class="rule-number">6</div>
+                <div class="rule-title">Exponencial General</div>
+                
+                <div class="rule-formula">
+                    $$\frac{d}{dx}[a^x] = a^x \cdot \ln(a), \quad a > 0$$
+                </div>
+
+                <div class="rule-description">
+                    Para bases diferentes de e, la derivada incluye el logaritmo natural de la base.
+                </div>
+
+                <div class="example-section">
+                    <div class="example-title">¿Cuál es la derivada?</div>
+                    
+                    <div class="function-display">
+                        $$f(x) = 2 \cdot 3^x$$
+                    </div>
+
+                    <div class="options-grid" id="quiz6"></div>
+
+                    <button class="check-button" onclick="checkAnswer(6)">Verificar Respuesta</button>
+                    <div class="feedback-container">
+                        <div class="feedback" id="feedback6"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Regla 7: Raíz Cuadrada -->
+            <div class="rule-card">
+                <div class="rule-number">7</div>
+                <div class="rule-title">Raíz Cuadrada</div>
+                
+                <div class="rule-formula">
+                    $$\frac{d}{dx}[\sqrt{x}] = \frac{1}{2\sqrt{x}}$$
+                </div>
+
+                <div class="rule-description">
+                    La raíz cuadrada es equivalente a x^(1/2), por lo que aplicamos la regla de potencia.
+                </div>
+
+                <div class="example-section">
+                    <div class="example-title">¿Cuál es la derivada?</div>
+                    
+                    <div class="function-display">
+                        $$f(x) = 3\sqrt{x}$$
+                    </div>
+
+                    <div class="options-grid" id="quiz7"></div>
+
+                    <button class="check-button" onclick="checkAnswer(7)">Verificar Respuesta</button>
+                    <div class="feedback-container">
+                        <div class="feedback" id="feedback7"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Regla 8: Tangente -->
+            <div class="rule-card">
+                <div class="rule-number">8</div>
+                <div class="rule-title">Función Tangente</div>
+                
+                <div class="rule-formula">
+                    $$\frac{d}{dx}[\tan(x)] = \sec^2(x)$$
+                </div>
+
+                <div class="rule-description">
+                    La derivada de tangente es secante al cuadrado. Recuerda que sec(x) = 1/cos(x).
+                </div>
+
+                <div class="example-section">
+                    <div class="example-title">¿Cuál es la derivada?</div>
+                    
+                    <div class="function-display">
+                        $$f(x) = 5\tan(x)$$
+                    </div>
+
+                    <div class="options-grid" id="quiz8"></div>
+
+                    <button class="check-button" onclick="checkAnswer(8)">Verificar Respuesta</button>
+                    <div class="feedback-container">
+                        <div class="feedback" id="feedback8"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Regla 9: Combinación -->
+            <div class="rule-card">
+                <div class="rule-number">9</div>
+                <div class="rule-title">Combinación: Potencia × Exponencial</div>
+                
+                <div class="rule-formula">
+                    $$\frac{d}{dx}[kx^n \cdot e^x] \text{ (usando regla del producto)}$$
+                </div>
+
+                <div class="rule-description">
+                    Cuando combinamos funciones usamos la regla del producto: (fg)' = f'g + fg'
+                </div>
+
+                <div class="example-section">
+                    <div class="example-title">¿Cuál es la derivada?</div>
+                    
+                    <div class="function-display">
+                        $$f(x) = x^2 e^x$$
+                    </div>
+
+                    <div class="options-grid" id="quiz9"></div>
+
+                    <button class="check-button" onclick="checkAnswer(9)">Verificar Respuesta</button>
+                    <div class="feedback-container">
+                        <div class="feedback" id="feedback9"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Regla 10: Potencia Negativa -->
+            <div class="rule-card">
+                <div class="rule-number">10</div>
+                <div class="rule-title">Potencia Negativa</div>
+                
+                <div class="rule-formula">
+                    $$\frac{d}{dx}[x^{-n}] = -nx^{-n-1}$$
+                </div>
+
+                <div class="rule-description">
+                    La regla de potencia también aplica para exponentes negativos. Equivale a derivar 1/x^n.
+                </div>
+
+                <div class="example-section">
+                    <div class="example-title">¿Cuál es la derivada?</div>
+                    
+                    <div class="function-display">
+                        $$f(x) = 4x^{-2}$$
+                    </div>
+
+                    <div class="options-grid" id="quiz10"></div>
+
+                    <button class="check-button" onclick="checkAnswer(10)">Verificar Respuesta</button>
+                    <div class="feedback-container">
+                        <div class="feedback" id="feedback10"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Regla 11: Arcoseno -->
+            <div class="rule-card">
+                <div class="rule-number">11</div>
+                <div class="rule-title">Arcoseno (Inversa de Seno)</div>
+                
+                <div class="rule-formula">
+                    $$\frac{d}{dx}[\arcsin(x)] = \frac{1}{\sqrt{1-x^2}}$$
+                </div>
+
+                <div class="rule-description">
+                    Las funciones trigonométricas inversas tienen derivadas específicas. Esta es la del arcoseno.
+                </div>
+
+                <div class="example-section">
+                    <div class="example-title">¿Cuál es la derivada?</div>
+                    
+                    <div class="function-display">
+                        $$f(x) = 2\arcsin(x)$$
+                    </div>
+
+                    <div class="options-grid" id="quiz11"></div>
+
+                    <button class="check-button" onclick="checkAnswer(11)">Verificar Respuesta</button>
+                    <div class="feedback-container">
+                        <div class="feedback" id="feedback11"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Regla 12: Logaritmo General -->
+            <div class="rule-card">
+                <div class="rule-number">12</div>
+                <div class="rule-title">Logaritmo en base a</div>
+                
+                <div class="rule-formula">
+                    $$\frac{d}{dx}[\log_a(x)] = \frac{1}{x \ln(a)}, \quad a > 0, a \neq 1$$
+                </div>
+
+                <div class="rule-description">
+                    El logaritmo en cualquier base tiene una derivada que depende del logaritmo natural.
+                </div>
+
+                <div class="example-section">
+                    <div class="example-title">¿Cuál es la derivada?</div>
+                    
+                    <div class="function-display">
+                        $$f(x) = 3\log_2(x)$$
+                    </div>
+
+                    <div class="options-grid" id="quiz12"></div>
+
+                    <button class="check-button" onclick="checkAnswer(12)">Verificar Respuesta</button>
+                    <div class="feedback-container">
+                        <div class="feedback" id="feedback12"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Base de datos de preguntas
+        const questions = {
+            1: {
+                correct: "15x^2",
+                options: ["15x^2", "15x^4", "5x^2"],
+                displayCorrect: "$$15x^2$$"
+            },
+            2: {
+                correct: "3e^x",
+                options: ["3e^x", "e^x", "3"],
+                displayCorrect: "$$3e^x$$"
+            },
+            3: {
+                correct: "2/x",
+                options: ["2/x", "1/x", "2"],
+                displayCorrect: "$$\\frac{2}{x}$$"
+            },
+            4: {
+                correct: "4cos(x)",
+                options: ["4cos(x)", "cos(x)", "-4sin(x)"],
+                displayCorrect: "$$4\\cos(x)$$"
+            },
+            5: {
+                correct: "-2sin(x)",
+                options: ["-2sin(x)", "2sin(x)", "-sin(x)"],
+                displayCorrect: "$$-2\\sin(x)$$"
+            },
+            6: {
+                correct: "2*3^x*ln(3)",
+                options: ["2*3^x*ln(3)", "3^x*ln(3)", "2*ln(3)"],
+                displayCorrect: "$$2 \\cdot 3^x \\cdot \\ln(3)$$"
+            },
+            7: {
+                correct: "3/(2√x)",
+                options: ["3/(2√x)", "3/(√x)", "3√x"],
+                displayCorrect: "$$\\frac{3}{2\\sqrt{x}}$$"
+            },
+            8: {
+                correct: "5sec²(x)",
+                options: ["5sec²(x)", "5cos²(x)", "5tan(x)"],
+                displayCorrect: "$$5\\sec^2(x)$$"
+            },
+            9: {
+                correct: "(2x+x²)e^x",
+                options: ["(2x+x²)e^x", "2xe^x", "x²e^x"],
+                displayCorrect: "$$(2x+x^2)e^x$$"
+            },
+            10: {
+                correct: "-8x^(-3)",
+                options: ["-8x^(-3)", "8x^(-3)", "-8x^(-2)"],
+                displayCorrect: "$$-8x^{-3}$$"
+            },
+            11: {
+                correct: "2/√(1-x²)",
+                options: ["2/√(1-x²)", "1/√(1-x²)", "2√(1-x²)"],
+                displayCorrect: "$$\\frac{2}{\\sqrt{1-x^2}}$$"
+            },
+            12: {
+                correct: "3/(x·ln(2))",
+                options: ["3/(x·ln(2))", "3/(x·ln(3))", "3·ln(2)"],
+                displayCorrect: "$$\\frac{3}{x \\cdot \\ln(2)}$$"
+            }
+        };
+
+        // Función para barajar array
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        // Inicializar opciones desordenadas
+        function initializeQuiz(quizNumber) {
+            const question = questions[quizNumber];
+            const shuffledOptions = shuffleArray(question.options);
+            const optionsHtml = shuffledOptions.map(option => `
+                <label class="option">
+                    <input type="radio" name="q${quizNumber}" value="${option}">
+                    <span class="option-label">$$${option}$$</span>
+                </label>
+            `).join('');
+            
+            document.getElementById(`quiz${quizNumber}`).innerHTML = optionsHtml;
+            MathJax.typesetPromise().catch(err => console.log(err));
+        }
+
+        // Verificar respuesta
+        function checkAnswer(questionNumber) {
+            const selected = document.querySelector(`input[name="q${questionNumber}"]:checked`);
+            const feedback = document.getElementById(`feedback${questionNumber}`);
+            const question = questions[questionNumber];
+
+            if (!selected) {
+                feedback.textContent = 'Por favor, selecciona una opción';
+                feedback.className = 'feedback info';
+                return;
+            }
+
+            const selectedValue = selected.value.trim();
+            const correctValue = question.correct.trim();
+
+            if (selectedValue === correctValue) {
+                feedback.innerHTML = `¡Correcto! Excelente trabajo.`;
+                feedback.className = 'feedback correct';
+            } else {
+                feedback.innerHTML = `Incorrecto. La respuesta correcta es: ${question.displayCorrect}`;
+                feedback.className = 'feedback incorrect';
+                MathJax.typesetPromise().catch(err => console.log(err));
+            }
+        }
+
+        // Inicializar todos los quiz al cargar
+        window.addEventListener('load', () => {
+            for (let i = 1; i <= 12; i++) {
+                initializeQuiz(i);
+            }
+        });
+    </script>
+</body>
+</html>
