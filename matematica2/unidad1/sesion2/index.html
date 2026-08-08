@@ -1,64 +1,243 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Matemática II | Unidad 1 | Sesión 2</title>
+
+<title>SUMATHE | Matemática II | Unidad 1 | Sesión 2</title>
 
 <style>
-body{margin:0;font-family:Segoe UI,Arial;background:#eef2f8;color:#1f2937}
-header{background:linear-gradient(135deg,#173b88,#0f6ab4);color:white;padding:40px;text-align:center}
-nav{text-align:center;background:white;padding:12px}
-nav a{color:#173b88;text-decoration:none;font-weight:bold;margin:0 8px}
-main{max-width:1200px;margin:auto;padding:32px 20px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
-.card{display:block;background:white;padding:22px;border-radius:16px;text-decoration:none;color:#173b88;box-shadow:0 5px 15px rgba(0,0,0,.12)}
-.tag{display:inline-block;background:#eaf0ff;padding:5px 10px;border-radius:20px;font-size:12px;font-weight:bold}
-.card p{color:#555}
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+font-family:Segoe UI,Arial,sans-serif;
+background:#eef2f8;
+color:#1f2937;
+}
+
+header{
+background:linear-gradient(135deg,#173b88,#0f6ab4);
+color:white;
+padding:45px;
+text-align:center;
+}
+
+header h1{
+font-size:42px;
+margin-bottom:8px;
+}
+
+header h2{
+font-size:22px;
+font-weight:400;
+}
+
+nav{
+background:white;
+padding:14px;
+text-align:center;
+box-shadow:0 2px 6px rgba(0,0,0,.08);
+}
+
+nav a{
+text-decoration:none;
+color:#173b88;
+font-weight:bold;
+margin:0 15px;
+}
+
+.container{
+width:92%;
+max-width:1400px;
+margin:auto;
+padding:35px;
+}
+
+.info{
+background:white;
+padding:18px;
+border-left:6px solid #d89b1d;
+border-radius:12px;
+margin-bottom:30px;
+font-size:18px;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+gap:22px;
+}
+
+.card{
+background:white;
+padding:24px;
+border-radius:16px;
+text-decoration:none;
+color:#173b88;
+box-shadow:0 6px 18px rgba(0,0,0,.12);
+transition:.25s;
+}
+
+.card:hover{
+transform:translateY(-5px);
+}
+
+.tag{
+display:inline-block;
+background:#eaf0ff;
+padding:6px 14px;
+border-radius:20px;
+font-size:13px;
+font-weight:bold;
+margin-bottom:12px;
+}
+
+.card h3{
+font-size:24px;
+margin-bottom:10px;
+}
+
+.card p{
+color:#555;
+line-height:1.5;
+}
+
+footer{
+margin-top:45px;
+padding:22px;
+text-align:center;
+color:#666;
+font-size:15px;
+}
+
 </style>
+
 </head>
 
 <body>
 
 <header>
+
 <h1>Matemática II</h1>
-<p>Unidad 1 · Sesión 2</p>
+
+<h2>Unidad 1 · Sesión 2</h2>
+
 </header>
 
 <nav>
-<a href="../">← Unidad 1</a>
-<a href="../../">Curso</a>
+
+<a href="../">⬅ Unidad 1</a>
+
+<a href="../../">🏠 Matemática II</a>
+
 </nav>
 
-<main>
+<div class="container">
+
+<div class="info">
+
+<b>5 recursos interactivos</b><br>
+
+<b>Temas:</b> Elasticidad de la demanda, derivadas y optimización de funciones de una variable.
+
+</div>
+
 <div class="grid">
 
-<a class="card" href="M2_U01_S02_R01_elasticidad_demanda.html">
-<span class="tag">R01</span>
-<h3>Elasticidad de la demanda</h3>
-<p>Abrir recurso interactivo</p>
+<a class="card"
+href="M2_U01_S02_R01_elasticidad_demanda.html">
+
+<span class="tag">Elasticidad</span>
+
+<h3>R01 · Elasticidad de la demanda</h3>
+
+<p>
+
+Introducción al concepto de elasticidad precio de la demanda y su interpretación económica.
+
+</p>
+
 </a>
 
-<a class="card" href="M2_U01_S02_R02_recta_tangente_paralela.html">
-<span class="tag">R02</span>
-<h3>Recta tangente paralela</h3>
-<p>Abrir recurso interactivo</p>
+<a class="card"
+href="M2_U01_S02_R02_recta_tangente_paralela.html">
+
+<span class="tag">Derivadas</span>
+
+<h3>R02 · Recta tangente paralela</h3>
+
+<p>
+
+Aplicación geométrica de la derivada para construir rectas tangentes paralelas.
+
+</p>
+
 </a>
 
-<a class="card" href="M2_U01_S02_R03_comparacion_elasticidad_empresas.html">
-<span class="tag">R03</span>
-<h3>Comparación de elasticidad entre empresas</h3>
-<p>Abrir recurso interactivo</p>
+<a class="card"
+href="M2_U01_S02_R03_comparacion_elasticidad_empresas.html">
+
+<span class="tag">Aplicación económica</span>
+
+<h3>R03 · Comparación de elasticidad entre empresas</h3>
+
+<p>
+
+Comparación del comportamiento de la elasticidad de la demanda en distintos escenarios.
+
+</p>
+
 </a>
 
-<a class="card" href="M2_U01_S02_R04_elasticidad_puntual_demanda.html">
-<span class="tag">R04</span>
-<h3>Elasticidad puntual de la demanda</h3>
-<p>Abrir recurso interactivo</p>
+<a class="card"
+href="M2_U01_S02_R04_elasticidad_puntual_demanda.html">
+
+<span class="tag">Elasticidad puntual</span>
+
+<h3>R04 · Elasticidad puntual de la demanda</h3>
+
+<p>
+
+Determinación y clasificación de la elasticidad puntual mediante un simulador interactivo.
+
+</p>
+
+</a>
+
+<a class="card"
+href="M2_U01_S02_R05_clasificacion_puntos_criticos.html">
+
+<span class="tag">Optimización</span>
+
+<h3>R05 · Clasificación de puntos críticos</h3>
+
+<p>
+
+Identificación de máximos, mínimos y puntos de inflexión utilizando el criterio de la primera y segunda derivada.
+
+</p>
+
 </a>
 
 </div>
-</main>
+
+</div>
+
+<footer>
+
+<b>SUMATHE</b><br>
+
+Matemática II · Unidad 1 · Sesión 2
+
+</footer>
 
 </body>
+
 </html>
