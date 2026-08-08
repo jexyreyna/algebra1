@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Laboratorio: Razón Promedio de Cambio</title>
+<style>
+  :root {
+    --text-primary: #0f172a;
+    --text-secondary: #64748b;
+    --text-muted: #94a3b8;
+    --surface-1: #f1f5f9;
+    --surface-card: #ffffff;
+    --border: #e2e8f0;
+    --radius: 8px;
+    --green: #0F6E56;
+    --coral: #993C1D;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: linear-gradient(135deg, #0f172a, #134e4a, #0e7490);
+    min-height: 100vh;
+    padding: 2rem 1rem;
+    color: var(--text-primary);
+  }
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    background: var(--surface-card);
+    border-radius: 16px;
+    padding: 1.75rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  }
+  h1 {
+    font-size: 20px;
+    font-weight: 600;
+    text-align: center;
+    margin: 0 0 1.25rem;
+  }
+  .slider-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 4px;
+  }
+  .slider-row label {
+    font-size: 14px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+  }
+  input[type="range"] { flex: 1; }
+  #qVal {
+    font-size: 15px;
+    font-weight: 600;
+    min-width: 56px;
+    text-align: right;
+  }
+  .hint {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin: 0 0 1rem;
+  }
+  svg { width: 100%; height: auto; display: block; }
+  .card {
+    background: var(--surface-1);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-top: 1rem;
+  }
+  .range-label {
+    font-size: 13px;
+    color: var(--green);
+    font-weight: 600;
+    margin: 0 0 8px;
+  }
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px,1fr));
+    gap: 10px;
+  }
+  .stat-label { font-size: 12px; color: var(--text-secondary); margin: 0; }
+  .stat-value { font-size: 16px; font-weight: 600; margin: 0; }
+  .stat-value.rate { color: var(--green); }
+  #interpretation { font-size: 14px; line-height: 1.7; margin: 0; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Laboratorio: razón promedio de cambio de U(q) = 10q − 0.001q²</h1>
+
+  <div class="slider-row">
+    <label for="qSlider">q inicial</label>
+    <input type="range" id="qSlider" min="0" max="5500" value="1000" step="500">
+    <span id="qVal">1000</span>
+  </div>
+  <p class="hint">El control avanza de 500 en 500 unidades. Se compara U(q) con U(q + 500).</p>
+
+  <svg id="plot" viewBox="0 0 640 360"></svg>
+
+  <div class="card">
+    <p id="rangeLabel" class="range-label">De q = 1000 a q = 1500</p>
+    <div class="stats-grid">
+      <div>
+        <p class="stat-label">U(q)</p>
+        <p id="u1" class="stat-value">9990</p>
+      </div>
+      <div>
+        <p class="stat-label">U(q + 500)</p>
+        <p id="u2" class="stat-value">12750</p>
+      </div>
+      <div>
+        <p class="stat-label">ΔU</p>
+        <p id="deltaU" class="stat-value">2760</p>
+      </div>
+      <div>
+        <p class="stat-label">Razón promedio de cambio</p>
+        <p id="rate" class="stat-value rate">5.52</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <p id="interpretation">Entre q = 1000 y q = 1500, la utilidad aumenta en promedio 5.52 miles de soles por cada unidad extra vendida.</p>
+  </div>
+</div>
+
+<script>
+(function(){
+  var W = 640, H = 360, mL = 55, mR = 20, mT = 20, mB = 45;
+  var qMax = 6000, uMax = 25000;
+  function sx(q){ return mL + (q/qMax)*(W-mL-mR); }
+  function sy(u){ return H-mB - (u/uMax)*(H-mT-mB); }
+  function U(q){ return 10*q - 0.001*q*q; }
+  function r1(n){ return Math.round(n*100)/100; }
+
+  var svg = document.getElementById('plot');
+  var ns = 'http://www.w3.org/2000/svg';
+  function el(tag, attrs){
+    var e = document.createElementNS(ns, tag);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    return e;
+  }
+
+  for (var gy = 0; gy <= uMax; gy += 5000){
+    svg.appendChild(el('line', {x1:mL, y1:sy(gy), x2:W-mR, y2:sy(gy), stroke:'#e1e0d9', 'stroke-width':1}));
+    var t = el('text', {x:mL-8, y:sy(gy)+4, 'text-anchor':'end', 'font-size':11, fill:'#898781'});
+    t.textContent = gy;
+    svg.appendChild(t);
+  }
+  for (var gx = 0; gx <= qMax; gx += 1000){
+    var lx = el('text', {x:sx(gx), y:H-mB+18, 'text-anchor':'middle', 'font-size':11, fill:'#898781'});
+    lx.textContent = gx;
+    svg.appendChild(lx);
+  }
+  svg.appendChild(el('line', {x1:mL, y1:H-mB, x2:W-mR, y2:H-mB, stroke:'#c3c2b7', 'stroke-width':1.2}));
+  svg.appendChild(el('line', {x1:mL, y1:mT, x2:mL, y2:H-mB, stroke:'#c3c2b7', 'stroke-width':1.2}));
+
+  var xLabel = el('text', {x:(mL+W-mR)/2, y:H-6, 'text-anchor':'middle', 'font-size':12, fill:'#52514e'});
+  xLabel.textContent = 'q (unidades vendidas)';
+  svg.appendChild(xLabel);
+  var yLabel = el('text', {x:16, y:(mT+H-mB)/2, 'text-anchor':'middle', 'font-size':12, fill:'#52514e', transform:'rotate(-90 16 ' + ((mT+H-mB)/2) + ')'});
+  yLabel.textContent = 'U (miles de soles)';
+  svg.appendChild(yLabel);
+
+  var pts = [];
+  for (var q = 0; q <= qMax; q += 60){ pts.push(sx(q) + ',' + sy(U(q))); }
+  svg.appendChild(el('polyline', {points:pts.join(' '), fill:'none', stroke:'#5F5E5A', 'stroke-width':2}));
+
+  var vline1 = el('line', {stroke:'#0F6E56', 'stroke-width':1.5, 'stroke-dasharray':'4,3'});
+  var vline2 = el('line', {stroke:'#993C1D', 'stroke-width':1.5, 'stroke-dasharray':'4,3'});
+  var vlabel1 = el('text', {'font-size':11, fill:'#0F6E56', 'text-anchor':'middle', 'font-weight':'600'});
+  var vlabel2 = el('text', {'font-size':11, fill:'#993C1D', 'text-anchor':'middle', 'font-weight':'600'});
+  var secLine = el('line', {stroke:'#5F5E5A', 'stroke-width':2, 'stroke-dasharray':'6,3'});
+  var pt1 = el('circle', {r:5, fill:'#0F6E56', stroke:'white', 'stroke-width':1.5});
+  var pt2 = el('circle', {r:5, fill:'#993C1D', stroke:'white', 'stroke-width':1.5});
+  svg.appendChild(vline1);
+  svg.appendChild(vline2);
+  svg.appendChild(secLine);
+  svg.appendChild(vlabel1);
+  svg.appendChild(vlabel2);
+  svg.appendChild(pt1);
+  svg.appendChild(pt2);
+
+  function update(q1){
+    var q2 = q1 + 500;
+    var u1 = U(q1), u2 = U(q2);
+    var deltaU = u2 - u1;
+    var rate = deltaU / 500;
+    var m = deltaU / 500;
+    var extL = q1 - 350, extR = q2 + 350;
+    secLine.setAttribute('x1', sx(extL));
+    secLine.setAttribute('y1', sy(u1 + m*(extL-q1)));
+    secLine.setAttribute('x2', sx(extR));
+    secLine.setAttribute('y2', sy(u1 + m*(extR-q1)));
+    pt1.setAttribute('cx', sx(q1)); pt1.setAttribute('cy', sy(u1));
+    pt2.setAttribute('cx', sx(q2)); pt2.setAttribute('cy', sy(u2));
+
+    vline1.setAttribute('x1', sx(q1)); vline1.setAttribute('y1', sy(0));
+    vline1.setAttribute('x2', sx(q1)); vline1.setAttribute('y2', sy(u1));
+    vline2.setAttribute('x1', sx(q2)); vline2.setAttribute('y1', sy(0));
+    vline2.setAttribute('x2', sx(q2)); vline2.setAttribute('y2', sy(u2));
+    vlabel1.setAttribute('x', sx(q1)-14); vlabel1.setAttribute('y', sy(u1/2)+4);
+    vlabel1.textContent = r1(u1);
+    vlabel2.setAttribute('x', sx(q2)+16); vlabel2.setAttribute('y', sy(u2/2)+4);
+    vlabel2.textContent = r1(u2);
+
+    document.getElementById('qVal').textContent = q1;
+    document.getElementById('rangeLabel').textContent = 'De q = ' + q1 + ' a q = ' + q2;
+    document.getElementById('u1').textContent = r1(u1);
+    document.getElementById('u2').textContent = r1(u2);
+    document.getElementById('deltaU').textContent = r1(deltaU);
+    document.getElementById('rate').textContent = r1(rate);
+
+    var tendencia = rate > 0 ? 'aumenta' : (rate < 0 ? 'disminuye' : 'se mantiene igual');
+    document.getElementById('interpretation').textContent =
+      'Entre q = ' + q1 + ' y q = ' + q2 + ', la utilidad ' + tendencia + ' en promedio ' + Math.abs(r1(rate)) + ' miles de soles por cada unidad extra vendida.';
+  }
+
+  var slider = document.getElementById('qSlider');
+  slider.addEventListener('input', function(){ update(parseInt(this.value)); });
+  update(parseInt(slider.value));
+})();
+</script>
+</body>
+</html>

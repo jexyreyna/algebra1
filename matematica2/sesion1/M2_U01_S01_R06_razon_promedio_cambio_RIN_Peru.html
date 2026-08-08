@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Laboratorio: RIN del Perú por gobierno</title>
+<style>
+  :root {
+    --text-primary: #0f172a;
+    --text-secondary: #64748b;
+    --text-muted: #94a3b8;
+    --surface-1: #f1f5f9;
+    --surface-card: #ffffff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: linear-gradient(135deg, #0f172a, #134e4a, #0e7490);
+    min-height: 100vh;
+    padding: 2rem 1rem;
+    color: var(--text-primary);
+  }
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    background: var(--surface-card);
+    border-radius: 16px;
+    padding: 1.75rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  }
+  h1 {
+    font-size: 19px;
+    font-weight: 600;
+    text-align: center;
+    margin: 0 0 1.25rem;
+  }
+  .slider-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 4px;
+  }
+  .slider-row label {
+    font-size: 14px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+  }
+  input[type="range"] { flex: 1; }
+  #yrVal {
+    font-size: 15px;
+    font-weight: 600;
+    min-width: 48px;
+    text-align: right;
+  }
+  .hint {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin: 0 0 1rem;
+  }
+  svg { width: 100%; height: auto; display: block; }
+  #panel {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 1rem;
+  }
+  .info-card {
+    background: var(--surface-1);
+    border-radius: 12px;
+    padding: 0.85rem;
+    border-left: 3px solid;
+  }
+  .info-year { font-size: 11px; font-weight: 600; margin: 0 0 4px; }
+  .info-name { font-size: 13px; font-weight: 600; margin: 0 0 6px; }
+  .info-label { font-size: 11px; color: var(--text-secondary); margin: 0; }
+  .info-value { font-size: 17px; font-weight: 600; margin: 0; }
+  #changeCard {
+    background: var(--surface-1);
+    border-radius: 12px;
+    padding: 0.85rem;
+    margin-top: 10px;
+  }
+  #changeCard .title { font-size: 11px; color: var(--text-secondary); font-weight: 600; margin: 0 0 8px; }
+  .change-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(120px,1fr)); gap: 10px; }
+  .change-label { font-size: 11px; color: var(--text-secondary); margin: 0; }
+  .change-value { font-size: 18px; font-weight: 600; margin: 0; }
+  #interpretationCard {
+    background: var(--surface-1);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-top: 10px;
+  }
+  #interpretation { font-size: 14px; line-height: 1.7; margin: 0; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Reservas internacionales netas del Perú, por gobierno (1985–2012)</h1>
+
+  <div class="slider-row">
+    <label for="yrSlider">Año inicial</label>
+    <input type="range" id="yrSlider" min="1985" max="2010" value="1985" step="5">
+    <span id="yrVal">1985</span>
+  </div>
+  <p class="hint">El control avanza de 5 en 5 años. El último tramo llega hasta 2012, último dato disponible.</p>
+
+  <svg id="plot" viewBox="0 0 680 320"></svg>
+
+  <div id="panel"></div>
+
+  <div id="changeCard"></div>
+
+  <div id="interpretationCard">
+    <p id="interpretation"></p>
+  </div>
+</div>
+
+<script>
+(function(){
+  var data = {1985:1493,1986:958,1987:43,1988:-352,1989:357,1990:531,1991:1304,1992:2001,1993:2741,1994:5718,1995:6641,1996:8540,1997:10169,1998:9183,1999:8404,2000:8180,2001:8613,2002:9598,2003:10194,2004:12631,2005:14097,2006:17275,2007:27689,2008:31196,2009:33135,2010:44105,2011:48816,2012:50301};
+  var eraBands = [
+    {start:1985,end:1990,color:'#D85A30'},
+    {start:1990,end:2000,color:'#378ADD'},
+    {start:2000,end:2001,color:'#888780'},
+    {start:2001,end:2006,color:'#1D9E75'},
+    {start:2006,end:2011,color:'#D85A30'},
+    {start:2011,end:2012,color:'#7F77DD'}
+  ];
+  var yearInfo = {
+    1985:{name:'Alan García', color:'#D85A30'},
+    1990:{name:'Alberto Fujimori', color:'#378ADD'},
+    1995:{name:'Alberto Fujimori', color:'#378ADD'},
+    2000:{name:'Valentín Paniagua', color:'#888780'},
+    2005:{name:'Alejandro Toledo', color:'#1D9E75'},
+    2010:{name:'Alan García', color:'#D85A30'},
+    2012:{name:'Ollanta Humala', color:'#7F77DD'}
+  };
+
+  var W=680,H=320,mL=55,mR=15,mT=15,mB=35;
+  var qMin=1985,qMax=2012,uMin=-3000,uMax=55000;
+  function sx(q){ return mL + (q-qMin)/(qMax-qMin)*(W-mL-mR); }
+  function sy(u){ return H-mB - (u-uMin)/(uMax-uMin)*(H-mT-mB); }
+  function r1(n){ return Math.round(n*10)/10; }
+  var svg = document.getElementById('plot');
+  var ns = 'http://www.w3.org/2000/svg';
+  function el(tag, attrs){ var e=document.createElementNS(ns,tag); for(var k in attrs) e.setAttribute(k,attrs[k]); return e; }
+
+  eraBands.forEach(function(era){
+    svg.appendChild(el('rect', {x:sx(era.start), y:mT, width:sx(era.end)-sx(era.start), height:H-mT-mB, fill:era.color, 'fill-opacity':0.08}));
+  });
+  for (var gy=0; gy<=uMax; gy+=10000){
+    svg.appendChild(el('line', {x1:mL,y1:sy(gy),x2:W-mR,y2:sy(gy), stroke:'#e1e0d9', 'stroke-width':1}));
+    var t=el('text',{x:mL-8,y:sy(gy)+4,'text-anchor':'end','font-size':10, fill:'#898781'}); t.textContent=gy; svg.appendChild(t);
+  }
+  svg.appendChild(el('line',{x1:mL,y1:sy(0),x2:W-mR,y2:sy(0), stroke:'#c3c2b7', 'stroke-width':1}));
+  [1985,1990,1995,2000,2005,2010,2012].forEach(function(yr){
+    var t=el('text',{x:sx(yr),y:H-mB+16,'text-anchor':'middle','font-size':10, fill:'#898781'}); t.textContent=yr; svg.appendChild(t);
+  });
+
+  var pts=[]; for (var yr=qMin; yr<=qMax; yr++){ pts.push(sx(yr)+','+sy(data[yr])); }
+  svg.appendChild(el('polyline',{points:pts.join(' '), fill:'none', stroke:'#5F5E5A', 'stroke-width':2}));
+
+  var vline1 = el('line', {'stroke-width':1.5, 'stroke-dasharray':'4,3'});
+  var vline2 = el('line', {'stroke-width':1.5, 'stroke-dasharray':'4,3'});
+  var secLine = el('line', {stroke:'#5F5E5A', 'stroke-width':2, 'stroke-dasharray':'6,3'});
+  var pt1 = el('circle', {r:5, stroke:'white', 'stroke-width':1.5});
+  var pt2 = el('circle', {r:5, stroke:'white', 'stroke-width':1.5});
+  var vlabel1 = el('text', {'font-size':11,'text-anchor':'middle','font-weight':'600'});
+  var vlabel2 = el('text', {'font-size':11,'text-anchor':'middle','font-weight':'600'});
+  [vline1,vline2,secLine,vlabel1,vlabel2,pt1,pt2].forEach(function(e){ svg.appendChild(e); });
+
+  var panel = document.getElementById('panel');
+  var changeCard = document.getElementById('changeCard');
+
+  function update(start){
+    var end = Math.min(start+5, 2012);
+    var pStart = yearInfo[start];
+    var pEnd = yearInfo[end];
+    var uStart = data[start], uEnd = data[end];
+    var delta = uEnd - uStart;
+    var years = end - start;
+    var rate = r1(delta/years);
+
+    var m = delta/years;
+    var extL = start-1.5, extR = end+1.5;
+    secLine.setAttribute('x1', sx(extL)); secLine.setAttribute('y1', sy(uStart + m*(extL-start)));
+    secLine.setAttribute('x2', sx(extR)); secLine.setAttribute('y2', sy(uStart + m*(extR-start)));
+
+    vline1.setAttribute('x1', sx(start)); vline1.setAttribute('y1', sy(0));
+    vline1.setAttribute('x2', sx(start)); vline1.setAttribute('y2', sy(uStart));
+    vline1.setAttribute('stroke', pStart.color);
+    vline2.setAttribute('x1', sx(end)); vline2.setAttribute('y1', sy(0));
+    vline2.setAttribute('x2', sx(end)); vline2.setAttribute('y2', sy(uEnd));
+    vline2.setAttribute('stroke', pEnd.color);
+
+    pt1.setAttribute('cx', sx(start)); pt1.setAttribute('cy', sy(uStart)); pt1.setAttribute('fill', pStart.color);
+    pt2.setAttribute('cx', sx(end)); pt2.setAttribute('cy', sy(uEnd)); pt2.setAttribute('fill', pEnd.color);
+
+    vlabel1.setAttribute('x', sx(start)-16); vlabel1.setAttribute('y', sy(uStart/2)+4);
+    vlabel1.setAttribute('fill', pStart.color); vlabel1.textContent = uStart.toLocaleString();
+    vlabel2.setAttribute('x', sx(end)+18); vlabel2.setAttribute('y', sy(uEnd/2)+4);
+    vlabel2.setAttribute('fill', pEnd.color); vlabel2.textContent = uEnd.toLocaleString();
+
+    document.getElementById('yrVal').textContent = start;
+
+    panel.innerHTML =
+      '<div class="info-card" style="border-left-color:'+pStart.color+';">' +
+        '<p class="info-year" style="color:'+pStart.color+';">Año ' + start + '</p>' +
+        '<p class="info-name">' + pStart.name + '</p>' +
+        '<p class="info-label">RIN inicio</p>' +
+        '<p class="info-value">' + uStart.toLocaleString() + '</p>' +
+      '</div>' +
+      '<div class="info-card" style="border-left-color:'+pEnd.color+';">' +
+        '<p class="info-year" style="color:'+pEnd.color+';">Año ' + end + '</p>' +
+        '<p class="info-name">' + pEnd.name + '</p>' +
+        '<p class="info-label">RIN final</p>' +
+        '<p class="info-value">' + uEnd.toLocaleString() + '</p>' +
+      '</div>';
+
+    var deltaColor = delta >= 0 ? '#0F6E56' : '#993C1D';
+    var deltaSign = delta >= 0 ? '+' : '';
+    changeCard.style.borderLeft = '3px solid ' + deltaColor;
+    changeCard.innerHTML =
+      '<p class="title">Cambio en el tramo</p>' +
+      '<div class="change-grid">' +
+        '<div>' +
+          '<p class="change-label">ΔRIN (' + start + ' \u2192 ' + end + ')</p>' +
+          '<p class="change-value" style="color:' + deltaColor + ';">' + deltaSign + delta.toLocaleString() + '</p>' +
+        '</div>' +
+        '<div>' +
+          '<p class="change-label">Años transcurridos</p>' +
+          '<p class="change-value">' + years + '</p>' +
+        '</div>' +
+        '<div>' +
+          '<p class="change-label">Razón promedio de cambio</p>' +
+          '<p class="change-value" style="color:' + deltaColor + ';">' + (rate>=0?'+':'') + rate.toLocaleString() + ' / año</p>' +
+        '</div>' +
+      '</div>';
+
+    var tendencia = rate > 0 ? 'aumentaron' : (rate < 0 ? 'disminuyeron' : 'se mantuvieron');
+    var samePres = pStart.name === pEnd.name;
+    var frase = samePres
+      ? 'Bajo ' + pStart.name + ', entre ' + start + ' y ' + end + ' las reservas ' + tendencia + ' en promedio ' + Math.abs(rate).toLocaleString() + ' millones de US$ por año.'
+      : 'Entre ' + start + ' (' + pStart.name + ') y ' + end + ' (' + pEnd.name + '), las reservas ' + tendencia + ' en promedio ' + Math.abs(rate).toLocaleString() + ' millones de US$ por año, cruzando un cambio de gobierno.';
+    document.getElementById('interpretation').textContent = frase;
+  }
+
+  var slider = document.getElementById('yrSlider');
+  slider.addEventListener('input', function(){ update(parseInt(this.value)); });
+  update(parseInt(slider.value));
+})();
+</script>
+</body>
+</html>
