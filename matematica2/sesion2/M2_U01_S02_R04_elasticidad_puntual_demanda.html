@@ -12,6 +12,7 @@
     --text-muted: #94a3b8;
     --surface-1: #f1f5f9;
     --surface-card: #ffffff;
+    --border: #e2e8f0;
   }
   * { box-sizing: border-box; }
   body {
@@ -23,7 +24,7 @@
     color: var(--text-primary);
   }
   .container {
-    max-width: 720px;
+    max-width: 760px;
     margin: 0 auto;
     background: var(--surface-card);
     border-radius: 16px;
@@ -37,10 +38,14 @@
     margin: 0 0 1.25rem;
   }
   .step-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1rem; }
-  .step-card { background: var(--surface-1); border-radius: 12px; padding: 0.85rem; border-left: 3px solid; }
-  .step-label { font-size: 11px; color: var(--text-secondary); font-weight: 600; margin: 0 0 4px; }
-  .step-final { background: #EEEDFE; }
-  .step-final .step-label { color: #534AB7; }
+  .step-card { background: var(--surface-1); border-radius: 12px; padding: 0.9rem; border-left: 3px solid; }
+  .step-label { font-size: 11px; color: var(--text-secondary); font-weight: 600; margin: 0 0 6px; }
+  .step-final { background: #EEEDFE; padding: 1rem; text-align: center; }
+  .step-final .step-label { color: #534AB7; margin-bottom: 8px; }
+  .calc-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(240px,1fr)); gap: 10px; margin-bottom: 1rem; }
+  .calc-card { background: var(--surface-1); border-radius: 12px; padding: 0.9rem; border: 0.5px solid var(--border); border-top: 3px solid; }
+  .calc-title { font-size: 12px; font-weight: 600; margin: 0 0 8px; }
+  .calc-note { font-size: 12px; color: var(--text-secondary); margin: 8px 0 0; }
   .slider-row { display: flex; align-items: center; gap: 12px; margin-bottom: 0.5rem; }
   .slider-row label { font-size: 14px; color: var(--text-secondary); white-space: nowrap; }
   input[type="range"] { flex: 1; }
@@ -62,23 +67,32 @@
   <div class="step-list">
     <div class="step-card" style="border-left-color:#888780;">
       <p class="step-label">Paso 1 · función de demanda</p>
-      <div class="ktx" data-tex="p = 240 - 2\sqrt{q}" style="font-size:16px;"></div>
+      <div class="ktx" data-tex="p = 240 - 2\sqrt{q}" style="font-size:17px;"></div>
     </div>
     <div class="step-card" style="border-left-color:#378ADD;">
-      <p class="step-label">Paso 2 · derivamos p respecto a q</p>
-      <div class="ktx" data-tex="\dfrac{dp}{dq} = -2\cdot\dfrac{1}{2\sqrt{q}} = -\dfrac{1}{\sqrt{q}}" style="font-size:16px;"></div>
-    </div>
-    <div class="step-card" style="border-left-color:#378ADD;">
-      <p class="step-label">Paso 3 · invertimos para obtener dq/dp</p>
-      <div class="ktx" data-tex="\dfrac{dq}{dp} = -\sqrt{q}" style="font-size:16px;"></div>
+      <p class="step-label">Paso 2 · derivamos e invertimos</p>
+      <div class="ktx" data-tex="\begin{aligned} \dfrac{dp}{dq} &= -2\cdot\dfrac{1}{2\sqrt{q}} = -\dfrac{1}{\sqrt{q}} \\[4pt] \dfrac{dq}{dp} &= -\sqrt{q} \end{aligned}" style="font-size:16px;"></div>
     </div>
     <div class="step-card" style="border-left-color:#1D9E75;">
-      <p class="step-label">Paso 4 · aplicamos la fórmula de elasticidad</p>
-      <div class="ktx" data-tex="E_d = \dfrac{dq}{dp}\cdot\dfrac{p}{q} = -\sqrt{q}\cdot\dfrac{240-2\sqrt{q}}{q} = -\dfrac{240-2\sqrt{q}}{\sqrt{q}}" style="font-size:16px;"></div>
+      <p class="step-label">Paso 3 · aplicamos la fórmula de elasticidad</p>
+      <div class="ktx" data-tex="\begin{aligned} E_d &= \dfrac{dq}{dp}\cdot\dfrac{p}{q} \\[4pt] &= -\sqrt{q}\cdot\dfrac{240-2\sqrt{q}}{q} \\[4pt] &= -\dfrac{240-2\sqrt{q}}{\sqrt{q}} \\[4pt] &= 2-\dfrac{240}{\sqrt{q}} \end{aligned}" style="font-size:16px;"></div>
     </div>
     <div class="step-card step-final">
-      <p class="step-label">Paso 5 · simplificamos: modelo final</p>
-      <div class="ktx" data-tex="E_d(q) = 2 - \dfrac{240}{\sqrt{q}}" style="font-size:19px;color:#26215C;"></div>
+      <p class="step-label">Modelo final</p>
+      <div class="ktx" data-tex="\boxed{\,E_d(q) = 2 - \dfrac{240}{\sqrt{q}}\,}" style="font-size:20px;color:#26215C;"></div>
+    </div>
+  </div>
+
+  <div class="calc-grid">
+    <div class="calc-card" style="border-top-color:#D85A30;">
+      <p class="calc-title" style="color:#993C1D;">Panel de cálculo · q = 2500</p>
+      <div class="ktx" data-tex="\begin{aligned} \sqrt{2500} &= 50 \\[3pt] p &= 240-2(50) = 140 \\[3pt] E_d(2500) &= 2-\dfrac{240}{50} \\[3pt] &= 2 - 4.8 \\[3pt] &= \boxed{-2.8} \end{aligned}" style="font-size:15px;"></div>
+      <p class="calc-note">|E_d| &gt; 1 → demanda elástica</p>
+    </div>
+    <div class="calc-card" style="border-top-color:#EF9F27;">
+      <p class="calc-title" style="color:#854F0B;">Panel de cálculo · q = 6400</p>
+      <div class="ktx" data-tex="\begin{aligned} \sqrt{6400} &= 80 \\[3pt] p &= 240-2(80) = 80 \\[3pt] E_d(6400) &= 2-\dfrac{240}{80} \\[3pt] &= 2 - 3 \\[3pt] &= \boxed{-1} \end{aligned}" style="font-size:15px;"></div>
+      <p class="calc-note">|E_d| = 1 → elasticidad unitaria</p>
     </div>
   </div>
 
@@ -87,7 +101,7 @@
     <input type="range" id="qSlider" min="400" max="14000" value="6400" step="400">
     <span id="qVal">6400</span>
   </div>
-  <p class="hint">Paso de 400 en 400, para que el control incluya exactamente q = 6400, el punto de elasticidad unitaria.</p>
+  <p class="hint">Paso de 400 en 400, para que el control incluya exactamente q = 6400.</p>
 
   <svg id="plot" viewBox="0 0 640 260"></svg>
 
@@ -114,7 +128,7 @@
 <script>
 (function(){
   document.querySelectorAll('.ktx').forEach(function(el){
-    try { katex.render(el.getAttribute('data-tex'), el, { throwOnError:false }); }
+    try { katex.render(el.getAttribute('data-tex'), el, { throwOnError:false, trust:true }); }
     catch(e){ el.textContent = el.getAttribute('data-tex'); }
   });
 
