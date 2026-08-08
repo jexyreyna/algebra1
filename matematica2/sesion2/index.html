@@ -1,18 +1,261 @@
-<!doctype html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Matemática II - Sesión 2</title><style>
-body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:#eef2f8;color:#1f2937}
-header{background:linear-gradient(135deg,#173b88,#0f6ab4);color:#fff;padding:40px 24px;text-align:center}
-header h1{margin:0 0 8px;font-size:42px} header p{margin:0;font-size:18px}
-nav{background:#fff;padding:12px 20px;text-align:center;border-bottom:1px solid #dbe3ef}
-nav a{color:#173b88;text-decoration:none;font-weight:600;margin:0 8px}
-main{max-width:1200px;margin:auto;padding:32px 20px 60px}
-.info{background:#fff;border-left:5px solid #d89b1d;padding:16px 18px;border-radius:12px;margin-bottom:24px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}
-.card{display:block;text-decoration:none;color:#1f2937;background:#fff;border:1px solid #dbe3ef;border-radius:16px;padding:22px;box-shadow:0 6px 18px rgba(15,42,102,.08)}
-.card:hover{transform:translateY(-3px);border-color:#d89b1d}
-.tag{display:inline-block;background:#eaf0ff;color:#173b88;font-weight:700;font-size:12px;padding:5px 9px;border-radius:999px;margin-bottom:10px}
-.card h2,.card h3{margin:0 0 8px;color:#173b88}.card p{margin:0;color:#586174;line-height:1.5}
-footer{text-align:center;padding:22px;color:#6b7280;background:#fff;border-top:1px solid #dbe3ef}
-</style></head><body>
-<header><h1>Matemática II</h1><p>Unidad 1 · Sesión 2</p></header><nav><a href="../">← Unidad 1</a><a href="../../../">Curso</a></nav>
-<main><div class="info"><b>4 recursos interactivos.</b> Selecciona una tarjeta.</div><div class="grid"><a class="card" href="M2_U01_S02_R01_elasticidad_demanda.html"><span class="tag">R01</span><h3>Elasticidad de la demanda</h3><p>Abrir recurso interactivo</p></a><a class="card" href="M2_U01_S02_R02_recta_tangente_paralela.html"><span class="tag">R02</span><h3>Recta tangente paralela</h3><p>Abrir recurso interactivo</p></a><a class="card" href="M2_U01_S02_R03_comparacion_elasticidad_empresas.html"><span class="tag">R03</span><h3>Comparación de elasticidad entre empresas</h3><p>Abrir recurso interactivo</p></a><a class="card" href="M2_U01_S02_R04_elasticidad_puntual_demanda.html"><span class="tag">R04</span><h3>Elasticidad puntual de la demanda</h3><p>Abrir recurso interactivo</p></a></div></main>
-<footer>SUMATHE · Unidad 1 · Sesión 2</footer></body></html>
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>SUMATHE | Matemática II | Unidad 1 | Sesión 1</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+
+font-family:Segoe UI,Arial,sans-serif;
+background:#eef2f8;
+color:#1f2937;
+
+}
+
+header{
+
+background:linear-gradient(135deg,#173b88,#0f6ab4);
+color:white;
+padding:40px;
+text-align:center;
+
+}
+
+header h1{
+
+font-size:42px;
+margin-bottom:8px;
+
+}
+
+header h2{
+
+font-weight:400;
+font-size:22px;
+
+}
+
+.container{
+
+width:92%;
+max-width:1400px;
+margin:auto;
+padding:35px;
+
+}
+
+.info{
+
+background:white;
+padding:18px;
+border-left:6px solid #d89b1d;
+border-radius:12px;
+margin-bottom:28px;
+font-size:19px;
+
+}
+
+.grid{
+
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+gap:22px;
+
+}
+
+.card{
+
+background:white;
+padding:24px;
+border-radius:16px;
+text-decoration:none;
+color:#173b88;
+box-shadow:0 6px 18px rgba(0,0,0,.12);
+transition:.25s;
+
+}
+
+.card:hover{
+
+transform:translateY(-5px);
+
+}
+
+.tag{
+
+display:inline-block;
+background:#eaf0ff;
+padding:6px 14px;
+border-radius:20px;
+font-size:13px;
+font-weight:bold;
+margin-bottom:12px;
+
+}
+
+.card h3{
+
+font-size:24px;
+margin-bottom:10px;
+
+}
+
+.card p{
+
+color:#555;
+line-height:1.5;
+
+}
+
+footer{
+
+margin-top:50px;
+padding:25px;
+text-align:center;
+color:#666;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+
+<h1>Matemática II</h1>
+
+<h2>Unidad 1 · Sesión 1</h2>
+
+</header>
+
+<div class="container">
+
+<div class="info">
+
+<b>6 recursos interactivos</b><br>
+
+Tema: Razón de cambio promedio, razón de cambio instantánea y derivadas.
+
+</div>
+
+<div class="grid">
+
+<a class="card"
+href="M2_U01_S01_R01_razon_cambio_contexto_pobreza.html">
+
+<span class="tag">Razón de cambio</span>
+
+<h3>R01 · Contexto de pobreza</h3>
+
+<p>
+
+Razón de cambio promedio, instantánea y porcentual aplicada a un indicador de pobreza.
+
+</p>
+
+</a>
+
+<a class="card"
+href="M2_U01_S01_R02_razon_cambio_promedio_instantanea.html">
+
+<span class="tag">Razón de cambio</span>
+
+<h3>R02 · Cambio promedio e instantáneo</h3>
+
+<p>
+
+Interpretación gráfica mediante rectas secantes y tangentes.
+
+</p>
+
+</a>
+
+<a class="card"
+href="M2_U01_S01_R03_derivadas_funciones_elementales.html">
+
+<span class="tag">Derivadas</span>
+
+<h3>R03 · Derivadas de funciones elementales</h3>
+
+<p>
+
+Aplicación de las reglas básicas de derivación.
+
+</p>
+
+</a>
+
+<a class="card"
+href="M2_U01_S01_R04_juego_reglas_derivacion.html">
+
+<span class="tag">Juego</span>
+
+<h3>R04 · Juego de reglas de derivación</h3>
+
+<p>
+
+Actividad interactiva para practicar las reglas de derivación.
+
+</p>
+
+</a>
+
+<a class="card"
+href="M2_U01_S01_R05_razon_promedio_cambio_utilidad.html">
+
+<span class="tag">Aplicación económica</span>
+
+<h3>R05 · Razón promedio de cambio de la utilidad</h3>
+
+<p>
+
+Aplicación de la razón promedio de cambio en funciones económicas.
+
+</p>
+
+</a>
+
+<a class="card"
+href="M2_U01_S01_R06_razon_promedio_cambio_RIN_Peru.html">
+
+<span class="tag">Aplicación económica</span>
+
+<h3>R06 · Razón promedio de cambio del RIN del Perú</h3>
+
+<p>
+
+Interpretación del comportamiento de las Reservas Internacionales Netas.
+
+</p>
+
+</a>
+
+</div>
+
+</div>
+
+<footer>
+
+<b>SUMATHE</b><br>
+
+Matemática II · Unidad 1 · Sesión 1
+
+</footer>
+
+</body>
+
+</html>
