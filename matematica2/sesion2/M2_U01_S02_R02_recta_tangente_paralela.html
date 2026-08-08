@@ -1,587 +1,588 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recta Tangente Paralela - Interactivo</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tangente paralela a una recta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #14172B;
+    --panel: #1E2240;
+    --panel-2: #242952;
+    --border: #313866;
+    --text: #F2EFE6;
+    --text-dim: #A8ACC8;
+    --gold: #E8B84B;
+    --coral: #F0665C;
+    --teal: #5FC9B8;
+    --grid: #2A2F55;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(circle at 15% 8%, #1c2145 0%, transparent 45%),
+      var(--bg);
+    color:var(--text);
+    font-family:'Inter', sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:36px 24px 64px;}
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
+  /* Header */
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12.5px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--gold);
+    margin-bottom:10px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .eyebrow::before{content:"";width:22px;height:1px;background:var(--gold);display:inline-block;}
+  h1{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:clamp(28px,4vw,42px);
+    line-height:1.08;
+    margin:0 0 14px;
+    letter-spacing:-.01em;
+  }
+  h1 em{color:var(--gold);font-style:italic;font-weight:500;}
+  .lede{
+    color:var(--text-dim);
+    font-size:15.5px;
+    line-height:1.6;
+    max-width:640px;
+    margin:0 0 28px;
+  }
 
-        .container {
-            max-width: 1600px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 16px;
-            padding: 30px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        }
+  /* Statement card */
+  .statement{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:20px 24px;
+    margin-bottom:32px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:28px;
+    align-items:center;
+  }
+  .statement-item{display:flex;flex-direction:column;gap:6px;}
+  .statement-label{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.1em;
+    color:var(--text-dim);
+  }
+  .statement-eq{
+    font-family:'JetBrains Mono',monospace;
+    font-size:19px;
+    font-weight:700;
+  }
+  .statement-eq.parabola{color:var(--teal);}
+  .statement-eq.line{color:var(--coral);}
 
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
+  /* Layout */
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start;}
+  @media (max-width:920px){ .grid{grid-template-columns:1fr;} }
 
-        .header h1 {
-            font-size: 32px;
-            color: #667eea;
-            margin-bottom: 10px;
-        }
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:22px 24px 26px;
+  }
+  .panel h2{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:18px;
+    margin:0 0 4px;
+  }
+  .panel .sub{color:var(--text-dim);font-size:13px;margin:0 0 18px;}
 
-        .header p {
-            font-size: 16px;
-            color: #6b7280;
-            max-width: 800px;
-            margin: 0 auto;
-        }
+  /* Controls */
+  .control-group{margin-bottom:20px;}
+  .control-group:last-child{margin-bottom:0;}
+  .control-title{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:var(--text-dim);
+    margin-bottom:10px;
+    display:flex;align-items:center;gap:8px;
+  }
+  .dot{width:9px;height:9px;border-radius:50%;display:inline-block;}
+  .dot.teal{background:var(--teal);}
+  .dot.coral{background:var(--coral);}
 
-        .content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-bottom: 30px;
-        }
+  .slider-row{
+    display:grid;
+    grid-template-columns:22px 1fr 58px;
+    align-items:center;
+    gap:10px;
+    margin-bottom:10px;
+  }
+  .slider-row label{
+    font-family:'JetBrains Mono',monospace;
+    font-size:14px;
+    font-weight:700;
+    color:var(--text);
+  }
+  input[type=range]{
+    -webkit-appearance:none;
+    width:100%;
+    height:4px;
+    border-radius:2px;
+    background:var(--grid);
+    outline:none;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    width:16px;height:16px;border-radius:50%;
+    background:var(--gold);
+    cursor:pointer;
+    border:2px solid #14172B;
+    box-shadow:0 0 0 1px var(--gold);
+  }
+  input[type=range]::-moz-range-thumb{
+    width:16px;height:16px;border-radius:50%;
+    background:var(--gold);cursor:pointer;border:2px solid #14172B;
+  }
+  .slider-val{
+    font-family:'JetBrains Mono',monospace;
+    font-size:13px;
+    text-align:right;
+    background:var(--panel-2);
+    border:1px solid var(--border);
+    border-radius:6px;
+    padding:4px 6px;
+    color:var(--text);
+  }
 
-        .panel {
-            background: #f9fafb;
-            border: 2px solid #e5e7eb;
-            border-radius: 12px;
-            padding: 25px;
-        }
+  .error-box{
+    background:rgba(240,102,92,.1);
+    border:1px solid var(--coral);
+    color:var(--coral);
+    border-radius:10px;
+    padding:12px 14px;
+    font-size:13.5px;
+    line-height:1.5;
+    margin-top:6px;
+  }
 
-        .panel h2 {
-            font-size: 18px;
-            color: #1f2937;
-            margin-bottom: 15px;
-            border-bottom: 2px solid #667eea;
-            padding-bottom: 10px;
-        }
+  /* Steps */
+  .step{
+    display:grid;
+    grid-template-columns:26px 1fr;
+    gap:12px;
+    padding:14px 0;
+    border-top:1px solid var(--border);
+  }
+  .step:first-of-type{border-top:none;padding-top:0;}
+  .step-num{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:17px;
+    color:var(--gold);
+    line-height:1.3;
+  }
+  .step-body h3{
+    margin:0 0 6px;
+    font-size:14px;
+    font-weight:600;
+    color:var(--text);
+  }
+  .step-body p{
+    margin:0 0 8px;
+    font-size:13.5px;
+    color:var(--text-dim);
+    line-height:1.55;
+  }
+  .eqline{
+    font-family:'JetBrains Mono',monospace;
+    font-size:14px;
+    background:var(--panel-2);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:8px 12px;
+    display:inline-block;
+    margin:2px 6px 2px 0;
+  }
+  .eqline.result{border-color:var(--gold);color:var(--gold);font-weight:700;}
 
-        .input-group {
-            margin-bottom: 15px;
-        }
+  .result-card{
+    margin-top:18px;
+    background:linear-gradient(135deg, rgba(232,184,74,.12), rgba(232,184,74,.03));
+    border:1px solid var(--gold);
+    border-radius:12px;
+    padding:16px 18px;
+  }
+  .result-card .rc-label{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.1em;
+    color:var(--gold);
+    margin-bottom:6px;
+  }
+  .result-card .rc-eq{
+    font-family:'JetBrains Mono',monospace;
+    font-size:21px;
+    font-weight:700;
+    color:var(--text);
+  }
 
-        label {
-            display: block;
-            font-size: 13px;
-            color: #6b7280;
-            margin-bottom: 5px;
-            font-weight: 600;
-        }
+  /* Graph panel */
+  .graph-panel{position:sticky;top:20px;}
+  svg{width:100%;height:auto;display:block;}
+  .legend{display:flex;gap:18px;flex-wrap:wrap;margin-top:14px;}
+  .legend-item{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--text-dim);font-family:'JetBrains Mono',monospace;}
+  .legend-swatch{width:16px;height:3px;border-radius:2px;}
 
-        input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            font-size: 14px;
-        }
+  .slope-badge{
+    display:flex;align-items:center;gap:10px;
+    margin-top:16px;
+    padding:10px 14px;
+    background:var(--panel-2);
+    border:1px solid var(--border);
+    border-radius:10px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:13px;
+  }
+  .slope-badge .m{color:var(--coral);font-weight:700;}
+  .slope-badge .m2{color:var(--gold);font-weight:700;}
+  .slope-badge .eqmark{color:var(--teal);font-size:16px;}
 
-        .equation-display {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-            border: 2px solid #ddd6fe;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-            text-align: center;
-            font-family: 'Courier New', monospace;
-            font-size: 16px;
-            color: #667eea;
-            font-weight: 600;
-        }
-
-        button {
-            width: 100%;
-            padding: 12px;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s;
-            font-size: 14px;
-            margin-top: 10px;
-        }
-
-        button:hover {
-            background: #764ba2;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-        }
-
-        .graph-section {
-            grid-column: 1 / -1;
-            background: #f9fafb;
-            border: 2px solid #e5e7eb;
-            border-radius: 12px;
-            padding: 25px;
-        }
-
-        .graph-section h2 {
-            font-size: 18px;
-            color: #1f2937;
-            margin-bottom: 15px;
-            border-bottom: 2px solid #667eea;
-            padding-bottom: 10px;
-        }
-
-        svg {
-            width: 100%;
-            height: auto;
-            max-height: 600px;
-        }
-
-        .results-section {
-            grid-column: 1 / -1;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-        }
-
-        .result-card {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-            border: 2px solid #ddd6fe;
-            border-radius: 12px;
-            padding: 20px;
-        }
-
-        .result-card h3 {
-            font-size: 15px;
-            color: #667eea;
-            margin-bottom: 12px;
-            font-weight: 600;
-        }
-
-        .result-value {
-            background: white;
-            padding: 12px;
-            border-radius: 6px;
-            text-align: center;
-            font-size: 16px;
-            color: #1f2937;
-            font-family: 'Courier New', monospace;
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
-
-        .solution-section {
-            grid-column: 1 / -1;
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.1) 100%);
-            border: 2px solid #a7f3d0;
-            border-radius: 12px;
-            padding: 25px;
-        }
-
-        .solution-section h2 {
-            font-size: 18px;
-            color: #047857;
-            margin-bottom: 15px;
-            border-bottom: 2px solid #10b981;
-            padding-bottom: 10px;
-        }
-
-        .step {
-            background: white;
-            border-left: 4px solid #10b981;
-            padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 6px;
-        }
-
-        .step-title {
-            font-weight: 600;
-            color: #047857;
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
-
-        .step-content {
-            font-size: 13px;
-            color: #374151;
-            line-height: 1.6;
-            font-family: 'Courier New', monospace;
-        }
-
-        .formula-box {
-            background: #f0fdf4;
-            border: 1px solid #bbf7d0;
-            padding: 12px;
-            border-radius: 6px;
-            margin-top: 8px;
-            font-family: 'Courier New', monospace;
-            font-size: 13px;
-            color: #166534;
-            line-height: 1.6;
-        }
-
-        @media (max-width: 1024px) {
-            .content {
-                grid-template-columns: 1fr;
-            }
-
-            .graph-section, .results-section, .solution-section {
-                grid-column: 1;
-            }
-        }
-    </style>
+  footer{
+    margin-top:36px;
+    text-align:center;
+    color:var(--text-dim);
+    font-size:12px;
+    font-family:'JetBrains Mono',monospace;
+    letter-spacing:.04em;
+  }
+</style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>📐 Recta Tangente Paralela a una Recta Dada</h1>
-            <p>Encuentra la ecuación de la recta tangente a una parábola que sea paralela a una recta dada. Cambia los parámetros y observa cómo se actualizan los resultados automáticamente.</p>
+<div class="wrap">
+
+  <div class="eyebrow">Geometría analítica · Rectas tangentes</div>
+  <h1>Tangente <em>paralela</em> a una recta dada</h1>
+  <p class="lede">Ajusta los coeficientes de la parábola y de la recta para ver cómo cambia, paso a paso, la ecuación de la tangente que corre paralela a ella.</p>
+
+  <div class="statement">
+    <div class="statement-item">
+      <span class="statement-label">Curva</span>
+      <span class="statement-eq parabola" id="eq-parabola">y = 2x² − 9x − 1</span>
+    </div>
+    <div class="statement-item">
+      <span class="statement-label">Recta de referencia</span>
+      <span class="statement-eq line" id="eq-line">x + y = 6</span>
+    </div>
+  </div>
+
+  <div class="grid">
+
+    <!-- LEFT: controls + steps -->
+    <div>
+      <div class="panel" style="margin-bottom:24px;">
+        <h2>Parámetros</h2>
+        <p class="sub">Define la parábola y = ax² + bx + c, y la recta Ax + By = C.</p>
+
+        <div class="control-group">
+          <div class="control-title"><span class="dot teal"></span>Parábola y = ax² + bx + c</div>
+          <div class="slider-row">
+            <label>a</label>
+            <input type="range" id="a" min="-5" max="5" step="0.5" value="2">
+            <div class="slider-val" id="a-val">2</div>
+          </div>
+          <div class="slider-row">
+            <label>b</label>
+            <input type="range" id="b" min="-15" max="15" step="0.5" value="-9">
+            <div class="slider-val" id="b-val">-9</div>
+          </div>
+          <div class="slider-row">
+            <label>c</label>
+            <input type="range" id="c" min="-15" max="15" step="0.5" value="-1">
+            <div class="slider-val" id="c-val">-1</div>
+          </div>
         </div>
 
-        <div class="content">
-            <!-- Panel 1: Ecuación de la Parábola -->
-            <div class="panel">
-                <h2>🔵 Parábola: y = ax² + bx + c</h2>
-
-                <div class="input-group">
-                    <label>Coeficiente a:</label>
-                    <input type="number" id="parabolaA" value="2" step="0.1" oninput="actualizar()">
-                </div>
-
-                <div class="input-group">
-                    <label>Coeficiente b:</label>
-                    <input type="number" id="parabolaB" value="-9" step="0.1" oninput="actualizar()">
-                </div>
-
-                <div class="input-group">
-                    <label>Coeficiente c:</label>
-                    <input type="number" id="parabolaC" value="-1" step="0.1" oninput="actualizar()">
-                </div>
-
-                <div class="equation-display" id="parabolaDisplay">
-                    y = 2x² - 9x - 1
-                </div>
-
-                <button onclick="actualizar()">Actualizar</button>
-            </div>
-
-            <!-- Panel 2: Ecuación de la Recta -->
-            <div class="panel">
-                <h2>🔴 Recta Dada: Ax + By = C</h2>
-
-                <div class="input-group">
-                    <label>Coeficiente A:</label>
-                    <input type="number" id="rectaA" value="1" step="0.1" oninput="actualizar()">
-                </div>
-
-                <div class="input-group">
-                    <label>Coeficiente B:</label>
-                    <input type="number" id="rectaB" value="1" step="0.1" oninput="actualizar()">
-                </div>
-
-                <div class="input-group">
-                    <label>Coeficiente C:</label>
-                    <input type="number" id="rectaC" value="6" step="0.1" oninput="actualizar()">
-                </div>
-
-                <div class="equation-display" id="rectaDisplay">
-                    x + y = 6
-                </div>
-
-                <button onclick="actualizar()">Actualizar</button>
-            </div>
+        <div class="control-group">
+          <div class="control-title"><span class="dot coral"></span>Recta Ax + By = C</div>
+          <div class="slider-row">
+            <label>A</label>
+            <input type="range" id="A" min="-5" max="5" step="0.5" value="1">
+            <div class="slider-val" id="A-val">1</div>
+          </div>
+          <div class="slider-row">
+            <label>B</label>
+            <input type="range" id="B" min="-5" max="5" step="0.5" value="1">
+            <div class="slider-val" id="B-val">1</div>
+          </div>
+          <div class="slider-row">
+            <label>C</label>
+            <input type="range" id="C" min="-20" max="20" step="0.5" value="6">
+            <div class="slider-val" id="C-val">6</div>
+          </div>
         </div>
 
-        <!-- Gráfica -->
-        <div class="graph-section">
-            <h2>📈 Visualización Gráfica</h2>
-            <svg id="graph" viewBox="-50 -50 500 500" style="border: 1px solid #e5e7eb; border-radius: 8px;">
-                <defs>
-                    <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse">
-                        <path d="M 30 0 L 0 0 0 30" fill="none" stroke="#e5e7eb" stroke-width="0.5"/>
-                    </pattern>
-                </defs>
+        <div id="error-slot"></div>
+      </div>
 
-                <rect width="500" height="500" fill="#fafbfc"/>
-                <rect width="500" height="500" fill="url(#grid)"/>
-
-                <!-- Ejes -->
-                <line x1="0" y1="250" x2="500" y2="250" stroke="#1f2937" stroke-width="2"/>
-                <line x1="250" y1="0" x2="250" y2="500" stroke="#1f2937" stroke-width="2"/>
-
-                <!-- Etiquetas -->
-                <text x="470" y="240" font-size="14" fill="#1f2937" font-weight="600">X</text>
-                <text x="250" y="20" font-size="14" fill="#1f2937" font-weight="600">Y</text>
-
-                <!-- Parábola -->
-                <path id="parabolaPath" d="" fill="none" stroke="#667eea" stroke-width="2.5" opacity="0.8"/>
-
-                <!-- Recta dada -->
-                <line id="rectagivenLine" x1="0" y1="0" x2="500" y2="500" stroke="#ef4444" stroke-width="2" opacity="0.7" stroke-dasharray="5,5"/>
-
-                <!-- Recta tangente -->
-                <line id="tangentLine" x1="0" y1="0" x2="500" y2="500" stroke="#10b981" stroke-width="2.5" opacity="0.8"/>
-
-                <!-- Punto de tangencia -->
-                <circle id="tangentPoint" cx="250" cy="250" r="5" fill="#764ba2" stroke="white" stroke-width="2"/>
-
-                <!-- Leyenda -->
-                <g transform="translate(10, 10)">
-                    <line x1="0" y1="5" x2="30" y2="5" stroke="#667eea" stroke-width="2.5"/>
-                    <text x="40" y="10" font-size="11" fill="#1f2937">Parábola</text>
-
-                    <line x1="0" y1="30" x2="30" y2="30" stroke="#ef4444" stroke-width="2" stroke-dasharray="5,5"/>
-                    <text x="40" y="35" font-size="11" fill="#1f2937">Recta dada</text>
-
-                    <line x1="0" y1="55" x2="30" y2="55" stroke="#10b981" stroke-width="2.5"/>
-                    <text x="40" y="60" font-size="11" fill="#1f2937">Recta tangente</text>
-
-                    <circle cx="15" cy="80" r="3" fill="#764ba2"/>
-                    <text x="40" y="85" font-size="11" fill="#1f2937">Punto tangente</text>
-                </g>
-            </svg>
+      <div class="panel" id="steps-panel">
+        <h2>Solución paso a paso</h2>
+        <p class="sub">El razonamiento se recalcula en vivo con tus valores.</p>
+        <div id="steps"></div>
+        <div class="result-card">
+          <div class="rc-label">Ecuación de la recta tangente</div>
+          <div class="rc-eq" id="final-answer">y = −x − 9</div>
         </div>
-
-        <!-- Resultados -->
-        <div class="results-section">
-            <div class="result-card">
-                <h3>📌 Pendiente de la Recta Dada</h3>
-                <div class="result-value" id="slopeGiven">m = -1</div>
-                <div style="font-size: 12px; color: #6b7280; line-height: 1.5;">
-                    Calculada como: m = -A/B
-                </div>
-            </div>
-
-            <div class="result-card">
-                <h3>📍 Derivada de la Parábola</h3>
-                <div class="result-value" id="derivativeDisplay">f'(x) = 4x - 9</div>
-                <div style="font-size: 12px; color: #6b7280; line-height: 1.5;">
-                    d/dx(ax² + bx + c) = 2ax + b
-                </div>
-            </div>
-
-            <div class="result-card">
-                <h3>✓ Punto de Tangencia</h3>
-                <div class="result-value" id="tangentPointResult">x = 2, y = -11</div>
-                <div style="font-size: 12px; color: #6b7280; line-height: 1.5;">
-                    Solución: f'(x₀) = m
-                </div>
-            </div>
-
-            <div class="result-card">
-                <h3>✏️ Ecuación de la Recta Tangente</h3>
-                <div class="result-value" id="tangentEquation">x + y = -9</div>
-                <div style="font-size: 12px; color: #6b7280; line-height: 1.5;">
-                    Forma: y - y₀ = m(x - x₀)
-                </div>
-            </div>
-        </div>
-
-        <!-- Solución Paso a Paso -->
-        <div class="solution-section">
-            <h2>🎓 Solución Paso a Paso</h2>
-            <div id="solutionSteps"></div>
-        </div>
+      </div>
     </div>
 
-    <script>
-        function actualizar() {
-            const a = parseFloat(document.getElementById('parabolaA').value);
-            const b = parseFloat(document.getElementById('parabolaB').value);
-            const c = parseFloat(document.getElementById('parabolaC').value);
-            const rectA = parseFloat(document.getElementById('rectaA').value);
-            const rectB = parseFloat(document.getElementById('rectaB').value);
-            const rectC = parseFloat(document.getElementById('rectaC').value);
+    <!-- RIGHT: graph -->
+    <div class="panel graph-panel">
+      <h2>Vista gráfica</h2>
+      <p class="sub">Parábola, recta de referencia y tangente en el punto de tangencia.</p>
+      <svg id="graph" viewBox="0 0 560 500" xmlns="http://www.w3.org/2000/svg"></svg>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-swatch" style="background:var(--teal);"></span>Parábola</div>
+        <div class="legend-item"><span class="legend-swatch" style="background:var(--coral);"></span>Recta dada</div>
+        <div class="legend-item"><span class="legend-swatch" style="background:var(--gold);"></span>Tangente</div>
+      </div>
+      <div class="slope-badge">
+        <span>pendiente recta <span class="m" id="badge-mline">−1</span></span>
+        <span class="eqmark">=</span>
+        <span>pendiente tangente <span class="m2" id="badge-mtan">−1</span></span>
+      </div>
+    </div>
 
-            const parabolaText = formatearParabola(a, b, c);
-            const rectaText = formatearRecta(rectA, rectB, rectC);
-            document.getElementById('parabolaDisplay').textContent = parabolaText;
-            document.getElementById('rectaDisplay').textContent = rectaText;
+  </div>
 
-            const slopeGiven = rectB !== 0 ? -rectA / rectB : null;
-            if (slopeGiven === null) {
-                alert('La recta debe tener coeficiente B ≠ 0');
-                return;
-            }
-            document.getElementById('slopeGiven').innerHTML = `m = ${slopeGiven.toFixed(3)}`;
+  <footer>y = ax² + bx + c &nbsp;·&nbsp; Ax + By = C &nbsp;·&nbsp; paralelismo ⇒ pendientes iguales</footer>
+</div>
 
-            const derivativeText = formatearDerivada(a, b);
-            document.getElementById('derivativeDisplay').textContent = derivativeText;
+<script>
+const ids = ['a','b','c','A','B','C'];
+const state = {};
+ids.forEach(id=>{
+  const el = document.getElementById(id);
+  state[id] = parseFloat(el.value);
+  el.addEventListener('input', ()=>{
+    state[id] = parseFloat(el.value);
+    document.getElementById(id+'-val').textContent = fmtNum(state[id]);
+    render();
+  });
+  document.getElementById(id+'-val').textContent = fmtNum(state[id]);
+});
 
-            if (2 * a === 0) {
-                alert('El coeficiente a no puede ser 0');
-                return;
-            }
-            const x0 = (slopeGiven - b) / (2 * a);
-            const y0 = a * x0 * x0 + b * x0 + c;
+function fmtNum(n){
+  n = Math.round(n*1000)/1000;
+  if(Object.is(n,-0)) n = 0;
+  return (n % 1 === 0) ? n.toString() : n.toFixed(2).replace(/0+$/,'').replace(/\.$/,'');
+}
 
-            document.getElementById('tangentPointResult').innerHTML = 
-                `x = ${x0.toFixed(3)}, y = ${y0.toFixed(3)}`;
+// pretty-print a coefficient*variable term, handling sign and 1/-1
+function term(coef, variable, isFirst){
+  const n = Math.round(coef*1000)/1000;
+  if(n === 0) return '';
+  const sign = n < 0 ? '−' : (isFirst ? '' : '+');
+  const abs = Math.abs(n);
+  const coefStr = (abs === 1 && variable !== '') ? '' : fmtNum(abs);
+  const sep = isFirst ? sign : ' ' + sign + ' ';
+  return sep + coefStr + variable;
+}
 
-            const tangentA = slopeGiven;
-            const tangentB = -1;
-            const tangentC = slopeGiven * (-x0) - y0;
+function polyString(a,b,c){
+  let s = '';
+  let first = true;
+  if(a !== 0){ s += term(a,'x²',first); first = false; }
+  if(b !== 0){ s += term(b,'x',first); first = false; }
+  if(c !== 0){ s += term(c,'',first); first = false; }
+  if(s === '') s = '0';
+  s = s.replace(/^−/, '−').replace(/^\+ /,'');
+  return s.trim();
+}
 
-            const tangentEquation = formatearRecta(tangentA, tangentB, tangentC);
-            document.getElementById('tangentEquation').innerHTML = tangentEquation;
+function lineString(A,B,C){
+  let s = '';
+  let first = true;
+  if(A !== 0){ s += term(A,'x',first); first = false; }
+  if(B !== 0){ s += term(B,'y',first); first = false; }
+  if(s === '') s = '0';
+  return s.trim() + ' = ' + fmtNum(C);
+}
 
-            dibujarGrafica(a, b, c, rectA, rectB, rectC, x0, y0, slopeGiven, tangentA, tangentB, tangentC);
+function slopeInterceptString(m,n){
+  let s = 'y = ';
+  s += term(m,'x',true);
+  if(n !== 0){ s += term(n,'',false); }
+  else if (m===0) { s += fmtNum(0); }
+  return s.replace('y = +','y = ');
+}
 
-            generarSolucion(a, b, c, rectA, rectB, rectC, slopeGiven, x0, y0, tangentA, tangentB, tangentC, 
-                           parabolaText, rectaText, derivativeText, tangentEquation);
-        }
+function render(){
+  const {a,b,c,A,B,C} = state;
+  document.getElementById('eq-parabola').textContent = 'y = ' + polyString(a,b,c);
+  document.getElementById('eq-line').textContent = lineString(A,B,C);
 
-        function formatearParabola(a, b, c) {
-            let text = 'y = ';
-            text += a !== 0 ? `${a}x²` : '';
-            text += b > 0 ? ` + ${b}x` : b < 0 ? ` - ${Math.abs(b)}x` : '';
-            text += c > 0 ? ` + ${c}` : c < 0 ? ` - ${Math.abs(c)}` : '';
-            return text;
-        }
+  const errSlot = document.getElementById('error-slot');
+  const stepsPanel = document.getElementById('steps-panel');
+  errSlot.innerHTML = '';
 
-        function formatearRecta(A, B, C) {
-            return `${A.toFixed(3)}x + ${B.toFixed(3)}y = ${C.toFixed(3)}`;
-        }
+  if(a === 0){
+    errSlot.innerHTML = '<div class="error-box">Con a = 0 la curva deja de ser una parábola (sería una recta). Elige un valor de a distinto de 0.</div>';
+    stepsPanel.style.display = 'none';
+    document.getElementById('graph').innerHTML = '';
+    return;
+  }
+  if(B === 0){
+    errSlot.innerHTML = '<div class="error-box">Con B = 0 la recta Ax + By = C es vertical (pendiente indefinida). Ninguna tangente de esta parábola puede ser paralela a una recta vertical. Elige B ≠ 0.</div>';
+    stepsPanel.style.display = 'none';
+    document.getElementById('graph').innerHTML = '';
+    return;
+  }
+  stepsPanel.style.display = '';
 
-        function formatearDerivada(a, b) {
-            const coefA = 2 * a;
-            let text = "f'(x) = ";
-            text += coefA !== 0 ? `${coefA}x` : '';
-            text += b > 0 ? ` + ${b}` : b < 0 ? ` - ${Math.abs(b)}` : '';
-            return text;
-        }
+  const mLine = -A/B;
+  const x0 = (mLine - b) / (2*a);
+  const y0 = a*x0*x0 + b*x0 + c;
+  const nTan = y0 - mLine*x0;
 
-        function dibujarGrafica(a, b, c, rectA, rectB, rectC, x0, y0, slopeGiven, tangentA, tangentB, tangentC) {
-            let parabolaPath = '';
-            for (let x = -100; x <= 100; x += 2) {
-                const y = a * x * x + b * x + c;
-                const svgX = 250 + x * 2;
-                const svgY = 250 - y * 2;
-                parabolaPath += (parabolaPath ? 'L' : 'M') + svgX + ' ' + svgY;
-            }
-            document.getElementById('parabolaPath').setAttribute('d', parabolaPath);
+  // Steps
+  const steps = document.getElementById('steps');
+  steps.innerHTML = `
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h3>Pendiente de la recta de referencia</h3>
+        <p>Despejamos y de <span class="eqline">${lineString(A,B,C)}</span> para leer su pendiente.</p>
+        <div class="eqline">${slopeInterceptString(mLine, C/B)}</div>
+        <div class="eqline result">m = ${fmtNum(mLine)}</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h3>Derivada e igualdad de pendientes</h3>
+        <p>La pendiente de la tangente en cualquier punto x es y′. Como debe ser paralela, la igualamos a m.</p>
+        <div class="eqline">y′ = ${term(2*a,'x',true).trim()}${term(b,'',false)}</div>
+        <div class="eqline">${term(2*a,'x',true).trim()}${term(b,'',false)} = ${fmtNum(mLine)}</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h3>Punto de tangencia</h3>
+        <p>Resolvemos para x, y evaluamos en la parábola para obtener y.</p>
+        <div class="eqline">x₀ = ${fmtNum(x0)}</div>
+        <div class="eqline">y₀ = ${fmtNum(y0)}</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h3>Ecuación de la tangente</h3>
+        <p>Usamos punto-pendiente con (x₀, y₀) y m, y simplificamos.</p>
+        <div class="eqline">y − (${fmtNum(y0)}) = ${fmtNum(mLine)}(x − (${fmtNum(x0)}))</div>
+      </div>
+    </div>
+  `;
 
-            if (rectB !== 0) {
-                const y1 = (rectC - rectA * (-100)) / rectB;
-                const y2 = (rectC - rectA * 100) / rectB;
-                const svgX1 = 250 - 100 * 2;
-                const svgY1 = 250 - y1 * 2;
-                const svgX2 = 250 + 100 * 2;
-                const svgY2 = 250 - y2 * 2;
-                document.getElementById('rectagivenLine').setAttribute('x1', svgX1);
-                document.getElementById('rectagivenLine').setAttribute('y1', svgY1);
-                document.getElementById('rectagivenLine').setAttribute('x2', svgX2);
-                document.getElementById('rectagivenLine').setAttribute('y2', svgY2);
-            }
+  document.getElementById('final-answer').textContent = slopeInterceptString(mLine, nTan);
+  document.getElementById('badge-mline').textContent = fmtNum(mLine);
+  document.getElementById('badge-mtan').textContent = fmtNum(mLine);
 
-            if (tangentB !== 0) {
-                const y1 = (tangentC - tangentA * (-100)) / tangentB;
-                const y2 = (tangentC - tangentA * 100) / tangentB;
-                const svgX1 = 250 - 100 * 2;
-                const svgY1 = 250 - y1 * 2;
-                const svgX2 = 250 + 100 * 2;
-                const svgY2 = 250 - y2 * 2;
-                document.getElementById('tangentLine').setAttribute('x1', svgX1);
-                document.getElementById('tangentLine').setAttribute('y1', svgY1);
-                document.getElementById('tangentLine').setAttribute('x2', svgX2);
-                document.getElementById('tangentLine').setAttribute('y2', svgY2);
-            }
+  drawGraph(a,b,c,mLine,C/B,x0,y0,nTan);
+}
 
-            const svgX = 250 + x0 * 2;
-            const svgY = 250 - y0 * 2;
-            document.getElementById('tangentPoint').setAttribute('cx', svgX);
-            document.getElementById('tangentPoint').setAttribute('cy', svgY);
-        }
+function drawGraph(a,b,c,mLine,bLine,x0,y0,nTan){
+  const svg = document.getElementById('graph');
+  const W = 560, H = 500;
+  const vertexX = -b/(2*a);
 
-        function generarSolucion(a, b, c, rectA, rectB, rectC, slopeGiven, x0, y0, tangentA, tangentB, tangentC,
-                                parabolaText, rectaText, derivativeText, tangentEquation) {
-            const html = `
-                <div class="step">
-                    <div class="step-title">Paso 1: Ecuación de la Parábola</div>
-                    <div class="formula-box">${parabolaText}</div>
-                </div>
+  let xs = [vertexX, x0, vertexX-3.5, vertexX+3.5, x0-2.5, x0+2.5];
+  let xMin = Math.min(...xs) - 1;
+  let xMax = Math.max(...xs) + 1;
+  if(xMax - xMin < 6){ const mid=(xMax+xMin)/2; xMin=mid-3; xMax=mid+3; }
 
-                <div class="step">
-                    <div class="step-title">Paso 2: Recta Dada</div>
-                    <div class="formula-box">${rectaText}</div>
-                </div>
+  const samples = [];
+  const N = 80;
+  for(let i=0;i<=N;i++){
+    const x = xMin + (xMax-xMin)*i/N;
+    samples.push([x, a*x*x+b*x+c]);
+  }
+  let yMin = Math.min(...samples.map(p=>p[1]));
+  let yMax = Math.max(...samples.map(p=>p[1]));
+  const lineYAtMin = mLine*xMin + bLine, lineYAtMax = mLine*xMax + bLine;
+  yMin = Math.min(yMin, lineYAtMin, lineYAtMax, y0);
+  yMax = Math.max(yMax, lineYAtMin, lineYAtMax, y0);
+  const pad = (yMax-yMin)*0.12 || 2;
+  yMin -= pad; yMax += pad;
 
-                <div class="step">
-                    <div class="step-title">Paso 3: Calcular la Pendiente de la Recta Dada</div>
-                    <div class="step-content">
-                        De la ecuación Ax + By = C, obtenemos: y = -A/B·x + C/B<br>
-                        Por lo tanto, la pendiente es: m = -A/B
-                    </div>
-                    <div class="formula-box">m = -${rectA}/${rectB} = ${slopeGiven.toFixed(3)}</div>
-                </div>
+  const padPx = 42;
+  const sx = x => padPx + (x-xMin)/(xMax-xMin) * (W-2*padPx);
+  const sy = y => (H-padPx) - (y-yMin)/(yMax-yMin) * (H-2*padPx);
 
-                <div class="step">
-                    <div class="step-title">Paso 4: Derivada de la Parábola</div>
-                    <div class="step-content">
-                        Si y = ax² + bx + c, entonces f'(x) = 2ax + b
-                    </div>
-                    <div class="formula-box">${derivativeText}</div>
-                </div>
+  // grid step: choose "nice" step
+  function niceStep(range){
+    const raw = range/8;
+    const mag = Math.pow(10, Math.floor(Math.log10(raw)));
+    const norm = raw/mag;
+    let step;
+    if(norm < 1.5) step = 1; else if(norm < 3.5) step = 2; else if(norm < 7.5) step = 5; else step = 10;
+    return step*mag;
+  }
+  const stepX = niceStep(xMax-xMin);
+  const stepY = niceStep(yMax-yMin);
 
-                <div class="step">
-                    <div class="step-title">Paso 5: Igualar la Derivada a la Pendiente</div>
-                    <div class="step-content">
-                        Para que la recta tangente sea paralela a la recta dada, sus pendientes deben ser iguales:
-                    </div>
-                    <div class="formula-box">f'(x₀) = m<br>
-                    ${2*a}x₀ + ${b} = ${slopeGiven.toFixed(3)}
-                    </div>
-                </div>
+  let grid = '';
+  for(let gx = Math.ceil(xMin/stepX)*stepX; gx <= xMax; gx += stepX){
+    grid += `<line x1="${sx(gx)}" y1="${padPx}" x2="${sx(gx)}" y2="${H-padPx}" stroke="var(--grid)" stroke-width="1"/>`;
+  }
+  for(let gy = Math.ceil(yMin/stepY)*stepY; gy <= yMax; gy += stepY){
+    grid += `<line x1="${padPx}" y1="${sy(gy)}" x2="${W-padPx}" y2="${sy(gy)}" stroke="var(--grid)" stroke-width="1"/>`;
+  }
 
-                <div class="step">
-                    <div class="step-title">Paso 6: Resolver para x₀</div>
-                    <div class="formula-box">
-                    ${2*a}x₀ = ${slopeGiven.toFixed(3)} - ${b}<br>
-                    ${2*a}x₀ = ${(slopeGiven - b).toFixed(3)}<br>
-                    x₀ = ${x0.toFixed(3)}
-                    </div>
-                </div>
+  let axes = '';
+  if(xMin <= 0 && xMax >= 0){
+    axes += `<line x1="${sx(0)}" y1="${padPx}" x2="${sx(0)}" y2="${H-padPx}" stroke="#4A5090" stroke-width="1.5"/>`;
+  }
+  if(yMin <= 0 && yMax >= 0){
+    axes += `<line x1="${padPx}" y1="${sy(0)}" x2="${W-padPx}" y2="${sy(0)}" stroke="#4A5090" stroke-width="1.5"/>`;
+  }
 
-                <div class="step">
-                    <div class="step-title">Paso 7: Calcular y₀</div>
-                    <div class="step-content">
-                        Sustituir x₀ en la ecuación de la parábola:
-                    </div>
-                    <div class="formula-box">
-                    y₀ = ${a}·(${x0.toFixed(3)})² + ${b}·${x0.toFixed(3)} + ${c}<br>
-                    y₀ = ${(a*x0*x0).toFixed(3)} + ${(b*x0).toFixed(3)} + ${c}<br>
-                    y₀ = ${y0.toFixed(3)}
-                    </div>
-                </div>
+  const parabolaPath = 'M ' + samples.map(p=>`${sx(p[0]).toFixed(1)},${sy(p[1]).toFixed(1)}`).join(' L ');
+  const linePath = `M ${sx(xMin)},${sy(lineYAtMin)} L ${sx(xMax)},${sy(lineYAtMax)}`;
 
-                <div class="step">
-                    <div class="step-title">Paso 8: Ecuación de la Recta Tangente</div>
-                    <div class="step-content">
-                        Usamos la forma punto-pendiente: y - y₀ = m(x - x₀)
-                    </div>
-                    <div class="formula-box">
-                    y - (${y0.toFixed(3)}) = ${slopeGiven.toFixed(3)}(x - ${x0.toFixed(3)})<br>
-                    y + ${Math.abs(y0).toFixed(3)} = ${slopeGiven.toFixed(3)}x - ${(slopeGiven*x0).toFixed(3)}<br>
-                    y = ${slopeGiven.toFixed(3)}x - ${((slopeGiven*x0) + y0).toFixed(3)}
-                    </div>
-                </div>
+  const tanSpan = (xMax-xMin)*0.4;
+  const tx1 = x0-tanSpan, tx2 = x0+tanSpan;
+  const tanPath = `M ${sx(tx1)},${sy(mLine*tx1+nTan)} L ${sx(tx2)},${sy(mLine*tx2+nTan)}`;
 
-                <div class="step">
-                    <div class="step-title">Paso 9: Respuesta Final</div>
-                    <div class="formula-box">
-                    Forma general: ${tangentEquation}
-                    </div>
-                </div>
-            `;
-            document.getElementById('solutionSteps').innerHTML = html;
-        }
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.innerHTML = `
+    ${grid}
+    ${axes}
+    <path d="${parabolaPath}" fill="none" stroke="var(--teal)" stroke-width="2.5"/>
+    <path d="${linePath}" fill="none" stroke="var(--coral)" stroke-width="2" stroke-dasharray="6 5"/>
+    <path d="${tanPath}" fill="none" stroke="var(--gold)" stroke-width="2.5"/>
+    <circle cx="${sx(x0)}" cy="${sy(y0)}" r="6" fill="var(--gold)" stroke="#14172B" stroke-width="2">
+      <animate attributeName="r" values="5;8;5" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <text x="${sx(x0)+12}" y="${sy(y0)-10}" fill="var(--gold)" font-family="JetBrains Mono, monospace" font-size="12" font-weight="700">
+      (${fmtNum(x0)}, ${fmtNum(y0)})
+    </text>
+  `;
+}
 
-        actualizar();
-    </script>
+render();
+</script>
 </body>
 </html>
