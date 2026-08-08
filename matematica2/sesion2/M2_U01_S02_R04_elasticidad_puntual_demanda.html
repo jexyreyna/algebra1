@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elasticidad de la demanda</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<style>
+  :root {
+    --text-primary: #0f172a;
+    --text-secondary: #64748b;
+    --text-muted: #94a3b8;
+    --surface-1: #f1f5f9;
+    --surface-card: #ffffff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: linear-gradient(135deg, #0f172a, #134e4a, #0e7490);
+    min-height: 100vh;
+    padding: 2rem 1rem;
+    color: var(--text-primary);
+  }
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    background: var(--surface-card);
+    border-radius: 16px;
+    padding: 1.75rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  }
+  h1 {
+    font-size: 19px;
+    font-weight: 600;
+    text-align: center;
+    margin: 0 0 1.25rem;
+  }
+  .step-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1rem; }
+  .step-card { background: var(--surface-1); border-radius: 12px; padding: 0.85rem; border-left: 3px solid; }
+  .step-label { font-size: 11px; color: var(--text-secondary); font-weight: 600; margin: 0 0 4px; }
+  .step-final { background: #EEEDFE; }
+  .step-final .step-label { color: #534AB7; }
+  .slider-row { display: flex; align-items: center; gap: 12px; margin-bottom: 0.5rem; }
+  .slider-row label { font-size: 14px; color: var(--text-secondary); white-space: nowrap; }
+  input[type="range"] { flex: 1; }
+  #qVal { font-size: 15px; font-weight: 600; min-width: 60px; text-align: right; }
+  .hint { font-size: 12px; color: var(--text-muted); margin: 0 0 0.5rem; }
+  svg { width: 100%; height: auto; margin-top: 0.5rem; display: block; }
+  .results-card { background: var(--surface-1); border-radius: 12px; padding: 1rem; margin-top: 0.75rem; }
+  .results-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(130px,1fr)); gap: 10px; margin-bottom: 10px; }
+  .result-label { font-size: 12px; color: var(--text-secondary); margin: 0; }
+  .result-value { font-size: 17px; font-weight: 600; margin: 0; }
+  #clasif { font-size: 14px; font-weight: 600; margin: 0; padding: 3px 8px; border-radius: 6px; display: inline-block; }
+  #interpretation { font-size: 14px; line-height: 1.7; margin: 0; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Elasticidad de la demanda: p = 240 − 2√q</h1>
+
+  <div class="step-list">
+    <div class="step-card" style="border-left-color:#888780;">
+      <p class="step-label">Paso 1 · función de demanda</p>
+      <div class="ktx" data-tex="p = 240 - 2\sqrt{q}" style="font-size:16px;"></div>
+    </div>
+    <div class="step-card" style="border-left-color:#378ADD;">
+      <p class="step-label">Paso 2 · derivamos p respecto a q</p>
+      <div class="ktx" data-tex="\dfrac{dp}{dq} = -2\cdot\dfrac{1}{2\sqrt{q}} = -\dfrac{1}{\sqrt{q}}" style="font-size:16px;"></div>
+    </div>
+    <div class="step-card" style="border-left-color:#378ADD;">
+      <p class="step-label">Paso 3 · invertimos para obtener dq/dp</p>
+      <div class="ktx" data-tex="\dfrac{dq}{dp} = -\sqrt{q}" style="font-size:16px;"></div>
+    </div>
+    <div class="step-card" style="border-left-color:#1D9E75;">
+      <p class="step-label">Paso 4 · aplicamos la fórmula de elasticidad</p>
+      <div class="ktx" data-tex="E_d = \dfrac{dq}{dp}\cdot\dfrac{p}{q} = -\sqrt{q}\cdot\dfrac{240-2\sqrt{q}}{q} = -\dfrac{240-2\sqrt{q}}{\sqrt{q}}" style="font-size:16px;"></div>
+    </div>
+    <div class="step-card step-final">
+      <p class="step-label">Paso 5 · simplificamos: modelo final</p>
+      <div class="ktx" data-tex="E_d(q) = 2 - \dfrac{240}{\sqrt{q}}" style="font-size:19px;color:#26215C;"></div>
+    </div>
+  </div>
+
+  <div class="slider-row">
+    <label for="qSlider">q</label>
+    <input type="range" id="qSlider" min="400" max="14000" value="6400" step="400">
+    <span id="qVal">6400</span>
+  </div>
+  <p class="hint">Paso de 400 en 400, para que el control incluya exactamente q = 6400, el punto de elasticidad unitaria.</p>
+
+  <svg id="plot" viewBox="0 0 640 260"></svg>
+
+  <div class="results-card">
+    <div class="results-grid">
+      <div>
+        <p class="result-label">p(q)</p>
+        <p id="pVal" class="result-value">80.00</p>
+      </div>
+      <div>
+        <p class="result-label">E_d(q)</p>
+        <p id="eVal" class="result-value">-1.00</p>
+      </div>
+      <div>
+        <p class="result-label">Clasificación</p>
+        <p id="clasif">Unitaria</p>
+      </div>
+    </div>
+    <p id="interpretation"></p>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script>
+(function(){
+  document.querySelectorAll('.ktx').forEach(function(el){
+    try { katex.render(el.getAttribute('data-tex'), el, { throwOnError:false }); }
+    catch(e){ el.textContent = el.getAttribute('data-tex'); }
+  });
+
+  var W=640,H=260,mL=45,mR=15,mT=15,mB=30;
+  var qMin=400,qMax=14000,eMin=-10,eMax=1;
+  function sx(q){ return mL + (q-qMin)/(qMax-qMin)*(W-mL-mR); }
+  function sy(e){ return H-mB - (e-eMin)/(eMax-eMin)*(H-mT-mB); }
+  function Ed(q){ return 2 - 240/Math.sqrt(q); }
+  function P(q){ return 240 - 2*Math.sqrt(q); }
+  function r2(n){ return Math.round(n*100)/100; }
+
+  var svg=document.getElementById('plot');
+  var ns='http://www.w3.org/2000/svg';
+  function el(tag,attrs){ var e=document.createElementNS(ns,tag); for(var k in attrs) e.setAttribute(k,attrs[k]); return e; }
+
+  for (var ge=-10; ge<=0; ge+=2){
+    svg.appendChild(el('line',{x1:mL,y1:sy(ge),x2:W-mR,y2:sy(ge),stroke:'#e1e0d9','stroke-width':1}));
+    var t=el('text',{x:mL-8,y:sy(ge)+4,'text-anchor':'end','font-size':10,fill:'#898781'}); t.textContent=ge; svg.appendChild(t);
+  }
+  [2000,4000,6400,8000,10000,12000,14000].forEach(function(qv){
+    var t=el('text',{x:sx(qv),y:H-mB+16,'text-anchor':'middle','font-size':10,fill:'#898781'}); t.textContent=qv; svg.appendChild(t);
+  });
+  svg.appendChild(el('line',{x1:mL,y1:H-mB,x2:W-mR,y2:H-mB,stroke:'#c3c2b7','stroke-width':1}));
+  svg.appendChild(el('line',{x1:mL,y1:mT,x2:mL,y2:H-mB,stroke:'#c3c2b7','stroke-width':1}));
+
+  svg.appendChild(el('line',{x1:mL,y1:sy(-1),x2:W-mR,y2:sy(-1),stroke:'#EF9F27','stroke-width':1.3,'stroke-dasharray':'4,3'}));
+  var unitLbl=el('text',{x:W-mR,y:sy(-1)-4,'text-anchor':'end','font-size':10,fill:'#854F0B'});
+  unitLbl.textContent = 'E = -1 (unitaria, q = 6400)';
+  svg.appendChild(unitLbl);
+
+  var pts=[];
+  for (var q=qMin; q<=qMax; q+=100){ pts.push(sx(q)+','+sy(Ed(q))); }
+  svg.appendChild(el('polyline',{points:pts.join(' '),fill:'none',stroke:'#5F5E5A','stroke-width':2}));
+
+  var marker = el('circle',{r:6,stroke:'white','stroke-width':1.5});
+  svg.appendChild(marker);
+  var vline = el('line',{stroke:'#5F5E5A','stroke-width':1,'stroke-dasharray':'3,3'});
+  svg.insertBefore(vline, marker);
+
+  var slider = document.getElementById('qSlider');
+
+  function update(q){
+    var p = P(q);
+    var e = Ed(q);
+    var absE = Math.abs(e);
+    var color, label;
+    if (absE > 1.02){ color = '#D85A30'; label = 'Elástica'; }
+    else if (absE < 0.98){ color = '#1D9E75'; label = 'Inelástica'; }
+    else { color = '#EF9F27'; label = 'Unitaria'; }
+
+    marker.setAttribute('cx', sx(q)); marker.setAttribute('cy', sy(e)); marker.setAttribute('fill', color);
+    vline.setAttribute('x1', sx(q)); vline.setAttribute('y1', sy(e));
+    vline.setAttribute('x2', sx(q)); vline.setAttribute('y2', H-mB);
+
+    document.getElementById('qVal').textContent = q;
+    document.getElementById('pVal').textContent = r2(p).toFixed(2);
+    document.getElementById('eVal').textContent = r2(e).toFixed(2);
+    var clasif = document.getElementById('clasif');
+    clasif.textContent = label;
+    clasif.style.color = color;
+    clasif.style.background = color === '#D85A30' ? '#FAECE7' : (color === '#1D9E75' ? '#E1F5EE' : '#FAEEDA');
+
+    var texto = absE > 1.02
+      ? 'En q = ' + q + ', la demanda es elástica: un cambio de 1% en el precio produce un cambio de ' + Math.abs(r2(e)) + '% en la cantidad demandada, en sentido contrario.'
+      : (absE < 0.98
+        ? 'En q = ' + q + ', la demanda es inelástica: la cantidad demandada reacciona menos que proporcionalmente ante cambios en el precio.'
+        : 'En q = ' + q + ', la demanda tiene elasticidad unitaria: el cambio porcentual en cantidad iguala al cambio porcentual en precio. Este es el punto donde el ingreso total pq es máximo.');
+    document.getElementById('interpretation').textContent = texto;
+  }
+
+  slider.addEventListener('input', function(){ update(parseInt(this.value)); });
+  update(parseInt(slider.value));
+})();
+</script>
+</body>
+</html>
